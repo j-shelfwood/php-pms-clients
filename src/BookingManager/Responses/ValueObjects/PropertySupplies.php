@@ -1,9 +1,8 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use Tightenco\Collect\Support\Collection;
 
 class PropertySupplies
 {
@@ -18,11 +17,11 @@ class PropertySupplies
     public static function fromXml(Collection|array $data): self
     {
         return new self(
-            coffee: (bool) Arr::get($data, 'coffee', false),
-            tea: (bool) Arr::get($data, 'tea', false),
-            milk: (bool) Arr::get($data, 'milk', false),
-            sugar: (bool) Arr::get($data, 'sugar', false),
-            dishwasherTablets: (bool) Arr::get($data, 'dishwasher_tablets', false)
+            coffee: (bool) ($data instanceof Collection ? $data->get('coffee') : ($data['coffee'] ?? false)),
+            tea: (bool) ($data instanceof Collection ? $data->get('tea') : ($data['tea'] ?? false)),
+            milk: (bool) ($data instanceof Collection ? $data->get('milk') : ($data['milk'] ?? false)),
+            sugar: (bool) ($data instanceof Collection ? $data->get('sugar') : ($data['sugar'] ?? false)),
+            dishwasherTablets: (bool) ($data instanceof Collection ? $data->get('dishwasher_tablets') : ($data['dishwasher_tablets'] ?? false))
         );
     }
 }

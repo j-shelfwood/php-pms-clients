@@ -1,12 +1,10 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon; // Keep Carbon for date parsing
+use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
 
-// Note: This class was already extracted but might have been inside PropertyInfoResponse before.
-// Ensure it's standalone and correctly namespaced.
 class PropertyImageResponse
 {
     public function __construct(
@@ -16,15 +14,29 @@ class PropertyImageResponse
         public readonly ?Carbon $modified
     ) {}
 
-    public static function fromXml(array|\Illuminate\Support\Collection $data): self
+    public static function fromXml(Collection|array $data): self
     {
+        $attributes = $data instanceof Collection ? $data->get('@attributes', []) : ($data['@attributes'] ?? []);
+        if ($attributes instanceof Collection) { // Ensure attributes is an array for consistent access
+            $attributes = $attributes->all();
+        }
+
+        $name = (string) ($attributes['name'] ?? ($data instanceof Collection ? $data->get('name') : ($data['name'] ?? 'default.jpg')));
+        $url = (string) ($attributes['url'] ?? ($data instanceof Collection ? $data->get('url') : ($data['url'] ?? '')));
+
+        $descriptionValue = $data instanceof Collection ? $data->get('#text') : ($data['#text'] ?? ($data[0] ?? ''));
+        if (is_array($descriptionValue)) { // Handle cases where #text might be an array
+            $descriptionValue = $descriptionValue[0] ?? '';
+        }
+        $description = (string) $descriptionValue;
+
+        $modifiedDate = $attributes['modified'] ?? null;
+
         return new self(
-            name: (string) Arr::get($data, '@attributes.name', Arr::get($data, 'name', 'default.jpg')),
-            url: (string) Arr::get($data, '@attributes.url', Arr::get($data, 'url', '')),
-            description: (string) (Arr::get($data, '#text') ?? Arr::get($data, '', '')),
-            modified: Arr::has($data, '@attributes.modified') ? Carbon::parse(Arr::get($data, '@attributes.modified')) : null
+            name: $name,
+            url: $url,
+            description: $description,
+            modified: $modifiedDate ? Carbon::parse($modifiedDate) : null
         );
     }
-
-    // No toArray for strict DTO/VO unity
 }

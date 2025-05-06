@@ -1,13 +1,13 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses;
 
 use Exception;
-use Illuminate\Support\Collection; // Added for logging
-use Illuminate\Support\Facades\Log; // Added for exception handling
-use Domain\Connections\BookingManager\Responses\ValueObjects\CalendarDayInfo;
+use Tightenco\Collect\Support\Collection;
+use Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects\CalendarDayInfo;
+use Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects\CalendarRate;
+use Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects\CalendarTax;
 
-// Add use statements for the extracted classes
 class CalendarResponse
 {
     /** @var Collection<int, CalendarDayInfo> */
@@ -30,59 +30,55 @@ class CalendarResponse
     public static function map(Collection|array $rawResponse): self
     {
         try {
-            // The structure might be nested under 'calendars' -> 'calendar'
-            $calendarData = collect($rawResponse->get('calendar'));
-            if ($calendarData->isEmpty() && $rawResponse->has('calendars.calendar')) {
-                // Handle cases where it's nested like <calendars><calendar>...</calendar></calendars>
-                $calendarData = collect($rawResponse->get('calendars.calendar'));
-            } elseif ($calendarData->isEmpty() && $rawResponse->has('calendars') && is_array($rawResponse->get('calendars'))) {
-                // Handle cases like <calendars><calendar>...</calendar><calendar>...</calendar></calendars> - This shouldn't happen for single property calendar but check anyway
-                // This case is less likely for a single property calendar response, usually it's one <calendar> tag.
-                // If multiple calendars were possible, logic to handle an array here would be needed.
-                Log::warning('CalendarResponse::map encountered unexpected structure with multiple calendars.', ['response' => $rawResponse]);
-                // For now, assume the first one if multiple exist, though API docs suggest one.
-                $calendarsArray = $rawResponse->get('calendars');
+            $sourceData = $rawResponse instanceof Collection ? $rawResponse : new Collection($rawResponse);
+
+            $calendarData = new Collection($sourceData->get('calendar'));
+            if ($calendarData->isEmpty() && $sourceData->has('calendars.calendar')) {
+                $calendarData = new Collection($sourceData->get('calendars.calendar'));
+            } elseif ($calendarData->isEmpty() && $sourceData->has('calendars') && is_array($sourceData->get('calendars'))) {
+                $calendarsArray = $sourceData->get('calendars');
                 if (isset($calendarsArray['calendar'][0])) {
-                    $calendarData = collect($calendarsArray['calendar'][0]);
+                    $calendarData = new Collection($calendarsArray['calendar'][0]);
                 } elseif (isset($calendarsArray['calendar'])) {
-                    $calendarData = collect($calendarsArray['calendar']);
+                    $calendarData = new Collection($calendarsArray['calendar']);
                 }
             }
 
             if ($calendarData->isEmpty()) {
-                Log::error('CalendarResponse::map - Calendar data is empty or not found in expected structure.', ['response' => $rawResponse]);
-
-                // Depending on requirements, either throw an exception or return an empty response
-                // throw new Exception('Invalid response structure: Missing calendar data.');
-                return new self(0, collect()); // Return empty if data missing
+                // Removed Log::error
+                // Consider throwing an exception or returning a default/empty state based on application needs
+                // For now, let's throw an exception as missing data is usually critical.
+                throw new Exception('Invalid response structure: Missing calendar data.');
+                // return new self(0, new Collection()); // Alternative: Return empty if data missing
             }
 
-            $propertyId = (int) ($calendarData->get('@attributes.property_id') ?? $calendarData->get('@attributes.id') ?? 0); // Check both property_id and id
+            $propertyId = (int) ($calendarData->get('@attributes.property_id') ?? $calendarData->get('@attributes.id') ?? 0);
 
-            // The 'info' key might hold a single item or an array of items if multiple days are returned.
             $infoItems = $calendarData->get('info', []);
-
             // Ensure $infoItems is always an array of items for consistent processing
-            if (! is_array($infoItems) || (isset($infoItems['@attributes']) && count($infoItems) <= 2)) { // Basic check if it looks like a single item assoc array
-                // Handle case where only one 'info' item exists (not an indexed array)
+            // If $infoItems is a Collection, convert it to an array
+            if ($infoItems instanceof Collection) {
+                $infoItems = $infoItems->all();
+            }
+
+            // If it's not an array or looks like a single associative array item (e.g. has '@attributes')
+            if (!is_array($infoItems) || (isset($infoItems['@attributes']) && count($infoItems) <= 2 && !isset($infoItems[0]))) {
                 $infoItems = [$infoItems];
             } elseif (empty($infoItems)) {
-                $infoItems = []; // Ensure it's an empty array if no info items found
+                $infoItems = [];
             }
 
             $days = collect($infoItems)
-                ->filter(fn ($info) => ! empty($info)) // Filter out potentially empty entries if XML was weird
+                ->filter(fn ($info) => !empty($info))
                 ->map(function ($info) {
                     try {
-                        // Ensure $info is a collection for consistent processing
-                        return CalendarDayInfo::fromXml(collect($info));
+                        return CalendarDayInfo::fromXml(new Collection($info));
                     } catch (Exception $e) {
-                        Log::error('Failed to map CalendarDayInfo from XML fragment', [
-                            'error' => $e->getMessage(),
-                            'xml_fragment' => $info,
-                        ]);
-
-                        return null; // Return null for failed mappings
+                        // Removed Log::error, consider re-throwing or custom error handling
+                        // For now, let's allow it to bubble up or return null if that's preferred.
+                        // Depending on strictness, you might want to throw new MappingException(...) here.
+                        // error_log('Failed to map CalendarDayInfo: ' . $e->getMessage()); // Simple alternative to Log
+                        return null;
                     }
                 })
                 ->filter(); // Remove nulls from failed mappings
@@ -90,8 +86,8 @@ class CalendarResponse
             return new self($propertyId, $days);
 
         } catch (Exception $e) {
-            Log::error('Error parsing calendar response', ['error' => $e->getMessage(), 'response' => $rawResponse]);
-            // Re-throw or handle as appropriate for your application flow
+            // Removed Log::error
+            // error_log('Error parsing calendar response: ' . $e->getMessage()); // Simple alternative to Log
             throw new Exception('Failed to map CalendarResponse: '.$e->getMessage(), 0, $e);
         }
     }

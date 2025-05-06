@@ -1,11 +1,9 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses;
 
 use Exception;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
+use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
 
 class FinalizeBookingResponse
 {
@@ -27,21 +25,22 @@ class FinalizeBookingResponse
      * Assumes the input is the parsed content of a successful response.
      * Error handling should occur before calling this map method.
      *
-     * @param  Collection  $rawResponse  The raw response data (content of the <booking> tag).
+     * @param  Collection|array  $rawResponse  The raw response data (content of the <booking> tag).
      *
      * @throws Exception If required attributes are missing.
      */
     public static function map(Collection|array $rawResponse): self
     {
         try {
-            // Data is expected directly within the <booking> tag passed as $rawResponse
-            $attributes = $rawResponse->get('@attributes', []);
-            $bookingId = (int) Arr::get($attributes, 'id');
-            $identifier = (string) Arr::get($attributes, 'identifier');
-            $message = (string) $rawResponse->get('message', 'Booking finalized.'); // Default message if none provided
+            $sourceData = $rawResponse instanceof Collection ? $rawResponse : new Collection($rawResponse);
+            // Data is expected directly within the <booking> tag passed as $sourceData
+            $attributes = new Collection($sourceData->get('@attributes', []));
+            $bookingId = (int) $attributes->get('id');
+            $identifier = (string) $attributes->get('identifier');
+            $message = (string) $sourceData->get('message', 'Booking finalized.'); // Default message if none provided
 
             if (! $bookingId || ! $identifier) {
-                Log::error('FinalizeBookingResponse::map - Missing id or identifier attribute', ['response' => $rawResponse]);
+                // Removed Log::error
                 throw new Exception('Invalid response structure: Missing booking id or identifier.');
             }
 
@@ -51,7 +50,7 @@ class FinalizeBookingResponse
                 message: $message
             );
         } catch (Exception $e) {
-            Log::error('Error parsing finalize booking response', ['error' => $e->getMessage(), 'response' => $rawResponse]);
+            // Removed Log::error
             // Re-throw or handle as appropriate
             throw new Exception('Failed to map FinalizeBookingResponse: '.$e->getMessage(), 0, $e);
         }

@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpPms\Clients\Tests;
+namespace Shelfwood\PhpPms\Clients\Tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 

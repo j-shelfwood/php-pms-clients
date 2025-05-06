@@ -1,9 +1,8 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
 
 class PropertyLocation
 {
@@ -22,8 +21,9 @@ class PropertyLocation
     public static function fromXml(Collection|array $data): self
     {
         $gpsCoords = null;
-        if ($gps = Arr::get($data, 'gps')) {
-            $coords = explode(',', (string) $gps);
+        $gpsValue = $data instanceof Collection ? $data->get('gps') : ($data['gps'] ?? null);
+        if ($gpsValue) {
+            $coords = explode(',', (string) $gpsValue);
             $gpsCoords = [
                 'lat' => isset($coords[0]) ? (float) trim($coords[0]) : null,
                 'lon' => isset($coords[1]) ? (float) trim($coords[1]) : null,
@@ -31,26 +31,35 @@ class PropertyLocation
         }
 
         $cityGpsCoords = null;
-        $cityData = Arr::get($data, 'city', []);
-        $cityAttributes = Arr::get($cityData, '@attributes', []);
-        if ($cityGps = Arr::get($cityAttributes, 'gps')) {
-            $coords = explode(',', (string) $cityGps);
+        $cityData = $data instanceof Collection ? $data->get('city', []) : ($data['city'] ?? []);
+        $cityAttributes = $cityData['@attributes'] ?? [];
+        $cityGpsValue = $cityAttributes['gps'] ?? null;
+
+        if ($cityGpsValue) {
+            $coords = explode(',', (string) $cityGpsValue);
             $cityGpsCoords = [
                 'lat' => isset($coords[0]) ? (float) trim($coords[0]) : null,
                 'lon' => isset($coords[1]) ? (float) trim($coords[1]) : null,
             ];
         }
 
+        $cityName = '';
+        if (is_array($cityData) && isset($cityData['#text'])) {
+            $cityName = (string) $cityData['#text'];
+        } elseif (is_string($cityData)) {
+            $cityName = (string) $cityData;
+        }
+
         return new self(
             latitude: $gpsCoords['lat'] ?? null,
             longitude: $gpsCoords['lon'] ?? null,
-            address: (string) Arr::get($data, 'address', ''),
-            zipcode: (string) Arr::get($data, 'zipcode', ''),
-            city: (string) (Arr::get($cityData, '#text') ?? Arr::get($cityData, '') ?? ''), // Handle text or direct value
-            country: (string) Arr::get($cityAttributes, 'country', ''),
+            address: (string) ($data instanceof Collection ? $data->get('address') : ($data['address'] ?? '')),
+            zipcode: (string) ($data instanceof Collection ? $data->get('zipcode') : ($data['zipcode'] ?? '')),
+            city: $cityName,
+            country: (string) ($cityAttributes['country'] ?? ''),
             cityLatitude: $cityGpsCoords['lat'] ?? null,
             cityLongitude: $cityGpsCoords['lon'] ?? null,
-            area: (string) Arr::get($data, 'area', '')
+            area: (string) ($data instanceof Collection ? $data->get('area') : ($data['area'] ?? ''))
         );
     }
 }

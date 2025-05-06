@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpPms\Clients\BookingManager\Responses;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses;
 
 /**
  * Read-only DTO representing a booking rate for a stay, as returned by the API.

@@ -1,8 +1,8 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
 
-use Illuminate\Support\Collection;
+use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
 
 class CalendarTax
 {
@@ -18,25 +18,40 @@ class CalendarTax
 
     public static function fromXml(Collection|array $taxData): self
     {
-        // Handle potential variations where 'vat' or 'other' might be simple floats or arrays with attributes
-        $vat = $taxData->get('vat');
-        $other = $taxData->get('other');
+        $sourceData = $taxData instanceof Collection ? $taxData : new Collection($taxData);
 
-        $vatAmount = is_array($vat) ? (float) ($vat['#text'] ?? 0.0) : (float) $vat;
-        $vatValue = is_array($vat) ? (float) ($vat['@attributes']['value'] ?? 0.0) : 0.0;
+        $vatInfo = new Collection($sourceData->get('vat', []));
+        $otherInfo = new Collection($sourceData->get('other', []));
 
-        $otherAmount = is_array($other) ? (float) ($other['#text'] ?? 0.0) : (float) $other;
-        $otherType = is_array($other) ? (string) ($other['@attributes']['type'] ?? '') : '';
-        $otherValue = is_array($other) ? (float) ($other['@attributes']['value'] ?? 0.0) : 0.0;
+        $vatAmount = (float) ($vatInfo->get('#text') ?? $vatInfo[0] ?? ($sourceData->get('vat') ?? 0.0));
+        $vatValue = (float) ($vatInfo->get('@attributes.value') ?? ($vatInfo->get('@attributes')['value'] ?? 0.0));
+
+        $otherAmount = (float) ($otherInfo->get('#text') ?? $otherInfo[0] ?? ($sourceData->get('other') ?? 0.0));
+        $otherType = (string) ($otherInfo->get('@attributes.type') ?? ($otherInfo->get('@attributes')['type'] ?? ''));
+        $otherValue = (float) ($otherInfo->get('@attributes.value') ?? ($otherInfo->get('@attributes')['value'] ?? 0.0));
+
+        // Handle cases where vat/other might not be collections but direct values
+        if (!($sourceData->get('vat') instanceof Collection || is_array($sourceData->get('vat')))) {
+            $vatAmount = (float) ($sourceData->get('vat') ?? 0.0);
+            $vatValue = 0.0; // No attributes if it's a direct value
+        }
+        if (!($sourceData->get('other') instanceof Collection || is_array($sourceData->get('other')))) {
+            $otherAmount = (float) ($sourceData->get('other') ?? 0.0);
+            $otherType = '';
+            $otherValue = 0.0;
+        }
+
+        $totalAttribute = $sourceData->get('@attributes');
+        $total = (float) ($totalAttribute['total'] ?? $sourceData->get('total') ?? 0.0);
 
         return new self(
-            total: (float) ($taxData->get('@attributes')['total'] ?? $taxData->get('total') ?? 0.0),
+            total: $total,
             other: $otherAmount,
             otherType: $otherType,
             otherValue: $otherValue,
             vat: $vatAmount,
             vatValue: $vatValue,
-            final: (float) ($taxData->get('final') ?? 0.0)
+            final: (float) ($sourceData->get('final') ?? 0.0)
         );
     }
 }

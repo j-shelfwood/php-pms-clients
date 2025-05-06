@@ -1,41 +1,38 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
 
-use Illuminate\Support\Collection;
+use Tightenco\Collect\Support\Collection;
 
 class StayTax
 {
     public function __construct(
         public readonly float $total,
-        public readonly float $vatAmount,
+        public readonly float $vatAmount,    // Changed from vat
         public readonly float $vatValue,
+        public readonly float $otherAmount,  // Changed from other
         public readonly string $otherType,
-        public readonly float $otherAmount,
         public readonly float $otherValue,
         public readonly float $final
     ) {}
 
     public static function fromXml(Collection|array $taxData): self
     {
-        // Note: The XML structure puts the amount as text content and value/type as attributes.
-        // Handle potential variations where 'vat' or 'other' might be simple floats or arrays with attributes
-        $vat = $taxData->get('vat');
-        $other = $taxData->get('other');
-
+        $vat = $taxData->get('vat', []);
         $vatAmount = is_array($vat) ? (float) ($vat['#text'] ?? 0.0) : (float) $vat;
-        $vatValue = is_array($vat) ? (float) ($vat['@attributes']['value'] ?? 0.0) : 0.0; // Default if not array
+        $vatValue = is_array($vat) ? (float) ($vat['@attributes']['value'] ?? 0.0) : 0.0;
 
+        $other = $taxData->get('other', []);
         $otherAmount = is_array($other) ? (float) ($other['#text'] ?? 0.0) : (float) $other;
         $otherType = is_array($other) ? (string) ($other['@attributes']['type'] ?? '') : '';
         $otherValue = is_array($other) ? (float) ($other['@attributes']['value'] ?? 0.0) : 0.0;
 
         return new self(
-            total: (float) ($taxData->get('@attributes')['total'] ?? $taxData->get('total') ?? 0.0), // Handle potential attribute vs element
+            total: (float) ($taxData->get('@attributes')['total'] ?? $taxData->get('total') ?? 0.0),
             vatAmount: $vatAmount,
             vatValue: $vatValue,
-            otherType: $otherType,
             otherAmount: $otherAmount,
+            otherType: $otherType,
             otherValue: $otherValue,
             final: (float) ($taxData->get('final') ?? 0.0)
         );

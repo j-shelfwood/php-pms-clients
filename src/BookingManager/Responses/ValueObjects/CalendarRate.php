@@ -1,8 +1,8 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
 
-use Illuminate\Support\Collection;
+use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
 
 class CalendarRate
 {
@@ -19,15 +19,18 @@ class CalendarRate
 
     public static function fromXml(Collection|array $rateData): self
     {
+        $sourceData = $rateData instanceof Collection ? $rateData : new Collection($rateData);
+        $attributes = new Collection($sourceData->get('@attributes', []));
+
         return new self(
-            percentage: (float) ($rateData->get('@attributes')['percentage'] ?? 0.0),
-            currency: (string) ($rateData->get('@attributes')['currency'] ?? ''),
-            total: (float) ($rateData->get('total') ?? 0.0),
-            final: (float) ($rateData->get('final') ?? 0.0),
-            tax: CalendarTax::fromXml(collect($rateData->get('tax', []))),
-            fee: (float) ($rateData->get('fee') ?? 0.0),
-            prepayment: (float) ($rateData->get('prepayment') ?? 0.0),
-            balanceDue: (float) ($rateData->get('balance_due') ?? 0.0)
+            percentage: (float) ($attributes->get('percentage', 0.0)),
+            currency: (string) ($attributes->get('currency', '')),
+            total: (float) ($sourceData->get('total') ?? 0.0),
+            final: (float) ($sourceData->get('final') ?? 0.0),
+            tax: CalendarTax::fromXml(new Collection($sourceData->get('tax', []))),
+            fee: (float) ($sourceData->get('fee') ?? 0.0),
+            prepayment: (float) ($sourceData->get('prepayment') ?? 0.0),
+            balanceDue: (float) ($sourceData->get('balance_due') ?? 0.0)
         );
     }
 }

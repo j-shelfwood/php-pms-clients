@@ -1,9 +1,8 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
 
 class CalendarChange
 {
@@ -15,12 +14,14 @@ class CalendarChange
 
     public static function fromXml(Collection|array $data): self
     {
-        $attributes = Arr::get($data, '@attributes', []);
-        $monthsString = (string) Arr::get($attributes, 'months', '');
-        $months = ! empty($monthsString) ? collect(explode(',', $monthsString)) : collect();
+        $sourceData = $data instanceof Collection ? $data : new Collection($data);
+        $attributes = new Collection($sourceData->get('@attributes', []));
+
+        $monthsString = (string) $attributes->get('months', '');
+        $months = !empty($monthsString) ? collect(explode(',', $monthsString)) : collect();
 
         return new self(
-            propertyId: (int) Arr::get($attributes, 'id', 0),
+            propertyId: (int) $attributes->get('id', 0),
             months: $months
         );
     }

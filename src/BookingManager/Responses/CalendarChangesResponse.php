@@ -1,12 +1,11 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses;
 
-use Domain\Connections\BookingManager\Responses\ValueObjects\CalendarChange;
+use Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects\CalendarChange;
 use Exception;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
+use Carbon\Carbon; // Keep Carbon
+use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
 
 class CalendarChangesResponse
 {
@@ -27,22 +26,27 @@ class CalendarChangesResponse
     public static function map(Collection|array $rawResponse): self
     {
         try {
-            // Data is expected under the root 'changes' element
-            $changesData = $rawResponse->get('changes') ?? $rawResponse; // Handle if 'changes' is the root
-            $attributes = $changesData->get('@attributes', []);
+            $sourceData = $rawResponse instanceof Collection ? $rawResponse : new Collection($rawResponse);
 
-            $amount = (int) Arr::get($attributes, 'amount', 0);
-            $timeStr = Arr::get($attributes, 'time');
-            $time = $timeStr ? Carbon::parse($timeStr) : Carbon::now(); // Default to now if time is missing
+            // Data is expected under the root 'changes' element or might be the root itself
+            $changesData = new Collection($sourceData->get('changes') ?? $sourceData);
+            $attributes = new Collection($changesData->get('@attributes', []));
+
+            $amount = (int) $attributes->get('amount', 0);
+            $timeStr = $attributes->get('time');
+            $time = $timeStr ? Carbon::parse($timeStr) : Carbon::now();
 
             $changeItemsRaw = $changesData->get('change', []);
-            // Ensure it's always an array for consistent processing
-            if (! is_array($changeItemsRaw) || (Arr::isAssoc($changeItemsRaw) && ! empty($changeItemsRaw))) {
-                $changeItemsRaw = [$changeItemsRaw];
+            // Ensure it's always an array of items for consistent processing
+            if ($changeItemsRaw instanceof Collection) {
+                $changeItemsRaw = $changeItemsRaw->all();
+            }
+            if (!is_array($changeItemsRaw) || (isset($changeItemsRaw['@attributes']) && !isset($changeItemsRaw[0]))) {
+                 $changeItemsRaw = empty($changeItemsRaw) ? [] : [$changeItemsRaw];
             }
 
             $changes = collect($changeItemsRaw)
-                ->map(fn ($item) => CalendarChange::fromXml(collect($item)))
+                ->map(fn ($item) => CalendarChange::fromXml(new Collection($item)))
                 ->filter(); // Remove potential nulls if mapping fails
 
             return new self($amount, $time, $changes);

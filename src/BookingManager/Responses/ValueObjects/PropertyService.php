@@ -1,24 +1,23 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
 
 class PropertyService
 {
     public function __construct(
         public readonly bool $linen,
         public readonly bool $towels,
-        public readonly bool $cleaning // Deprecated in docs, but present in mock
+        public readonly bool $cleaning
     ) {}
 
     public static function fromXml(Collection|array $data): self
     {
         return new self(
-            linen: (bool) Arr::get($data, 'linen', false),
-            towels: (bool) Arr::get($data, 'towels', false),
-            cleaning: (bool) Arr::get($data, 'cleaning', false)
+            linen: (bool) ($data instanceof Collection ? $data->get('linen') : ($data['linen'] ?? false)),
+            towels: (bool) ($data instanceof Collection ? $data->get('towels') : ($data['towels'] ?? false)),
+            cleaning: (bool) ($data instanceof Collection ? $data->get('cleaning') : ($data['cleaning'] ?? false))
         );
     }
 }

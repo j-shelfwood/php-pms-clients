@@ -1,26 +1,29 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
 
 class PropertyTax
 {
     public function __construct(
-        public readonly float $vat, // Assuming this is percentage or value based on context
-        public readonly float $other, // Assuming this is percentage or value
+        public readonly float $vat,
+        public readonly float $other,
         public readonly string $otherType // 'relative' or 'fixed'
     ) {}
 
     public static function fromXml(Collection|array $data): self
     {
-        $otherData = Arr::get($data, 'other', []);
+        $otherData = $data instanceof Collection ? $data->get('other', []) : ($data['other'] ?? []);
+        if ($otherData instanceof Collection) $otherData = $otherData->all(); // Ensure array
+
+        $otherText = is_array($otherData) ? ($otherData['#text'] ?? 0.0) : $otherData;
+        $otherAttributesType = is_array($otherData) && isset($otherData['@attributes']['type']) ? $otherData['@attributes']['type'] : '';
 
         return new self(
-            vat: (float) Arr::get($data, 'vat', 0.0),
-            other: (float) (is_array($otherData) ? ($otherData['#text'] ?? 0.0) : $otherData),
-            otherType: (string) (is_array($otherData) ? ($otherData['@attributes']['type'] ?? '') : '')
+            vat: (float) ($data instanceof Collection ? $data->get('vat') : ($data['vat'] ?? 0.0)),
+            other: (float) $otherText,
+            otherType: (string) $otherAttributesType
         );
     }
 }

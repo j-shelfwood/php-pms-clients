@@ -1,16 +1,18 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients; // Changed namespace
+namespace Shelfwood\PhpPms\Clients;
 
 use Exception;
-use SimpleXMLElement;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger; // Import NullLogger for default
+use Psr\Log\NullLogger;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Client; // Import Guzzle Client for default
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use Shelfwood\PhpPms\Clients\Exceptions\HttpClientException;
-use Tightenco\Collect\Support\Collection; // Corrected use statement
+use Shelfwood\PhpPms\Clients\Exceptions\ParseException; // Ensure this is used if thrown by XmlParser
+use Shelfwood\PhpPms\Clients\Util\XmlParser; // Added
+use Shelfwood\PhpPms\Clients\Util\Dtos\ErrorDetailsDto; // Added
+use Tightenco\Collect\Support\Collection;
 
 abstract class XMLClient
 {
@@ -31,19 +33,16 @@ abstract class XMLClient
         $this->logger = $logger ?? new NullLogger();
     }
 
-    abstract protected function sendRequest(string $xml): string;
-
     protected function makeRequest(string $endpoint, array $params = [], string $method = 'GET'): Collection
     {
         $url = rtrim($this->baseUrl, '/') . '/' . ltrim($endpoint, '/');
         $this->logger->debug('Making API request', [
             'method' => $method,
             'url' => $url,
-            'params' => $params, // Be mindful of logging sensitive keys like api_key if necessary
+            'params' => array_diff_key($params, array_flip(['key', 'apiKey'])),
         ]);
 
         $requestParams = $params;
-        // Assuming apiKey should be part of query parameters for GET or form parameters for POST
         $requestParams['key'] = $this->apiKey;
 
         try {
@@ -58,65 +57,64 @@ abstract class XMLClient
                 'url' => $url,
                 'method' => $method,
                 'error' => $e->getMessage(),
-                'response' => $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : null,
+                'response_body' => $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : null,
             ]);
             throw new HttpClientException('HTTP request failed: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
-        $parsedResponse = $this->parseXml($body);
+        try {
+            $parsedResponse = XmlParser::parse($body);
+        } catch (ParseException $e) {
+            $this->logger->error('Failed to parse XML response', [
+                'url' => $url,
+                'method' => $method,
+                'error' => $e->getMessage(),
+                'body' => $body, // Log the body that failed to parse
+            ]);
+            throw new HttpClientException('Failed to parse XML response: ' . $e->getMessage(), 0, $e);
+        }
 
-        if ($this->hasError($parsedResponse)) {
-            $this->logError($endpoint, $params, $parsedResponse); // params here are original, without apiKey
-            throw new HttpClientException('Error in API response: '.json_encode($parsedResponse->toArray()));
+
+        if (XmlParser::hasError($parsedResponse)) {
+            $errorDetails = XmlParser::extractErrorDetails($parsedResponse);
+            $this->logError($endpoint, $params, $errorDetails); // Pass DTO to logError
+
+            $exceptionMessage = sprintf(
+                'API Error%s: %s',
+                ($errorDetails->code ? ' (Code: ' . $errorDetails->code . ')' : ''),
+                $errorDetails->message ?? 'Error in API response'
+            );
+
+            $exceptionCode = 0;
+            if ($errorDetails->code !== null) {
+                 if (is_int($errorDetails->code)) {
+                    $exceptionCode = $errorDetails->code;
+                } elseif (ctype_digit((string)$errorDetails->code)) {
+                    $exceptionCode = (int)$errorDetails->code;
+                }
+            }
+
+            throw new HttpClientException($exceptionMessage, $exceptionCode);
         }
 
         return $parsedResponse;
     }
 
-    protected function hasError(Collection $response): bool
-    {
-        // Adjusted to use str_contains if available, or fallback
-        $responseText = $response->get('response', '');
-        $hasResponseError = is_string($responseText) && str_contains($responseText, '<error code="');
-        return $response->has('code') || $hasResponseError;
-    }
-
-    protected function logError(string $endpoint, array $params, Collection $response): void
+    protected function logError(string $endpoint, array $params, ErrorDetailsDto $errorDetails): void // Changed signature
     {
         $this->logger->error("Error while requesting {$endpoint}", [
-            'params' => $params,
-            'response' => $response->toArray(),
+            'params' => array_diff_key($params, array_flip(['key', 'apiKey'])),
+            'api_error_code' => $errorDetails->code,
+            'api_error_message' => $errorDetails->message,
+            'api_response_fragment' => $errorDetails->rawResponseFragment,
         ]);
-    }
-
-    protected function parseXml(string $xml): Collection
-    {
-        try {
-            // Ensure XML is not empty before parsing to avoid warnings with SimpleXMLElement
-            if (empty(trim($xml))) {
-                throw new Exception('Cannot parse empty XML string.');
-            }
-            $element = new SimpleXMLElement($xml);
-            $json = json_encode($element);
-            if ($json === false) {
-                // Consider custom exception: throw new ParseException('Failed to encode XML to JSON.');
-                throw new Exception('Failed to encode XML to JSON.');
-            }
-            $array = json_decode($json, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                // Consider custom exception: throw new ParseException('Failed to decode JSON to array: ' . json_last_error_msg());
-                throw new Exception('Failed to decode JSON to array: ' . json_last_error_msg());
-            }
-
-            return new Collection($array);
-        } catch (Exception $e) {
-            // Ensure PhpPms\Clients\Exceptions\ParseException is defined if you use it.
-            throw new Exception("Error parsing XML: " . $e->getMessage(), 0, $e);
-        }
     }
 
     /**
      * Build a standardized OTA error response XML.
+     * This method might be better placed in a utility class if used by multiple clients
+     * or if the client itself is not supposed to generate XML.
+     * For now, keeping it here if it's specific to this client's interaction patterns.
      */
     protected function buildErrorResponse(string $rootElement, string $message, int $code, string $type = ''): string
     {

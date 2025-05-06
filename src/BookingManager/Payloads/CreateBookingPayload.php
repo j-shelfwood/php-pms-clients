@@ -1,9 +1,6 @@
 <?php
 
-namespace PhpPms\Clients\BookingManager\Payloads;
-
-use App\Models\Booking;
-use App\Models\Property;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Payloads;
 
 class CreateBookingPayload
 {
@@ -16,7 +13,6 @@ class CreateBookingPayload
      * Based on the create-booking.xml API documentation.
      */
     public function __construct(
-        // Required API parameters
         public readonly int $property_id,
         public readonly string $start,
         public readonly string $end,
@@ -28,8 +24,6 @@ class CreateBookingPayload
         public readonly string $country,
         public readonly string $phone,
         public readonly int $amount_adults,
-
-        // Optional API parameters
         public readonly ?string $address_2 = null,
         public readonly ?int $amount_childs = null,
         public readonly ?string $time_arrival = null,
@@ -43,39 +37,13 @@ class CreateBookingPayload
         //
     }
 
-    public static function map(Booking $booking): self
-    {
-        $externalPropertyId = Property::externalIdFor($booking->property_id);
-        if (! $externalPropertyId) {
-            throw new \InvalidArgumentException("Could not find external ID for property ID: {$booking->property_id}");
-        }
-
-        return new self(
-            property_id: $externalPropertyId,
-            start: $booking->arrival->format('Y-m-d'),
-            end: $booking->departure->format('Y-m-d'),
-            name_first: $booking->first_name,
-            name_last: $booking->last_name,
-            email: $booking->email,
-            address_1: $booking->address_1,
-            city: $booking->city,
-            country: $booking->country,
-            phone: $booking->phone,
-            amount_adults: $booking->amount_adults,
-            address_2: $booking->address_2,
-            amount_childs: $booking->amount_children > 0 ? $booking->amount_children : null,
-            time_arrival: $booking->time_arrival,
-            flight: $booking->flight,
-            notes: $booking->notes,
-            rate_final: $booking->rate_meta['final_before_taxes'] ?? null,
-            rate_incl: isset($booking->rate_meta['final_before_taxes']) ? self::RATE_EXCL : null,
-            rate_prepayment: $booking->rate_meta['prepayment'] ?? null,
-            balance_due: $booking->balance_due
-        );
-    }
-
+    /**
+     * Converts the payload object to an array, filtering out null values.
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
-        return get_object_vars($this);
+        return array_filter(get_object_vars($this), fn ($value) => $value !== null);
     }
 }

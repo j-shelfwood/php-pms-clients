@@ -1,9 +1,8 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
 
 class PropertyProvider
 {
@@ -15,7 +14,11 @@ class PropertyProvider
 
     public static function fromXml(Collection|array $data): self
     {
-        $attributes = Arr::get($data, '@attributes', $data); // Handle direct attributes or nested under @attributes
+        $attributes = $data instanceof Collection ? ($data->get('@attributes') ?? $data) : ($data['@attributes'] ?? $data);
+        // If $attributes is still a Collection after get, convert to array for consistent access
+        if ($attributes instanceof Collection) {
+            $attributes = $attributes->all();
+        }
 
         return new self(
             id: (int) ($attributes['id'] ?? 0),

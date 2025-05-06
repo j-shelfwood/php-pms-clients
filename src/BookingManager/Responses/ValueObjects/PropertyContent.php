@@ -1,9 +1,8 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
 
 class PropertyContent
 {
@@ -18,11 +17,13 @@ class PropertyContent
     public static function fromXml(Collection|array $data): self
     {
         // Helper to extract CDATA or text content, avoid array-to-string conversion
-        $getText = fn ($key) => (
-            is_array(Arr::get($data, $key))
-                ? (string) (Arr::get($data, "{$key}.#text") ?? '')
-                : (string) (Arr::get($data, $key, ''))
-        );
+        $getText = function ($key) use ($data) {
+            $value = $data instanceof Collection ? $data->get($key) : ($data[$key] ?? null);
+            if (is_array($value)) {
+                return (string) ($value['#text'] ?? '');
+            }
+            return (string) ($value ?? '');
+        };
 
         return new self(
             short: $getText('short'),

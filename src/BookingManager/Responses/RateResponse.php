@@ -1,12 +1,10 @@
 <?php
 
-namespace Domain\Connections\BookingManager\Responses;
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses;
 
-use App\Models\Property;
 use Exception;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
+use Tightenco\Collect\Support\Collection;
+use Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects\StayRate;
 
 class RateResponse
 {
@@ -50,18 +48,18 @@ class RateResponse
     public static function map(Collection|array $response): self
     {
         try {
-            // Data is nested under 'property' in the typical info.xml response
-            // However, the provided mock 'get-rate-for-stay.xml' has 'property' inside 'info'
-            $infoData = $response->get('info') ?? $response; // Adjust based on whether 'info' wrapper exists
+            // Data is nested under \'property\' in the typical info.xml response
+            // However, the provided mock \'get-rate-for-stay.xml\' has \'property\' inside \'info\'
+            $infoData = $response->get('info') ?? $response; // Adjust based on whether \'info\' wrapper exists
             $propertyData = collect($infoData->get('property'));
 
             if ($propertyData->isEmpty()) {
-                Log::error('RateResponse::map - Missing property data in response', ['response' => $response]);
+                // Removed Log::error
                 throw new Exception('Invalid response structure: Missing property data.');
             }
 
             if (! $propertyData->has('rate')) {
-                Log::error('RateResponse::map - Missing rate data within property', ['propertyData' => $propertyData]);
+                // Removed Log::error
                 throw new Exception('Invalid response structure: Missing rate data.');
             }
 
@@ -82,58 +80,13 @@ class RateResponse
                 propertyId: (int) ($propertyAttributes['id'] ?? null),
                 propertyIdentifier: (string) ($propertyAttributes['identifier'] ?? null),
                 maxPersons: (int) ($propertyAttributes['max_persons'] ?? null),
-                // Availability might be at the 'info' level or 'property' level depending on context
+                // Availability might be at the \'info\' level or \'property\' level depending on context
                 available: (bool) ($propertyAttributes['available'] ?? $infoData->get('@attributes')['available'] ?? null),
                 minimalNights: (int) ($propertyAttributes['minimal_nights'] ?? null)
             );
         } catch (Exception $e) {
-            Log::error('Error parsing booking rate from response', ['error' => $e->getMessage(), 'response' => $response]);
             // Re-throw or handle as appropriate for your application flow
             throw new Exception('Failed to map RateResponse: '.$e->getMessage(), 0, $e);
         }
-    }
-
-    /**
-     * Returns a mock object with static values for testing purposes.
-     * Price per night (based on provided `$arrival` and `$departure` dates):
-     */
-    public static function mock(int $id, Carbon $arrival, Carbon $departure): self
-    {
-        // The $id is the external_id of the property so we need to find the property
-        $property = Property::whereExternalId($id)->firstOrFail();
-        // Get the calendars for the property for the given dates
-        $calendars = $property->calendars()
-            ->whereDate('date', '>=', $arrival)
-            ->whereDate('date', '<', $departure)
-            ->orderBy('date')
-            ->get();
-
-        $taxCalculator = app(\App\Services\TaxCalculator::class);
-
-        $final_before_taxes = $calendars->sum('final_rate');
-
-        $taxResults = $taxCalculator->calculateForStay($property, $arrival, $departure, $final_before_taxes);
-
-        $tax_vat = $taxResults['tax_vat'];
-        $tax_tourist = $taxResults['tax_tourist']; // Mock uses 'tourist', API uses 'other'
-        $tax_total = $taxResults['tax_total'];
-        $final_after_taxes = $taxResults['final_after_taxes'];
-        $prepayment = $taxResults['prepayment'];
-        $balance_due_remaining = $taxResults['balance_due_remaining'];
-
-        return new self(
-            final_before_taxes: round($final_before_taxes, 2),
-            final_after_taxes: round($final_after_taxes, 2),
-            tax_vat: $tax_vat,
-            tax_other: $tax_tourist, // Keep mock consistent, but acknowledge API difference
-            tax_total: $tax_total,
-            prepayment: $prepayment,
-            balance_due_remaining: $balance_due_remaining,
-            propertyId: $property->external_id, // Assuming external_id is the relevant ID here
-            propertyIdentifier: $property->external_identifier,
-            maxPersons: $property->max_persons,
-            available: true, // Mock assumes available
-            minimalNights: $property->min_nights
-        );
     }
 }
