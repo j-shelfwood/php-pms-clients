@@ -1,43 +1,46 @@
 <?php
 
-namespace Domain\Connections\Cubilis;
+namespace PhpPms\Clients\Cubilis;
 
-use App\Models\Booking;
-use App\Models\Property;
-use Domain\Dtos\BookingRate;
-use Illuminate\Support\Carbon;
-use Domain\Connections\XMLClient;
-use Domain\Dtos\CreateBookingData;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
-use Domain\Dtos\CalendarListResponse;
-use Domain\Dtos\PropertyListResponse;
-use Domain\Dtos\CreateBookingResponse;
-use Domain\Dtos\CalendarChangesResponse;
-use Illuminate\Http\Client\RequestException;
-use Domain\Connections\Cubilis\Dtos\BookingResponseDto;
-use Domain\Connections\Cubilis\Dtos\RoomListResponseDto;
+use PhpPms\Clients\Models\Booking; // TODO: Refactor out App specific models - Updated namespace
+use PhpPms\Clients\Models\Property; // TODO: Refactor out App specific models - Updated namespace
+use PhpPms\Clients\Dtos\BookingRate; // Updated namespace
+use Illuminate\Support\Carbon; // TODO: Consider replacing with DateTimeImmutable
+use PhpPms\Clients\XMLClient;
+use PhpPms\Clients\Dtos\CreateBookingData; // Updated namespace
+use PhpPms\Clients\Dtos\CalendarListResponse; // Updated namespace
+use PhpPms\Clients\Dtos\PropertyListResponse; // Updated namespace
+use PhpPms\Clients\Dtos\CreateBookingResponse; // Updated namespace
+use PhpPms\Clients\Dtos\CalendarChangesResponse; // Updated namespace
+use PhpPms\Clients\Exceptions\HttpClientException;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
+use Psr\Log\LoggerInterface;
+// Removed: use Illuminate\Support\Facades\Log;
+// Removed: use Illuminate\Support\Facades\Http;
+// Removed: use Illuminate\Http\Client\RequestException;
+use PhpPms\Clients\Cubilis\Dtos\BookingResponseDto; // Updated namespace
+use PhpPms\Clients\Cubilis\Dtos\RoomListResponseDto; // Updated namespace
 
 class CubilisAPI extends XMLClient
 {
-    protected string $endpoint;
-
+    // Removed: protected string $endpoint; // Now uses $this->baseUrl from parent
     protected ?string $username;
-
     protected ?string $password;
-
     protected string $requestorType;
-
     protected ?string $requestorId;
+    // httpClient and logger are inherited from XMLClient
 
     public function __construct(
-        string $endpoint,
+        string $endpoint, // This will be passed as baseUrl to parent
         ?string $username,
         ?string $password,
         string $requestorType,
-        ?string $requestorId
+        ?string $requestorId,
+        ?ClientInterface $httpClient = null,
+        ?LoggerInterface $logger = null
     ) {
-        $this->endpoint = $endpoint;
+        parent::__construct($endpoint, '', $httpClient, $logger); // Pass endpoint as baseUrl, empty string for apiKey
         $this->username = $username;
         $this->password = $password;
         $this->requestorType = $requestorType;
@@ -47,15 +50,28 @@ class CubilisAPI extends XMLClient
     protected function sendRequest(string $xml): string
     {
         try {
-            $response = Http::withBasicAuth($this->username, $this->password)
-                ->withBody($xml, 'application/xml')
-                ->post($this->endpoint);
-            $response->throw();
+            $options = [
+                'body' => $xml,
+                'headers' => [
+                    'Content-Type' => 'application/xml',
+                ],
+                // 'http_errors' => true, // Guzzle default: throws exceptions for 4xx/5xx responses
+            ];
 
-            return $response->body();
-        } catch (RequestException $e) {
-            Log::error('Cubilis API request failed', ['endpoint' => $this->endpoint, 'error' => $e->getMessage()]);
-            throw $e;
+            if ($this->username !== null && $this->password !== null) {
+                $options['auth'] = [$this->username, $this->password];
+            }
+
+            $response = $this->httpClient->request('POST', $this->baseUrl, $options);
+
+            return $response->getBody()->getContents();
+        } catch (GuzzleRequestException $e) {
+            $this->logger->error('Cubilis API request failed', [
+                'endpoint' => $this->baseUrl,
+                'error' => $e->getMessage(),
+                'response' => $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : null,
+            ]);
+            throw new HttpClientException('Cubilis API request failed: ' . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -164,6 +180,6 @@ class CubilisAPI extends XMLClient
 
     public function finalizeBooking(Booking $booking): void
     {
-        Log::info('Cubilis finalizeBooking stubbed', ['booking_id' => $booking->id]);
+        $this->logger->info('Cubilis finalizeBooking stubbed', ['booking_id' => $booking->id]);
     }
 }
