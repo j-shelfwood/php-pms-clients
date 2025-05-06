@@ -1,6 +1,6 @@
 <?php
 
-namespace Domain\Connections\Exceptions;
+namespace Shelfwood\PhpPms\Clients\Exceptions;
 
 use Exception;
 

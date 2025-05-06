@@ -6,7 +6,7 @@ use App\Models\Booking;
 use App\Models\Property;
 use Illuminate\Support\Carbon;
 use Domain\Connections\XMLClient;
-use Domain\Dtos\CreateBookingData;
+use PhpPms\Clients\BookingManager\Payloads\CreateBookingPayload;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Domain\Dtos\CalendarChangesResponse;
@@ -62,7 +62,7 @@ class BookingManagerAPI extends XMLClient
         ]));
     }
 
-    public function createBooking(CreateBookingData $bookingData): CreateBookingResponse
+    public function createBooking(CreateBookingPayload $bookingData): CreateBookingResponse
     {
         $requestData = $bookingData->toArray();
 

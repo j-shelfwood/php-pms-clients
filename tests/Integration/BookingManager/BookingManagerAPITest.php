@@ -8,7 +8,7 @@ use Domain\Connections\BookingManager\BookingManagerAPI;
 use Domain\Dtos\BookingRate;
 use Domain\Dtos\CalendarChangesResponse;
 use Domain\Dtos\CalendarResponse;
-use Domain\Dtos\CreateBookingData;
+use PhpPms\Clients\BookingManager\Payloads\CreateBookingPayload;
 use Domain\Dtos\CreateBookingResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -31,7 +31,7 @@ describe('BookingManagerAPI', function () {
         Http::fake([
             '*' => Http::response(file_get_contents(resource_path('mocks/create-booking.xml')), 200),
         ]);
-        $bookingData = new CreateBookingData(
+        $bookingData = new CreateBookingPayload(
             start: '2024-02-08',
             end: '2024-02-12',
             name_first: 'Joris',

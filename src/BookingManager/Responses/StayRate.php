@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpPms\Clients\BookingManager\Responses; // Changed namespace
+namespace Shelfwood\PhpPms\Clients\BookingManager\Responses;
 
 class StayRate
 {
