@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties count="1">
+  <property id="21663" name="Runstraat suite Amsterdam" identifier="#487" status="live" type="apartment">
+    <provider id="114" code="AMS" name="Billy Blue Amsterdam Hotels"/>
+    <location>
+      <gps>52.3724,4.88559</gps>
+      <address>Hartenstraat</address>
+      <zipcode>1016 CB</zipcode>
+      <city country="NL" gps="52.3731,4.89235">Amsterdam</city>
+      <area>Jordaan Area</area>
+    </location>
+    <type>leisure,business</type>
+    <max_persons>2</max_persons>
+    <minimal_nights>2</minimal_nights>
+    <maximal_nights>0</maximal_nights>
+    <available_start>2014-06-01</available_start>
+    <available_end>2024-06-30</available_end>
+    <floor>1</floor>
+    <stairs>0</stairs>
+    <size>32</size>
+    <bedrooms>0</bedrooms>
+    <single_bed>0</single_bed>
+    <double_bed>1</double_bed>
+    <single_sofa>0</single_sofa>
+    <double_sofa>0</double_sofa>
+    <single_bunk>0</single_bunk>
+    <bathrooms>1</bathrooms>
+    <toilets>1</toilets>
+    <elevator>0</elevator>
+    <view>street</view>
+    <internet>wifi</internet>
+    <internet_connection>highspeed</internet_connection>
+    <parking>none</parking>
+    <airco>0</airco>
+    <fans>0</fans>
+    <balcony>0</balcony>
+    <patio>0</patio>
+    <garden>0</garden>
+    <roof_terrace>0</roof_terrace>
+    <tv>flatscreen</tv>
+    <tv_connection>cable</tv_connection>
+    <dvd>none</dvd>
+    <computer>0</computer>
+    <printer>0</printer>
+    <iron>0</iron>
+    <dishwasher>0</dishwasher>
+    <oven>0</oven>
+    <microwave>0</microwave>
+    <grill>0</grill>
+    <hob>0</hob>
+    <fridge>1</fridge>
+    <freezer>0</freezer>
+    <washingmachine>0</washingmachine>
+    <dryer>0</dryer>
+    <toaster>0</toaster>
+    <kettle>1</kettle>
+    <coffeemachine>1</coffeemachine>
+    <bathtub>0</bathtub>
+    <jacuzzi>0</jacuzzi>
+    <shower_regular>1</shower_regular>
+    <shower_steam>0</shower_steam>
+    <swimmingpool>none</swimmingpool>
+    <sauna>none</sauna>
+    <hairdryer>1</hairdryer>
+    <entresol>0</entresol>
+    <wheelchair_friendly>0</wheelchair_friendly>
+    <smoking_allowed>0</smoking_allowed>
+    <pets_allowed>0</pets_allowed>
+    <heating>1</heating>
+    <supplies>
+      <coffee>1</coffee>
+      <tea>1</tea>
+      <milk>1</milk>
+      <sugar>1</sugar>
+      <dishwasher_tablets>0</dishwasher_tablets>
+    </supplies>
+    <service>
+      <linen>1</linen>
+      <towels>1</towels>
+    </service>
+    <cleaning_costs>0</cleaning_costs>
+    <deposit_costs>0</deposit_costs>
+    <check_in>14:00</check_in>
+    <check_out>11:00</check_out>
+    <tax>
+      <vat>12.5</vat>
+      <other type="relative">9</other>
+    </tax>
+    <prepayment>30</prepayment>
+    <fee>0</fee>
+    <content>
+      <short locale="en_gb"><![CDATA[Striking studio suite, for up to two guests, wonderfully located in Amsterdam’s Nine Streets.]]></short>
+      <full locale="en_gb"><![CDATA[<p><strong>Striking studio suite, for up to two guests, wonderfully located in Amsterdam’s Nine Streets.</strong></p>
+<p>The hotel combines instant access to Dam Square with a rewarding neighbourhood bustling with cafes, boutiques, restaurants and galleries. Boasting a beautiful interior and incorporating the themes of the Nine Streets, the suite includes wooden floors, ceiling beams, an exposed stone wall and modern furnishings. The central space is flooded with natural light and comes equipped with a flatscreen TV, a desk and chair, a cosy rug and contemporary light fixtures. The double bed rests against an impressive wall printed with a full length image of the historic Runstraat. A fully stocked fridge is available for you free of charge, and a coffee machine and Wi-Fi internet are also provided. The bathroom completes this fashionable holiday home with a shower, toilet, washbasin, shampoo, conditioner, shower gel, and body and hand lotion. Perfect for a small family or two couples, the accommodation ensures a memorable Dutch experience in the heart of Amsterdam.</p>
+<p>The hotel does not have an
+elevator, and breakfast service is not available. However, guests can find
+dining options conveniently situated within a 2-minute walk from the hotel.</p>
+<p><strong>Important Information</strong></p>
+<p>We want to assure our valued guests that the check-in process in all our properties follow the health and safety protocol to prevent spreading COVID-19 virus. We are implementing Corona-proof check-ins and our properties have their own entrance with very minimal to no interaction with other guests.&nbsp;</p>
+<p>Amsterdam is peaceful so we invite you to come and experience the feeling.</p>]]></full>
+      <area locale="en_gb"><![CDATA[<p>This Amsterdam hotel can be found in one of the capital’s most adored neighbourhoods, the Nine Streets or Negen Straatjes. Cutting across four major canals, this atmospheric quarter consists of nine avenues, each exuding a welcoming vibe and hosting a range of cosy establishments. From second hand stores to chic boutiques, the district is regarded as the premier location for shopping in the city and offers a variety of restaurants, bars and cafes to indulge in after a busy day exploring the sights.</p>
+<p>The breathtaking Canal Belt is on your doorstep, providing a picturesque locale to discover on foot, by bike or especially by boat, with ample cruises departing from different stops across the capital. Cultural venues are also close at hand, with nearby options including the ever popular Anne Frank House, the unique Museum of Spectacles and the magnificent New Church, which resides upon Amsterdam’s iconic Dam Square. Reachable through a five minute stroll, this animated plaza is also home to the neoclassical Royal Palace, the chic Bijenkorf department store and the towering National Monument.</p>]]></area>
+      <arrival><![CDATA[<p>Dear guest,<br />
+<br />
+We are delighted that you have chosen our hotel as your Amsterdam home and trust you will enjoy your stay at Hotel IX Amsterdam.<br />
+<br />
+In order to give you the best service possible we kindly ask you to read the following information carefully. For a smooth check-in please inform us your estimated time of arrival as soon as possible and send it to
+susan@hotelixamsterdam.com</p>
+<p><strong>Check-in and check-out</strong></p>
+<p>Check-in is at the hotel (address: Hartenstraat 8) from 14:00 pm and check-out is at 11:00 am at the latest. An early check-in before 14:00 pm is not always possible. For availability, please contact us two days prior to your arrival.</p>
+<p>
+<strong>Payment </strong></p>
+<p>The balance due (incl. VAT & Tourist tax) should preferably be paid by bank transfer prior to arrival. </p>
+<p>Bank details are as follows: </p>
+<p>Hotel IX Amsterdam</p>
+<p>IBAN NL04INGB0006267312</p>
+<p>Notify us in case you are unable to pay the balance due by bank transfer prior to arrival. In that case you can pay the balance due in cash or by credit card. Please take into account that international bank
+transfers take 1-3 working days to be processed<em>. </em></p>
+<p><strong>Other information</strong></p>
+<p>In addition to this information you will receive more detailed
+information prior to your departure.</p>
+<p>
+Some tourists think <strong>Amsterdam is a city</strong> of sin, but in truth it is a <b>city of freedom</b>. And in <strong>freedom</strong>, most people find sin.</p>
+<p>
+We look forward to your arrival and wish you a safe trip!<br />
+<br />
+Warm en welcome regards,</p>
+<p>Hotel IX Amsterdam</p>
+<p>+31 208458451</p>
+<p>susan@hotelixamsterdam.com</p>]]></arrival>
+      <tac><![CDATA[<p class="MsoNoSpacing"><strong><span style="text-decoration: underline;">Cancellation policy</span></strong></p>
+<p class="MsoNormal">Online payment is a pre-payment with a balance due upon arrival</p>
+<p class="MsoNormal"></p>
+<ul>
+	<li><span lang="NL"> </span>The 50% pre-payment is non-refundable at any time, not even in case of force majeure.</li>
+	<li>Bookings cancelled less than 21 days before the start of the stay will be charged with 100% of the balance due.</li>
+	<li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
+</ul>
+<p> </p>
+<p class="MsoNormal"><span lang="NL">The apartment provider reserves the right to cancel or alter the booking:<o:p></o:p></span></p>
+<p class="MsoNormal"></p>
+<ol>
+	<li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
+	<li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
+	<li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
+	<li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
+	<li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
+	<li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
+</ol>
+<p> </p>
+<p class="MsoNormal">The apartment provider will not be liable for any delay, loss, damage or expenses incurred if your booking needs to be altered or cancelled or the apartment provider is unable to perform the contractual obligations as a result of events beyond his reasonable control, which shall include but not be limited to events such as war, civil strife, terrorist activity, labor disputes, natural or man-made disaster, fire, flood, adverse weather conditions or change of local government laws.</p>
+<p class="MsoNormal">In any of these circumstances the apartment provider will refund any payments made in advance, but will have no further liability to the Client. If the apartment provider receives serious complaints or any disputes arise, he reserves the right to terminate your stay without notice and refunding payments.</p><p class="MsoNoSpacing"><strong><span style="text-decoration: underline;">Cancellation policy</span></strong></p>
+<p class="MsoNormal">Online payment is a pre-payment with a balance due upon arrival</p>
+<p class="MsoNormal"></p>
+<ul>
+	<li><span lang="NL"> </span>The 50% pre-payment is non-refundable at any time, not even in case of force majeure.</li>
+	<li>Bookings cancelled less than 21 days before the start of the stay will be charged with 100% of the balance due.</li>
+	<li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
+</ul>
+<p> </p>
+<p class="MsoNormal"><span lang="NL">The apartment provider reserves the right to cancel or alter the booking:<o:p></o:p></span></p>
+<p class="MsoNormal"></p>
+<ol>
+	<li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
+	<li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
+	<li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
+	<li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
+	<li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
+	<li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
+</ol>
+<p> </p>
+<p class="MsoNormal">The apartment provider will not be liable for any delay, loss, damage or expenses incurred if your booking needs to be altered or cancelled or the apartment provider is unable to perform the contractual obligations as a result of events beyond his reasonable control, which shall include but not be limited to events such as war, civil strife, terrorist activity, labor disputes, natural or man-made disaster, fire, flood, adverse weather conditions or change of local government laws.</p>
+<p class="MsoNormal">In any of these circumstances the apartment provider will refund any payments made in advance, but will have no further liability to the Client. If the apartment provider receives serious complaints or any disputes arise, he reserves the right to terminate your stay without notice and refunding payments.</p>]]></tac>
+    </content>
+    <images>
+      <image name="1.jpg" url="http://control.bookingmanager.com/data/property/real/21663_1.jpg" modified="2022-04-28 11:08:17"><![CDATA[Double bed Runstraat suite Amsterdam]]></image>
+      <image name="2.jpg" url="http://control.bookingmanager.com/data/property/real/21663_2.jpg" modified="2022-04-28 11:08:17"><![CDATA[Double bed other angle Runstraat suite Amsterdam]]></image>
+      <image name="3.jpg" url="http://control.bookingmanager.com/data/property/real/21663_3.jpg" modified="2022-04-28 11:08:17"><![CDATA[Bed with the view of Sofa Runstraat suite Amsterdam]]></image>
+      <image name="4.jpg" url="http://control.bookingmanager.com/data/property/real/21663_4.jpg" modified="2022-04-28 11:08:17"><![CDATA[Sofa Runstraat suite Amsterdam]]></image>
+      <image name="5.jpg" url="http://control.bookingmanager.com/data/property/real/21663_5.jpg" modified="2022-04-28 11:08:17"><![CDATA[Sofa other angle Runstraat suite Amsterdam]]></image>
+      <image name="6.jpg" url="http://control.bookingmanager.com/data/property/real/21663_6.jpg" modified="2022-04-28 11:08:17"><![CDATA[Double bed other angle Runstraat suite Amsterdam]]></image>
+      <image name="7.jpg" url="http://control.bookingmanager.com/data/property/real/21663_7.jpg" modified="2022-04-28 11:08:17"><![CDATA[Window Runstraat suite Amsterdam]]></image>
+      <image name="8.jpg" url="http://control.bookingmanager.com/data/property/real/21663_8.jpg" modified="2022-04-28 11:08:17"><![CDATA[Bed Runstraat suite Amsterdam]]></image>
+      <image name="9.jpg" url="http://control.bookingmanager.com/data/property/real/21663_9.jpg" modified="2022-04-28 11:08:17"><![CDATA[Decorative details with the view of bathroom Runstraat suite Amsterdam]]></image>
+      <image name="10.jpg" url="http://control.bookingmanager.com/data/property/real/21663_10.jpg" modified="2022-04-28 11:08:17"><![CDATA[Bed other angle Runstraat suite Amsterdam]]></image>
+      <image name="11.jpg" url="http://control.bookingmanager.com/data/property/real/21663_11.jpg" modified="2022-04-28 11:08:17"><![CDATA[Television Runstraat suite Amsterdam]]></image>
+      <image name="12.jpg" url="http://control.bookingmanager.com/data/property/real/21663_12.jpg" modified="2022-04-28 11:08:17"><![CDATA[Shower Runstraat suite Amsterdam]]></image>
+      <image name="13.jpg" url="http://control.bookingmanager.com/data/property/real/21663_13.jpg" modified="2022-04-28 11:08:17"><![CDATA[Bathroom Runstraat suite Amsterdam]]></image>
+      <image name="14.jpg" url="http://control.bookingmanager.com/data/property/real/21663_14.jpg" modified="2022-04-28 11:08:17"><![CDATA[Bathroom other angle Runstraat suite Amsterdam]]></image>
+      <image name="15.jpg" url="http://control.bookingmanager.com/data/property/real/21663_15.jpg" modified="2022-04-28 11:08:17"><![CDATA[Entree Runstraat suite Amsterdam]]></image>
+      <image name="16.jpg" url="http://control.bookingmanager.com/data/property/real/21663_16.jpg" modified="2022-04-28 11:08:17"><![CDATA[Neighborhood Runstraat suite Amsterdam]]></image>
+      <image name="17.jpg" url="http://control.bookingmanager.com/data/property/real/21663_17.jpg" modified="2022-04-28 11:08:17"><![CDATA[Apartment building Runstraat suite Amsterdam]]></image>
+      <image name="18.jpg" url="http://control.bookingmanager.com/data/property/real/21663_18.jpg" modified="2022-04-28 11:08:17"><![CDATA[Apartment building other angle Runstraat suite Amsterdam]]></image>
+      <image name="19.jpg" url="http://control.bookingmanager.com/data/property/real/21663_19.jpg" modified="2022-04-28 11:08:20"><![CDATA[Door lock Runstraat suite Amsterdam]]></image>
+      <image name="20.jpg" url="http://control.bookingmanager.com/data/property/real/21663_20.jpg" modified="2022-04-28 11:08:17"><![CDATA[Neighborhood Runstraat suite Amsterdam]]></image>
+      <image name="21.jpg" url="http://control.bookingmanager.com/data/property/real/21663_21.jpg" modified="2022-04-28 11:08:17"><![CDATA[Water View Runstraat suite Amsterdam]]></image>
+      <image name="22.jpg" url="http://control.bookingmanager.com/data/property/real/21663_22.jpg" modified="2022-04-28 11:08:17"><![CDATA[Neighborhood other angle Runstraat suite Amsterdam]]></image>
+      <image name="23.jpg" url="http://control.bookingmanager.com/data/property/real/21663_23.jpg" modified="2022-04-28 11:08:17"><![CDATA[Others Runstraat suite Amsterdam]]></image>
+      <image name="24.jpg" url="http://control.bookingmanager.com/data/property/real/21663_24.jpg" modified="2022-04-28 11:08:17"><![CDATA[Neighborhood Runstraat suite Amsterdam]]></image>
+      <image name="25.jpg" url="http://control.bookingmanager.com/data/property/real/21663_25.jpg" modified="2022-04-28 11:08:17"><![CDATA[Neighborhood Runstraat suite Amsterdam]]></image>
+    </images>
+    <created>2014-01-15 15:14:54</created>
+    <modified>2023-11-10 08:55:55</modified>
+  </property>
+  </properties>
+

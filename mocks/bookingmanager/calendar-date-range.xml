@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<calendars>
+  <calendar property_id="22958">
+    <info day="2023-11-01" season="high" modified="2023-11-12 15:52:22">
+      <available>0</available>
+      <stay_minimum>3</stay_minimum>
+      <rate percentage="104" currency="EUR">
+        <total>173.00</total>
+        <final>179.92</final>
+        <tax total="34.1848">
+          <other type="relative" value="10">17.99</other>
+          <vat value="9">16.19</vat>
+          <final>214.10</final>
+        </tax>
+        <fee>0.00</fee>
+        <prepayment>53.98</prepayment>
+        <balance_due>160.12</balance_due>
+      </rate>
+    </info>
+    <info day="2023-11-02" season="high" modified="2023-11-12 15:52:22">
+      <available>0</available>
+      <stay_minimum>3</stay_minimum>
+      <rate percentage="101" currency="EUR">
+        <total>173.00</total>
+        <final>174.73</final>
+        <tax total="33.1987">
+          <other type="relative" value="10">17.47</other>
+          <vat value="9">15.73</vat>
+          <final>207.93</final>
+        </tax>
+        <fee>0.00</fee>
+        <prepayment>52.42</prepayment>
+        <balance_due>155.51</balance_due>
+      </rate>
+    </info>
+    <info day="2023-11-03" season="high" modified="2023-11-12 15:52:22">
+      <available>0</available>
+      <stay_minimum>3</stay_minimum>
+      <rate percentage="119" currency="EUR">
+        <total>173.00</total>
+        <final>205.87</final>
+        <tax total="39.1153">
+          <other type="relative" value="10">20.59</other>
+          <vat value="9">18.53</vat>
+          <final>244.99</final>
+        </tax>
+        <fee>0.00</fee>
+        <prepayment>61.76</prepayment>
+        <balance_due>183.23</balance_due>
+      </rate>
+    </info>
+    <info day="2023-11-04" season="high" modified="2023-11-12 15:52:22">
+      <available>0</available>
+      <stay_minimum>3</stay_minimum>
+      <rate percentage="125" currency="EUR">
+        <total>173.00</total>
+        <final>216.25</final>
+        <tax total="41.0875">
+          <other type="relative" value="10">21.63</other>
+          <vat value="9">19.46</vat>
+          <final>257.34</final>
+        </tax>
+        <fee>0.00</fee>
+        <prepayment>64.88</prepayment>
+        <balance_due>192.46</balance_due>
+      </rate>
+    </info>
+    <info day="2023-11-05" season="high" modified="2023-11-12 15:52:22">
+      <available>0</available>
+      <stay_minimum>3</stay_minimum>
+      <rate percentage="107" currency="EUR">
+        <total>173.00</total>
+        <final>185.11</final>
+        <tax total="35.1709">
+          <other type="relative" value="10">18.51</other>
+          <vat value="9">16.66</vat>
+          <final>220.28</final>
+        </tax>
+        <fee>0.00</fee>
+        <prepayment>55.53</prepayment>
+        <balance_due>164.75</balance_due>
+      </rate>
+    </info>
+    <info day="2023-11-06" season="high" modified="2023-11-12 15:52:22">
+      <available>0</available>
+      <stay_minimum>3</stay_minimum>
+      <rate percentage="88" currency="EUR">
+        <total>173.00</total>
+        <final>152.24</final>
+        <tax total="28.9256">
+          <other type="relative" value="10">15.22</other>
+          <vat value="9">13.70</vat>
+          <final>181.17</final>
+        </tax>
+        <fee>0.00</fee>
+        <prepayment>45.67</prepayment>
+        <balance_due>135.50</balance_due>
+      </rate>
+    </info>
+    <info day="2023-11-07" season="high" modified="2023-11-12 15:52:22">
+      <available>0</available>
+      <stay_minimum>3</stay_minimum>
+      <rate percentage="88" currency="EUR">
+        <total>173.00</total>
+        <final>152.24</final>
+        <tax total="28.9256">
+          <other type="relative" value="10">15.22</other>
+          <vat value="9">13.70</vat>
+          <final>181.17</final>
+        </tax>
+        <fee>0.00</fee>
+        <prepayment>45.67</prepayment>
+        <balance_due>135.50</balance_due>
+      </rate>
+    </info>
+  </calendar>
+</calendars>
+

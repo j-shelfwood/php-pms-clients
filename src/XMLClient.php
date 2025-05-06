@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpPms\Clients; // Changed namespace
+namespace Shelfwood\PhpPms\Clients; // Changed namespace
 
 use Exception;
 use SimpleXMLElement;
@@ -9,7 +9,7 @@ use Psr\Log\NullLogger; // Import NullLogger for default
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Client; // Import Guzzle Client for default
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
-use PhpPms\Clients\Exceptions\HttpClientException;
+use Shelfwood\PhpPms\Clients\Exceptions\HttpClientException;
 use Tightenco\Collect\Support\Collection; // Corrected use statement
 
 abstract class XMLClient

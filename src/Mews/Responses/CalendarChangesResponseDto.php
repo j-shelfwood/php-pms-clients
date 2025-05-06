@@ -1,8 +1,8 @@
 <?php
 
-namespace Domain\Connections\Mews\Dtos;
+namespace Shelfwood\PhpPms\Clients\Mews\Dtos;
 
-use Domain\Dtos\CalendarChangesResponse;
+use Shelfwood\PhpPms\Clients\Dtos\CalendarChangesResponse;
 
 class CalendarChangesResponseDto
 {

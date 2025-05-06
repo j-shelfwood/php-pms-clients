@@ -1,0 +1,32 @@
+<booking id="171838" identifier="BILL-171838-148-AMS-21663-2024-02-08" provider_identifier="" channel_identifier="" arrival="2024-02-08" departure="2024-02-12">
+  <name first="Joris" last="Schelfhout"/>
+  <email>joris@shelfwood.co</email>
+  <address_1>Fagelstraat 83H</address_1>
+  <address_2>1052GA</address_2>
+  <city>Amsterdam</city>
+  <country/>
+  <phone>+31648353484</phone>
+  <amount_adults>1</amount_adults>
+  <amount_childs>0</amount_childs>
+  <time_arrival>14:00:00</time_arrival>
+  <flight/>
+  <notes>[2024-01-06 14:46:22] Booking via www.hotelixamsterdam.com
+yes</notes>
+  <property id="21663" identifier="#487">Runstraat suite Amsterdam</property>
+  <status>failed</status>
+  <message>Other: </message>
+  <rate currency="EUR">
+    <total>1232.00</total>
+    <final>1410.64</final>
+    <tax total="225.70">
+      <vat>126.96</vat>
+      <other>98.74</other>
+      <final>1636.34</final>
+    </tax>
+    <fee>0.00</fee>
+    <prepayment>423.19</prepayment>
+    <balance_due>1213.15</balance_due>
+  </rate>
+  <created>2024-01-06 14:46:22</created>
+  <modified>2024-01-06 14:46:29</modified>
+</booking>
