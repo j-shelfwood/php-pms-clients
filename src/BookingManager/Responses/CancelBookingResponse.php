@@ -24,12 +24,12 @@ class CancelBookingResponse
         if (isset($data['error'])) {
             return new self(false, (string) $data['error']);
         }
-
-        $success = $data['status'] === 'cancelled' || empty($data) || !isset($data['error']);
-
-        return new self(
-            $success,
-            $success ? 'Booking cancelled successfully.' : 'Failed to cancel booking.'
-        );
+        $status = (string) ($data['status'] ?? '');
+        $message = isset($data['message']) ? (string) $data['message'] : '';
+        $success = $status === 'cancelled';
+        if ($message === '') {
+            $message = $success ? 'Booking cancelled successfully.' : 'Failed to cancel booking.';
+        }
+        return new self($success, $message);
     }
 }
