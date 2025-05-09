@@ -1,8 +1,6 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
-
-use Tightenco\Collect\Support\Collection;
+namespace Shelfwood\PhpPms\BookingManager\Responses\ValueObjects;
 
 class StayRate
 {
@@ -13,13 +11,13 @@ class StayRate
         public readonly StayTax $tax
     ) {}
 
-    public static function fromXml(Collection|array $rateData): self
+    public static function fromXml(array $rateData): self
     {
         return new self(
-            final: (float) ($rateData->get('final') ?? 0.0),
-            prepayment: (float) ($rateData->get('prepayment') ?? 0.0),
-            balanceDue: (float) ($rateData->get('balance_due') ?? 0.0),
-            tax: StayTax::fromXml(collect($rateData->get('tax', [])))
+            final: (float) ($rateData['final'] ?? 0.0),
+            prepayment: (float) ($rateData['prepayment'] ?? 0.0),
+            balanceDue: (float) ($rateData['balance_due'] ?? 0.0),
+            tax: StayTax::fromXml($rateData['tax'] ?? [])
         );
     }
 }

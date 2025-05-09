@@ -1,10 +1,9 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\BookingManager\Responses;
+namespace Shelfwood\PhpPms\BookingManager\Responses;
 
 use Exception;
-use Tightenco\Collect\Support\Collection;
-use Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects\StayRate;
+use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\StayRate;
 
 class RateResponse
 {
@@ -25,11 +24,10 @@ class RateResponse
         public readonly float $final_before_taxes,
         public readonly float $final_after_taxes,
         public readonly float $tax_vat,
-        public readonly float $tax_other, // Renamed from tax_tourist for clarity based on XML ('other')
+        public readonly float $tax_other,
         public readonly float $tax_total,
         public readonly float $prepayment,
         public readonly float $balance_due_remaining,
-        // Optional: Include property details if needed
         public readonly ?int $propertyId = null,
         public readonly ?string $propertyIdentifier = null,
         public readonly ?int $maxPersons = null,
@@ -40,33 +38,29 @@ class RateResponse
     }
 
     /**
-     * Creates a new RateResponse instance from a response Collection (info.xml structure).
+     * Creates a new RateResponse instance from a response array (info.xml structure).
      *
-     * @param  Collection  $response  The response collection containing booking rate information.
+     * @param  array  $response  The response array containing booking rate information.
      * @return self Returns an instance of RateResponse populated with data from the response.
      */
-    public static function map(Collection|array $response): self
+    public static function map(array $response): self
     {
         try {
-            // Data is nested under \'property\' in the typical info.xml response
-            // However, the provided mock \'get-rate-for-stay.xml\' has \'property\' inside \'info\'
-            $infoData = $response->get('info') ?? $response; // Adjust based on whether \'info\' wrapper exists
-            $propertyData = collect($infoData->get('property'));
+            $infoData = $response['info'] ?? $response;
+            $propertyData = $infoData['property'] ?? [];
 
-            if ($propertyData->isEmpty()) {
-                // Removed Log::error
+            if (empty($propertyData)) {
                 throw new Exception('Invalid response structure: Missing property data.');
             }
 
-            if (! $propertyData->has('rate')) {
-                // Removed Log::error
+            if (!isset($propertyData['rate'])) {
                 throw new Exception('Invalid response structure: Missing rate data.');
             }
 
-            $rateData = collect($propertyData->get('rate'));
+            $rateData = $propertyData['rate'];
             $stayRate = StayRate::fromXml($rateData);
 
-            $propertyAttributes = $propertyData->get('@attributes', []);
+            $propertyAttributes = $propertyData['@attributes'] ?? [];
 
             return new self(
                 final_before_taxes: $stayRate->final,
@@ -76,16 +70,13 @@ class RateResponse
                 tax_total: $stayRate->tax->total,
                 prepayment: $stayRate->prepayment,
                 balance_due_remaining: $stayRate->balanceDue,
-                // Map property details as well
                 propertyId: (int) ($propertyAttributes['id'] ?? null),
                 propertyIdentifier: (string) ($propertyAttributes['identifier'] ?? null),
                 maxPersons: (int) ($propertyAttributes['max_persons'] ?? null),
-                // Availability might be at the \'info\' level or \'property\' level depending on context
-                available: (bool) ($propertyAttributes['available'] ?? $infoData->get('@attributes')['available'] ?? null),
+                available: (bool) ($propertyAttributes['available'] ?? null),
                 minimalNights: (int) ($propertyAttributes['minimal_nights'] ?? null)
             );
         } catch (Exception $e) {
-            // Re-throw or handle as appropriate for your application flow
             throw new Exception('Failed to map RateResponse: '.$e->getMessage(), 0, $e);
         }
     }

@@ -1,29 +1,52 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
-
-use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
+namespace Shelfwood\PhpPms\BookingManager\Responses\ValueObjects;
 
 class PropertyTax
 {
     public function __construct(
         public readonly float $vat,
         public readonly float $other,
-        public readonly string $otherType // 'relative' or 'fixed'
+        public readonly string $otherType
     ) {}
 
-    public static function fromXml(Collection|array $data): self
+    public static function fromXml(array $data): self
     {
-        $otherData = $data instanceof Collection ? $data->get('other', []) : ($data['other'] ?? []);
-        if ($otherData instanceof Collection) $otherData = $otherData->all(); // Ensure array
+        if (!is_array($data)) {
+            $data = [];
+        }
 
-        $otherText = is_array($otherData) ? ($otherData['#text'] ?? 0.0) : $otherData;
-        $otherAttributesType = is_array($otherData) && isset($otherData['@attributes']['type']) ? $otherData['@attributes']['type'] : '';
+        $vat = 0.0;
+        $vatType = '';
+        if (isset($data['vat'])) {
+            if (is_array($data['vat'])) {
+                $vat = (float)($data['vat']['#text'] ?? 0.0);
+                if (isset($data['vat']['@attributes']) && is_array($data['vat']['@attributes'])) {
+                    $vatType = (string)($data['vat']['@attributes']['type'] ?? '');
+                }
+            } else {
+                $vat = (float)$data['vat'];
+            }
+        }
+
+        $other = 0.0;
+        $otherType = '';
+        if (isset($data['other'])) {
+            $otherData = $data['other'];
+            if (is_array($otherData)) {
+                $other = (float)($otherData['#text'] ?? 0.0);
+                if (isset($otherData['@attributes']) && is_array($otherData['@attributes'])) {
+                    $otherType = (string)($otherData['@attributes']['type'] ?? '');
+                }
+            } elseif (!is_null($otherData) && $otherData !== '') {
+                $other = (float)$otherData;
+            }
+        }
 
         return new self(
-            vat: (float) ($data instanceof Collection ? $data->get('vat') : ($data['vat'] ?? 0.0)),
-            other: (float) $otherText,
-            otherType: (string) $otherAttributesType
+            vat: $vat,
+            other: $other,
+            otherType: $otherType
         );
     }
 }

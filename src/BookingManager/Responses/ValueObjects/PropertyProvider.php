@@ -1,8 +1,8 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\BookingManager\Responses\ValueObjects;
 
-use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
+
 
 class PropertyProvider
 {
@@ -12,18 +12,13 @@ class PropertyProvider
         public readonly string $name
     ) {}
 
-    public static function fromXml(Collection|array $data): self
+    public static function fromXml(array $data): self
     {
-        $attributes = $data instanceof Collection ? ($data->get('@attributes') ?? $data) : ($data['@attributes'] ?? $data);
-        // If $attributes is still a Collection after get, convert to array for consistent access
-        if ($attributes instanceof Collection) {
-            $attributes = $attributes->all();
-        }
-
+        $attributes = isset($data['@attributes']) ? $data['@attributes'] : $data;
         return new self(
-            id: (int) ($attributes['id'] ?? 0),
-            code: (string) ($attributes['code'] ?? ''),
-            name: (string) ($attributes['name'] ?? '')
+            id: (int)($attributes['id'] ?? 0),
+            code: (string)($attributes['code'] ?? ''),
+            name: (string)($attributes['name'] ?? '')
         );
     }
 }

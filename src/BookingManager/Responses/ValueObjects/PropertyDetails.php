@@ -1,19 +1,11 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\BookingManager\Responses;
+namespace Shelfwood\PhpPms\BookingManager\Responses\ValueObjects;
 
-use Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects\PropertyContent;
-use Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects\PropertyLocation;
-use Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects\PropertyProvider;
-use Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects\PropertyService;
-use Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects\PropertySupplies;
-use Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects\PropertyTax;
 use Exception;
-use Carbon\Carbon; // Keep Carbon
-use Tightenco\Collect\Support\Collection; // Use Tightenco Collection
-// Removed Log, Arr, PropertyInfoFactory, Arrayable
+use Carbon\Carbon;
 
-class PropertyInfoResponse
+class PropertyDetails
 {
     public function __construct(
         public readonly int $external_id,
@@ -90,96 +82,85 @@ class PropertyInfoResponse
         public readonly ?float $prepayment,
         public readonly ?float $fee,
         public readonly PropertyContent $content,
-        /** @var Collection<int, PropertyImageResponse> */
-        public readonly Collection $images,
+        /** @var PropertyImageResponse[] */
+        public readonly array $images,
         public readonly ?Carbon $external_created_at,
         public readonly ?Carbon $external_updated_at
     ) {}
 
-    // Removed factory() method
-    // Removed toDatabase() method
-
-    public static function map(Collection|array $data): self
+    public static function map(array $data): self
     {
+
         $propertyData = $data;
-        // Handle potential nesting under 'properties' -> 'property' or just 'property'
-        if ($data instanceof Collection) {
-            if (! $data->has('@attributes') && $data->has('properties.property')) {
-                $propertyData = collect($data->get('properties.property'));
-            } elseif (! $data->has('@attributes') && $data->has('property')) {
-                $propertyData = collect($data->get('property'));
-            }
-        } elseif (is_array($data)) {
-            if (! isset($data['@attributes']) && isset($data['properties']['property'])) {
-                $propertyData = collect($data['properties']['property']);
-            } elseif (! isset($data['@attributes']) && isset($data['property'])) {
-                $propertyData = collect($data['property']);
-            }
+        if (isset($data['properties']['property'])) {
+            $propertyData = $data['properties']['property'];
+        } elseif (isset($data['property'])) {
+            $propertyData = $data['property'];
         }
 
-        if (($propertyData instanceof Collection && $propertyData->isEmpty()) || (is_array($propertyData) && empty($propertyData))) {
-            // Removed Log call
+        if (empty($propertyData)) {
             throw new Exception('Invalid response structure: Missing property data.');
         }
 
-        $attributes = $propertyData instanceof Collection ? $propertyData->get('@attributes', []) : ($propertyData['@attributes'] ?? []);
-        if ($attributes instanceof Collection) $attributes = $attributes->all(); // Ensure array
+        $attributes = $propertyData['@attributes'] ?? [];
+        $id = (int) ($attributes['id'] ?? 0);
+        $name = (string) ($attributes['name'] ?? '');
+        $status = (string) ($attributes['status'] ?? '');
+        $identifier = isset($attributes['identifier']) ? (string) $attributes['identifier'] : null;
 
-        $getInt = function ($key, $default = 0) use ($propertyData) {
-            $value = $propertyData instanceof Collection ? $propertyData->get($key) : ($propertyData[$key] ?? null);
-            return (int) ($value ?? $default);
-        };
-        $getFloat = function ($key, $default = 0.0) use ($propertyData) {
-            $value = $propertyData instanceof Collection ? $propertyData->get($key) : ($propertyData[$key] ?? null);
-            return (float) ($value ?? $default);
-        };
-        $getBool = function ($key, $default = false) use ($propertyData) {
-            $value = $propertyData instanceof Collection ? $propertyData->get($key) : ($propertyData[$key] ?? null);
-            return (bool) ($value ?? $default);
-        };
-        $getString = function ($key, $default = null) use ($propertyData) {
-            $value = $propertyData instanceof Collection ? $propertyData->get($key) : ($propertyData[$key] ?? null);
-            if ($value === false) return null;
-            return ($value !== null && !is_array($value)) ? (string) $value : $default;
-        };
-        $getDate = function ($key) use ($propertyData) {
-            $dateStr = $propertyData instanceof Collection ? $propertyData->get($key) : ($propertyData[$key] ?? null);
-            try {
-                return $dateStr ? Carbon::parse($dateStr) : null;
-            } catch (\Throwable $e) {
-                // Removed Log call, consider a different way to handle parse errors if necessary
-                return null;
+        $getString = function($key, $default = null) use ($propertyData) {
+            $value = $propertyData[$key] ?? $default;
+            if (is_array($value) && empty($value)) {
+                return $default;
             }
+            if (!is_scalar($value) && $value !== null) {
+                return $default;
+            }
+            return $value === null ? null : (string) $value;
+        };
+
+        $getInt = function($key, $default = 0) use ($propertyData) {
+            $value = $propertyData[$key] ?? $default;
+            return is_numeric($value) ? (int) $value : $default;
+        };
+
+        $getFloat = function($key, $default = 0.0) use ($propertyData) {
+            $value = $propertyData[$key] ?? $default;
+            return is_numeric($value) ? (float) $value : $default;
+        };
+
+        $getBool = function($key, $default = false) use ($propertyData) {
+            $value = $propertyData[$key] ?? $default;
+            return is_bool($value) ? $value : (bool) $default;
+        };
+
+        $getDate = function($key) use ($propertyData) {
+            $value = $propertyData[$key] ?? null;
+            return ($value !== null && !empty($value) && !is_array($value)) ? Carbon::parse((string) $value) : null;
         };
 
         $typesString = $getString('type', '');
         $propertyTypes = !empty($typesString) ? explode(',', $typesString) : [];
 
-        $imagesData = $propertyData instanceof Collection ? $propertyData->get('images.image', []) : ($propertyData['images']['image'] ?? []);
-        if ($imagesData instanceof Collection) $imagesData = $imagesData->all();
 
-        if (!empty($imagesData) && isset($imagesData['name'])) { // Check if it's a single image not in an array
+        $imagesData = $propertyData['images']['image'] ?? [];
+        if (!is_array($imagesData)) {
+            $imagesData = [];
+        } elseif (isset($imagesData['@attributes']) || isset($imagesData['name'])) {
             $imagesData = [$imagesData];
         }
-
-        $imagesCollection = new Collection();
-        if (is_array($imagesData)) {
-            foreach ($imagesData as $imageData) {
-                if (!empty($imageData)) {
-                    // Corrected: PropertyImageResponse::fromXml, not map
-                    $imagesCollection->push(PropertyImageResponse::fromXml(collect($imageData)));
-                }
-            }
-        }
+        $imagesData = array_filter($imagesData, function ($img) {
+            return is_array($img) && isset($img['@attributes']);
+        });
 
         return new self(
-            external_id: (int) ($attributes['id'] ?? 0),
-            name: (string) ($attributes['name'] ?? ''),
-            identifier: $getString('@attributes.identifier'),
-            status: (string) ($attributes['status'] ?? ''),
+            external_id: $id,
+            name: $name,
+            identifier: $identifier,
+            status: $status,
             property_types: $propertyTypes,
-            provider: PropertyProvider::fromXml(collect($propertyData instanceof Collection ? $propertyData->get('provider', []) : ($propertyData['provider'] ?? []))),
-            location: PropertyLocation::fromXml(collect($propertyData instanceof Collection ? $propertyData->get('location', []) : ($propertyData['location'] ?? []))),
+            provider: PropertyProvider::fromXml($propertyData['provider'] ?? []),
+            location: PropertyLocation::fromXml($propertyData['location'] ?? []),
             max_persons: $getInt('max_persons'),
             minimal_nights: $getInt('minimal_nights'),
             maximal_nights: $getInt('maximal_nights'),
@@ -237,17 +218,17 @@ class PropertyInfoResponse
             smoking_allowed: $getBool('smoking_allowed'),
             pets_allowed: $getBool('pets_allowed'),
             heating: $getBool('heating'),
-            supplies: PropertySupplies::fromXml(collect($propertyData instanceof Collection ? $propertyData->get('supplies', []) : ($propertyData['supplies'] ?? []))),
-            service: PropertyService::fromXml(collect($propertyData instanceof Collection ? $propertyData->get('service', []) : ($propertyData['service'] ?? []))),
+            supplies: PropertySupplies::fromXml($propertyData['supplies'] ?? []),
+            service: PropertyService::fromXml($propertyData['service'] ?? []),
             cleaning_costs: $getFloat('cleaning_costs'),
             deposit_costs: $getFloat('deposit_costs'),
             check_in: $getString('check_in'),
             check_out: $getString('check_out'),
-            tax: PropertyTax::fromXml(collect($propertyData instanceof Collection ? $propertyData->get('tax', []) : ($propertyData['tax'] ?? []))),
+            tax: PropertyTax::fromXml($propertyData['tax'] ?? []),
             prepayment: $getFloat('prepayment'),
             fee: $getFloat('fee'),
-            content: PropertyContent::fromXml(collect($propertyData instanceof Collection ? $propertyData->get('content', []) : ($propertyData['content'] ?? []))),
-            images: $imagesCollection,
+            content: PropertyContent::fromXml($propertyData['content'] ?? []),
+            images: array_map(fn($imageData) => PropertyImage::fromXml($imageData), $imagesData),
             external_created_at: $getDate('external_created_at'),
             external_updated_at: $getDate('external_updated_at')
         );

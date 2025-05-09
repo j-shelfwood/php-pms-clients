@@ -1,8 +1,8 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\BookingManager\Responses\ValueObjects;
 
-use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
+
 
 class CalendarTax
 {
@@ -16,34 +16,16 @@ class CalendarTax
         public readonly float $final
     ) {}
 
-    public static function fromXml(Collection|array $taxData): self
+    public static function fromXml(array $taxData): self
     {
-        $sourceData = $taxData instanceof Collection ? $taxData : new Collection($taxData);
-
-        $vatInfo = new Collection($sourceData->get('vat', []));
-        $otherInfo = new Collection($sourceData->get('other', []));
-
-        $vatAmount = (float) ($vatInfo->get('#text') ?? $vatInfo[0] ?? ($sourceData->get('vat') ?? 0.0));
-        $vatValue = (float) ($vatInfo->get('@attributes.value') ?? ($vatInfo->get('@attributes')['value'] ?? 0.0));
-
-        $otherAmount = (float) ($otherInfo->get('#text') ?? $otherInfo[0] ?? ($sourceData->get('other') ?? 0.0));
-        $otherType = (string) ($otherInfo->get('@attributes.type') ?? ($otherInfo->get('@attributes')['type'] ?? ''));
-        $otherValue = (float) ($otherInfo->get('@attributes.value') ?? ($otherInfo->get('@attributes')['value'] ?? 0.0));
-
-        // Handle cases where vat/other might not be collections but direct values
-        if (!($sourceData->get('vat') instanceof Collection || is_array($sourceData->get('vat')))) {
-            $vatAmount = (float) ($sourceData->get('vat') ?? 0.0);
-            $vatValue = 0.0; // No attributes if it's a direct value
-        }
-        if (!($sourceData->get('other') instanceof Collection || is_array($sourceData->get('other')))) {
-            $otherAmount = (float) ($sourceData->get('other') ?? 0.0);
-            $otherType = '';
-            $otherValue = 0.0;
-        }
-
-        $totalAttribute = $sourceData->get('@attributes');
-        $total = (float) ($totalAttribute['total'] ?? $sourceData->get('total') ?? 0.0);
-
+        $vatInfo = isset($taxData['vat']) ? $taxData['vat'] : [];
+        $otherInfo = isset($taxData['other']) ? $taxData['other'] : [];
+        $vatAmount = is_array($vatInfo) ? (float)($vatInfo['#text'] ?? 0.0) : (float)$vatInfo;
+        $vatValue = is_array($vatInfo) ? (float)($vatInfo['@attributes']['value'] ?? 0.0) : 0.0;
+        $otherAmount = is_array($otherInfo) ? (float)($otherInfo['#text'] ?? 0.0) : (float)$otherInfo;
+        $otherType = is_array($otherInfo) ? (string)($otherInfo['@attributes']['type'] ?? '') : '';
+        $otherValue = is_array($otherInfo) ? (float)($otherInfo['@attributes']['value'] ?? 0.0) : 0.0;
+        $total = isset($taxData['@attributes']['total']) ? (float)$taxData['@attributes']['total'] : (float)($taxData['total'] ?? 0.0);
         return new self(
             total: $total,
             other: $otherAmount,
@@ -51,7 +33,7 @@ class CalendarTax
             otherValue: $otherValue,
             vat: $vatAmount,
             vatValue: $vatValue,
-            final: (float) ($sourceData->get('final') ?? 0.0)
+            final: (float)($taxData['final'] ?? 0.0)
         );
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\Util\Dtos;
+namespace Shelfwood\PhpPms\Exceptions;
 
-class ErrorDetailsDto
+class ErrorDetails
 {
     public function __construct(
         public readonly ?string $code,

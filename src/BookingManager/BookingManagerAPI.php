@@ -1,77 +1,141 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\BookingManager;
+namespace Shelfwood\PhpPms\BookingManager;
 
 use Carbon\Carbon;
-use Tightenco\Collect\Support\Collection;
-use Shelfwood\PhpPms\Clients\XMLClient;
-use Shelfwood\PhpPms\Clients\BookingManager\Payloads\CreateBookingPayload;
-use Shelfwood\PhpPms\Clients\BookingManager\Responses\RateResponse;
-use Shelfwood\PhpPms\Clients\BookingManager\Responses\CalendarResponse;
-use Shelfwood\PhpPms\Clients\BookingManager\Responses\PropertyInfoResponse;
-use Shelfwood\PhpPms\Clients\BookingManager\Responses\CreateBookingResponse;
-use Shelfwood\PhpPms\Clients\BookingManager\Responses\FinalizeBookingResponse;
-use Shelfwood\PhpPms\Clients\BookingManager\Responses\CalendarChangesResponse;
+use Psr\Log\LoggerInterface;
+use GuzzleHttp\ClientInterface;
+use Shelfwood\PhpPms\Http\XMLClient;
+use Shelfwood\PhpPms\BookingManager\Responses\RateResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\CalendarResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\PropertyResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\PropertiesResponse;
+use Shelfwood\PhpPms\BookingManager\Payloads\CreateBookingPayload;
+use Shelfwood\PhpPms\BookingManager\Responses\CancelBookingResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\CreateBookingResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\CalendarChangesResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\FinalizeBookingResponse;
 
 class BookingManagerAPI extends XMLClient
 {
-    public function getRateForStay(int $id, Carbon $arrival, Carbon $departure): RateResponse
-    {
-        $response = $this->makeRequest('info.xml', [
-            'id' => $id,
-            'arrival' => $arrival->format('Y-m-d'),
-            'departure' => $departure->format('Y-m-d'),
-        ]);
-
-        return RateResponse::map($response);
+    public function __construct(
+        ClientInterface $httpClient,
+        string $apiKey,
+        string $username,
+        string $baseUrl,
+        ?LoggerInterface $logger = null
+    ) {
+        parent::__construct($baseUrl, $apiKey, $username, $httpClient, $logger);
     }
 
     /**
      * Get all properties from BookingManager
      *
-     * @return Collection<PropertyInfoResponse>
+     * @return PropertiesResponse
      */
-    public function getAllProperties(): Collection
+    public function properties(): PropertiesResponse
     {
-        return $this->makeRequest('details.xml')
-            ->map(fn (Collection $details) => PropertyInfoResponse::map($details));
+        $params = ['request' => 'list_properties'];
+        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
+        $parsedArray = $responseArray[0] ?? [];
+        if (!$parsedArray || !isset($parsedArray['property'])) {
+            $this->logger->warning('No <property> elements found directly under the root parsed XML for getAllProperties.', [
+                'parsed_xml_keys' => is_array($parsedArray) ? implode(',', array_keys($parsedArray)) : 'null',
+            ]);
+            return new PropertiesResponse(properties: []);
+        }
+        if (isset($parsedArray['property']) && isset($parsedArray['property']['@attributes'])) {
+            $parsedArray['property'] = [$parsedArray['property']];
+        }
+        return PropertiesResponse::map($parsedArray);
     }
 
-    public function getPropertyById(int $id): PropertyInfoResponse
+    public function property(int $id): PropertyResponse
     {
-        return PropertyInfoResponse::map($this->makeRequest('details.xml', ['id' => $id]));
+        $params = [
+            'request' => 'get_property_details',
+            'property_id' => $id,
+        ];
+        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
+        $parsedXml = $responseArray[0];
+        $propertyArray = json_decode(json_encode($parsedXml), true);
+        return PropertyResponse::map($propertyArray);
     }
 
-    public function getCalendarForDateRange(int $propertyId, Carbon $startDate, Carbon $endDate): CalendarResponse
+    public function calendar(int $propertyId, Carbon $startDate, Carbon $endDate): CalendarResponse
     {
-        return CalendarResponse::map($this->makeRequest('calendar.xml', [
-            'id' => $propertyId,
-            'start' => $startDate->format('Y-m-d'),
-            'end' => $endDate->format('Y-m-d'),
-        ]));
+        $params = [
+            'request' => 'get_calendar',
+            'property_id' => $propertyId,
+            'date_from' => $startDate->format('Ymd'),
+            'date_to' => $endDate->format('Ymd'),
+        ];
+        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
+        return CalendarResponse::map($responseArray[0]);
     }
 
-    public function getCalendarChanges(Carbon $since): CalendarChangesResponse
+    public function calendarChanges(Carbon $since): CalendarChangesResponse
     {
-        return CalendarChangesResponse::map($this->makeRequest('calendar_changes.xml', [
-            'time' => $since->format('Y-m-d H:i:s'),
-        ]));
+        $params = [
+            'request' => 'get_calendar_changes',
+            'since' => $since->format('YmdHis'),
+        ];
+        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
+        return CalendarChangesResponse::map($responseArray[0]);
     }
 
-    public function createBooking(CreateBookingPayload $bookingData): CreateBookingResponse
+    public function rateForStay(int $propertyId, Carbon $arrivalDate, Carbon $departureDate, int $numAdults, ?int $numChildren = null, ?int $numBabies = null): RateResponse
     {
-        $response = $this->makeRequest('booking_create.xml?overwrite_rates=1', $bookingData->toArray(), 'POST');
+        $params = [
+            'request' => 'get_rate_for_stay',
+            'property_id' => $propertyId,
+            'arrival_date' => $arrivalDate->format('Ymd'),
+            'departure_date' => $departureDate->format('Ymd'),
+            'adults' => $numAdults,
+        ];
 
-        return CreateBookingResponse::map($response);
+        if ($numChildren !== null) {
+            $params['children'] = $numChildren;
+        }
+        if ($numBabies !== null) {
+            $params['babies'] = $numBabies;
+        }
+
+        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
+        return RateResponse::map($responseArray[0]);
+    }
+
+    public function createBooking(CreateBookingPayload $payload): CreateBookingResponse
+    {
+        $params = array_merge(['request' => 'create_booking'], $payload->toArray());
+        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
+        return CreateBookingResponse::map($responseArray[0]);
     }
 
     public function finalizeBooking(int $externalBookingId): FinalizeBookingResponse
     {
-        $response = $this->makeRequest('booking_finalize.xml', [
-            'id' => $externalBookingId,
+        $params = [
+            'request' => 'finalize_booking',
+            'booking_id' => $externalBookingId,
             'overwrite_rates' => 1,
-        ]);
+        ];
+        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
+        return FinalizeBookingResponse::map($responseArray[0]);
+    }
 
-        return FinalizeBookingResponse::map($response);
+    public function cancelBooking(int $bookingId, string $reason): CancelBookingResponse
+    {
+        $params = [
+            'request' => 'cancel_booking',
+            'booking_id' => $bookingId,
+            'reason' => $reason,
+        ];
+        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
+        return CancelBookingResponse::map($responseArray[0]);
+    }
+
+    private function getEndpoint(string $type): string
+    {
+        return "{$this->baseUrl}/{$type}";
     }
 }

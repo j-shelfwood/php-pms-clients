@@ -1,8 +1,8 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\BookingManager\Responses\ValueObjects;
 
-use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
+
 
 class PropertyService
 {
@@ -12,12 +12,12 @@ class PropertyService
         public readonly bool $cleaning
     ) {}
 
-    public static function fromXml(Collection|array $data): self
+    public static function fromXml(array $data): self
     {
         return new self(
-            linen: (bool) ($data instanceof Collection ? $data->get('linen') : ($data['linen'] ?? false)),
-            towels: (bool) ($data instanceof Collection ? $data->get('towels') : ($data['towels'] ?? false)),
-            cleaning: (bool) ($data instanceof Collection ? $data->get('cleaning') : ($data['cleaning'] ?? false))
+            linen: (bool)($data['linen'] ?? false),
+            towels: (bool)($data['towels'] ?? false),
+            cleaning: (bool)($data['cleaning'] ?? false)
         );
     }
 }

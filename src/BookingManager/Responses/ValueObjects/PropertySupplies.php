@@ -1,27 +1,32 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
-
-use Tightenco\Collect\Support\Collection;
+namespace Shelfwood\PhpPms\BookingManager\Responses\ValueObjects;
 
 class PropertySupplies
 {
-    public function __construct(
-        public readonly bool $coffee,
-        public readonly bool $tea,
-        public readonly bool $milk,
-        public readonly bool $sugar,
-        public readonly bool $dishwasherTablets
-    ) {}
+    public bool $coffee;
+    public bool $tea;
+    public bool $milk;
+    public bool $sugar;
+    public bool $dishwasherTablets;
 
-    public static function fromXml(Collection|array $data): self
+    public function __construct(bool $coffee, bool $tea, bool $milk, bool $sugar, bool $dishwasherTablets)
+    {
+        $this->coffee = $coffee;
+        $this->tea = $tea;
+        $this->milk = $milk;
+        $this->sugar = $sugar;
+        $this->dishwasherTablets = $dishwasherTablets;
+    }
+
+    public static function fromXml(array $data): self
     {
         return new self(
-            coffee: (bool) ($data instanceof Collection ? $data->get('coffee') : ($data['coffee'] ?? false)),
-            tea: (bool) ($data instanceof Collection ? $data->get('tea') : ($data['tea'] ?? false)),
-            milk: (bool) ($data instanceof Collection ? $data->get('milk') : ($data['milk'] ?? false)),
-            sugar: (bool) ($data instanceof Collection ? $data->get('sugar') : ($data['sugar'] ?? false)),
-            dishwasherTablets: (bool) ($data instanceof Collection ? $data->get('dishwasher_tablets') : ($data['dishwasher_tablets'] ?? false))
+            coffee: (bool) ($data['coffee'] ?? false),
+            tea: (bool) ($data['tea'] ?? false),
+            milk: (bool) ($data['milk'] ?? false),
+            sugar: (bool) ($data['sugar'] ?? false),
+            dishwasherTablets: (bool) ($data['dishwasher_tablets'] ?? false)
         );
     }
 }

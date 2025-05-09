@@ -1,27 +1,24 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\BookingManager\Responses\ValueObjects;
 
-use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
+
 
 class CalendarChange
 {
     public function __construct(
         public readonly int $propertyId,
-        /** @var Collection<int, string> */
-        public readonly Collection $months // Collection of 'YYYY-MM' strings
+        /** @var string[] */
+        public readonly array $months
     ) {}
 
-    public static function fromXml(Collection|array $data): self
+    public static function fromXml(array $data): self
     {
-        $sourceData = $data instanceof Collection ? $data : new Collection($data);
-        $attributes = new Collection($sourceData->get('@attributes', []));
-
-        $monthsString = (string) $attributes->get('months', '');
-        $months = !empty($monthsString) ? collect(explode(',', $monthsString)) : collect();
-
+        $attributes = isset($data['@attributes']) ? $data['@attributes'] : [];
+        $monthsString = isset($attributes['months']) ? (string)$attributes['months'] : '';
+        $months = !empty($monthsString) ? array_map('trim', explode(',', $monthsString)) : [];
         return new self(
-            propertyId: (int) $attributes->get('id', 0),
+            propertyId: isset($attributes['id']) ? (int)$attributes['id'] : 0,
             months: $months
         );
     }

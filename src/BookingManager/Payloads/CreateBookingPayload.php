@@ -1,6 +1,6 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\BookingManager\Payloads;
+namespace Shelfwood\PhpPms\BookingManager\Payloads;
 
 class CreateBookingPayload
 {

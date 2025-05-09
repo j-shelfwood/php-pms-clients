@@ -1,8 +1,8 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\BookingManager\Responses\ValueObjects;
+namespace Shelfwood\PhpPms\BookingManager\Responses\ValueObjects;
 
-use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
+
 
 class CalendarRate
 {
@@ -17,20 +17,18 @@ class CalendarRate
         public readonly float $balanceDue
     ) {}
 
-    public static function fromXml(Collection|array $rateData): self
+    public static function fromXml(array $rateData): self
     {
-        $sourceData = $rateData instanceof Collection ? $rateData : new Collection($rateData);
-        $attributes = new Collection($sourceData->get('@attributes', []));
-
+        $attributes = isset($rateData['@attributes']) ? $rateData['@attributes'] : [];
         return new self(
-            percentage: (float) ($attributes->get('percentage', 0.0)),
-            currency: (string) ($attributes->get('currency', '')),
-            total: (float) ($sourceData->get('total') ?? 0.0),
-            final: (float) ($sourceData->get('final') ?? 0.0),
-            tax: CalendarTax::fromXml(new Collection($sourceData->get('tax', []))),
-            fee: (float) ($sourceData->get('fee') ?? 0.0),
-            prepayment: (float) ($sourceData->get('prepayment') ?? 0.0),
-            balanceDue: (float) ($sourceData->get('balance_due') ?? 0.0)
+            percentage: (float)($attributes['percentage'] ?? 0.0),
+            currency: (string)($attributes['currency'] ?? ''),
+            total: (float)($rateData['total'] ?? 0.0),
+            final: (float)($rateData['final'] ?? 0.0),
+            tax: CalendarTax::fromXml(isset($rateData['tax']) ? $rateData['tax'] : []),
+            fee: (float)($rateData['fee'] ?? 0.0),
+            prepayment: (float)($rateData['prepayment'] ?? 0.0),
+            balanceDue: (float)($rateData['balance_due'] ?? 0.0)
         );
     }
 }

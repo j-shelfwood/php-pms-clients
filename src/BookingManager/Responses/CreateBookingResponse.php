@@ -1,10 +1,30 @@
 <?php
 
-namespace Shelfwood\PhpPms\Clients\BookingManager\Responses;
+declare(strict_types=1);
 
-use Exception;
-use Tightenco\Collect\Support\Collection; // Changed from Illuminate\Support\Collection
+namespace Shelfwood\PhpPms\BookingManager\Responses;
 
+use Shelfwood\PhpPms\Exceptions\MappingException;
+
+/**
+ * @phpstan-type BookingDetails array{
+ *   id: string,
+ *   status: string,
+ *   arrival: string,
+ *   departure: string,
+ *   totalPrice: string,
+ *   currency: string,
+ *   guestName: string,
+ *   guestEmail: string,
+ *   guestPhone: string,
+ *   adults: string,
+ *   children: string,
+ *   notes: string,
+ *   propertyId: string,
+ *   roomId: string,
+ *   rateId: string
+ * }
+ */
 class CreateBookingResponse
 {
     /**
@@ -15,44 +35,54 @@ class CreateBookingResponse
      * @param  string  $message  A confirmation message from the API.
      */
     public function __construct(
-        public readonly int $bookingId,
-        public readonly string $identifier,
-        public readonly string $message
+        public readonly string $id,
+        public readonly string $status,
+        public readonly string $arrival,
+        public readonly string $departure,
+        public readonly string $totalPrice,
+        public readonly string $currency,
+        public readonly string $guestName,
+        public readonly string $guestEmail,
+        public readonly string $guestPhone,
+        public readonly string $adults,
+        public readonly string $children,
+        public readonly string $notes,
+        public readonly string $propertyId,
+        public readonly string $roomId,
+        public readonly string $rateId
     ) {}
 
     /**
-     * Maps the raw XML response data to a CreateBookingResponse object.
-     * Assumes the input is the parsed content of a successful response.
-     * Error handling should occur before calling this map method.
+     * Maps the raw response data to a CreateBookingResponse object.
      *
-     * @param  Collection|array  $rawResponse  The raw response data (content of the <booking> tag).
-     *
-     * @throws Exception If required attributes are missing.
+     * @param  array  $rawResponse  The raw response data (content of the <booking> tag).
+     * @return self The mapped CreateBookingResponse object.
      */
-    public static function map(Collection|array $rawResponse): self
+    public static function map(array $rawResponse): self
     {
         try {
-            $sourceData = $rawResponse instanceof Collection ? $rawResponse : new Collection($rawResponse);
-            // Data is expected directly within the <booking> tag passed as $sourceData
-            $attributes = new Collection($sourceData->get('@attributes', []));
-            $bookingId = (int) $attributes->get('id');
-            $identifier = (string) $attributes->get('identifier');
-            $message = (string) $sourceData->get('message', 'Booking created.'); // Default message if none provided
-
-            if (! $bookingId || ! $identifier) {
-                // Removed Log::error
-                throw new Exception('Invalid response structure: Missing booking id or identifier.');
-            }
+            $sourceData = $rawResponse;
+            $attributes = $sourceData['@attributes'] ?? [];
 
             return new self(
-                bookingId: $bookingId,
-                identifier: $identifier,
-                message: $message
+                id: $attributes['id'] ?? '',
+                status: $attributes['status'] ?? '',
+                arrival: $sourceData['arrival'] ?? '',
+                departure: $sourceData['departure'] ?? '',
+                totalPrice: $sourceData['totalPrice'] ?? '',
+                currency: $sourceData['currency'] ?? '',
+                guestName: $sourceData['guestName'] ?? '',
+                guestEmail: $sourceData['guestEmail'] ?? '',
+                guestPhone: $sourceData['guestPhone'] ?? '',
+                adults: $sourceData['adults'] ?? '',
+                children: $sourceData['children'] ?? '',
+                notes: $sourceData['notes'] ?? '',
+                propertyId: $sourceData['propertyId'] ?? '',
+                roomId: $sourceData['roomId'] ?? '',
+                rateId: $sourceData['rateId'] ?? ''
             );
-        } catch (Exception $e) {
-            // Removed Log::error
-            // Re-throw or handle as appropriate
-            throw new Exception('Failed to map CreateBookingResponse: '.$e->getMessage(), 0, $e);
+        } catch (\Throwable $e) {
+            throw new MappingException('Error mapping CreateBookingResponse: '.$e->getMessage(), 0, $e);
         }
     }
 }
