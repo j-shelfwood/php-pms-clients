@@ -67,8 +67,8 @@ class CreateBookingResponse
             return new self(
                 id: $attributes['id'] ?? '',
                 status: $attributes['status'] ?? '',
-                arrival: $sourceData['arrival'] ?? '',
-                departure: $sourceData['departure'] ?? '',
+                arrival: $attributes['arrival'] ?? ($sourceData['arrival'] ?? ''),
+                departure: $attributes['departure'] ?? ($sourceData['departure'] ?? ''),
                 totalPrice: $sourceData['totalPrice'] ?? '',
                 currency: $sourceData['currency'] ?? '',
                 guestName: $sourceData['guestName'] ?? '',

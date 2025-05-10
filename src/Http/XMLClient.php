@@ -75,6 +75,10 @@ abstract class XMLClient
 
         try {
             $parsedResponse = XMLParser::parse($body);
+            if (isset($parsedResponse['error']) && is_array($parsedResponse['error'])) {
+                $msg = $parsedResponse['error']['message'] ?? ($parsedResponse['error']['@attributes']['message'] ?? json_encode($parsedResponse['error']));
+                throw new HttpClientException('API Error: ' . $msg, 0);
+            }
         } catch (ParseException $e) {
             $this->logger->error('Failed to parse XML response', [
                 'url' => $url,
