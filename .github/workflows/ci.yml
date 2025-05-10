@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "'**'" # all branches
+    tags-ignore:
+      - "'v*.*.*'" # Don'''t run on tags, release workflow will handle it
+  pull_request:
+    branches:
+      - "'**'" # all branches
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: macos-latest # For act compatibility as requested
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "'8.2'" # From composer.json
+          extensions: mbstring, xml, dom # Common extensions, xml for XMLClient
+          tools: composer
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('''**/composer.lock''') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run Pest tests
+        run: vendor/bin/pest
