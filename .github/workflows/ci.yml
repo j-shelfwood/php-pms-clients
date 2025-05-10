@@ -3,12 +3,12 @@ name: CI
 on:
   push:
     branches:
-      - "'**'" # all branches
+      - **
     tags-ignore:
-      - "'v*.*.*'" # Don'''t run on tags, release workflow will handle it
+      - 'v*.*.*' # Don'''t run on tags, release workflow will handle it
   pull_request:
     branches:
-      - "'**'" # all branches
+      - '**' # all branches
 
 jobs:
   test:
@@ -21,8 +21,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "'8.2'" # From composer.json
-          extensions: mbstring, xml, dom # Common extensions, xml for XMLClient
+          php-version: 8.2
+          extensions: mbstring, xml, dom
           tools: composer
         env:
           COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
