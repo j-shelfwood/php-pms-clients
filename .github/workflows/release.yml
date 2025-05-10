@@ -3,13 +3,13 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*' # Run only on version tags like v1.0.0
+      - "v*.*.*" # Run only on version tags like v1.0.0
 
 jobs:
   publish:
     name: Publish to Packagist
     runs-on: macos-latest # For act compatibility as requested
-    if: startsWith(github.ref, 'refs/tags/v') # Ensure it'''s a version tag
+    if: startsWith(github.ref, 'refs/tags/v') # Ensure it's a version tag
 
     steps:
       - name: Checkout code
@@ -18,7 +18,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # From composer.json
+          php-version: "8.2" # From composer.json
           extensions: mbstring, xml, dom # Common extensions, xml for XMLClient
           tools: composer
         env:

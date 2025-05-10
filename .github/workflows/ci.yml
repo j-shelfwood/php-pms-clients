@@ -3,12 +3,12 @@ name: CI
 on:
   push:
     branches:
-      - **
+      - "**"
     tags-ignore:
-      - 'v*.*.*' # Don'''t run on tags, release workflow will handle it
+      - "v*.*.*" # Don't run on tags, release workflow will handle it
   pull_request:
     branches:
-      - '**' # all branches
+      - "**" # all branches
 
 jobs:
   test:
