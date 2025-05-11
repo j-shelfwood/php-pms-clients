@@ -63,6 +63,18 @@ abstract class XMLClient
         try {
             $response = $this->httpClient->request($method, $url, $finalOptions);
             $body = $response->getBody()->getContents();
+
+            // Ensure body is not empty before parsing
+            if (empty($body)) {
+                $this->logger->warning('Received empty response body from API.', [
+                    'url' => $url,
+                    'method' => $method,
+                ]);
+                // Return an empty array or handle as an error, depending on desired behavior.
+                // For now, let's throw a specific exception if an empty body is not expected.
+                throw new HttpClientException('Received empty response body from API.', 0);
+            }
+
         } catch (GuzzleRequestException $e) {
             $this->logger->error('HTTP request failed', [
                 'url' => $url,
@@ -77,7 +89,7 @@ abstract class XMLClient
             $parsedResponse = XMLParser::parse($body);
             if (isset($parsedResponse['error']) && is_array($parsedResponse['error'])) {
                 $msg = $parsedResponse['error']['message'] ?? ($parsedResponse['error']['@attributes']['message'] ?? json_encode($parsedResponse['error']));
-                throw new HttpClientException('API Error: ' . $msg, 0);
+                throw new HttpClientException('API Error: ' . $msg, (int)($parsedResponse['error']['code'] ?? 0));
             }
         } catch (ParseException $e) {
             $this->logger->error('Failed to parse XML response', [
@@ -90,8 +102,31 @@ abstract class XMLClient
         }
 
         if (XMLParser::hasError($parsedResponse)) {
-            $errorMessage = (string) ($parsedResponse->error->message ?? 'Unknown API error');
-            $errorCode = isset($parsedResponse->error->code) ? (int) $parsedResponse->error->code : 0;
+            // Ensure $parsedResponse is an object if it's expected to have object properties like ->error
+            if (is_array($parsedResponse) && isset($parsedResponse['error'])) {
+                $errorData = $parsedResponse['error'];
+                $errorMessage = '';
+                $errorCode = 0;
+
+                if (is_array($errorData)) {
+                    $errorMessage = (string) ($errorData['message'] ?? ($errorData['text'] ?? 'Unknown API error'));
+                    $errorCode = isset($errorData['code']) ? (int) $errorData['code'] : 0;
+                } elseif (is_object($errorData)) {
+                    $errorMessage = (string) ($errorData->message ?? ($errorData->text ?? 'Unknown API error'));
+                    $errorCode = isset($errorData->code) ? (int) $errorData->code : 0;
+                } else {
+                    $errorMessage = (string) $errorData; // Fallback if error is just a string
+                }
+
+            } elseif (is_object($parsedResponse) && isset($parsedResponse->error)) {
+                 $errorData = $parsedResponse->error;
+                 $errorMessage = (string) ($errorData->message ?? ($errorData->text ?? 'Unknown API error'));
+                 $errorCode = isset($errorData->code) ? (int) $errorData->code : 0;
+            } else {
+                $errorMessage = 'Unknown API error structure in response.';
+                $errorCode = 0;
+            }
+
             $this->logger->error('API Error', [
                 'url' => $url,
                 'method' => $method,

@@ -53,13 +53,16 @@ class BookingManagerAPI extends XMLClient
     public function property(int $id): PropertyResponse
     {
         $params = [
-            'request' => 'get_property_details',
-            'property_id' => $id,
+            'request' => 'list_property',
+            'id' => $id,
         ];
         $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
-        $parsedXml = $responseArray[0];
-        $propertyArray = json_decode(json_encode($parsedXml), true);
-        return PropertyResponse::map($propertyArray);
+        $parsedArray = $responseArray[0] ?? [];
+        if (!$parsedArray || !isset($parsedArray['property'])) {
+            // Or throw a more specific exception
+            throw new \RuntimeException('Invalid response structure for property');
+        }
+        return PropertyResponse::map($parsedArray['property']);
     }
 
     public function calendar(int $propertyId, Carbon $startDate, Carbon $endDate): CalendarResponse
@@ -77,32 +80,56 @@ class BookingManagerAPI extends XMLClient
     public function calendarChanges(Carbon $since): CalendarChangesResponse
     {
         $params = [
-            'request' => 'get_calendar_changes',
-            'since' => $since->format('YmdHis'),
+            'request' => 'list_calendar_changes',
+            'since' => $since->toIso8601String(),
         ];
         $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
-        return CalendarChangesResponse::map($responseArray[0]);
+        $parsedArray = $responseArray[0] ?? [];
+
+        if (!$parsedArray || !isset($parsedArray['property'])) {
+            // Handle cases where 'property' might be empty if there are no changes
+            // or if the structure is different than expected.
+            // This might mean returning an empty response or logging a warning.
+            // For now, assume an empty array if 'property' is not set.
+            $parsedArray['property'] = [];
+        }
+        // Ensure 'property' is always an array, even if it's a single element without the typical list structure
+        if (isset($parsedArray['property']) && !is_array($parsedArray['property'])) {
+            $parsedArray['property'] = [$parsedArray['property']];
+        } elseif (isset($parsedArray['property']) && isset($parsedArray['property']['@attributes'])){
+            // Handle case where there's a single property with attributes, common in XML to array conversion
+            $parsedArray['property'] = [$parsedArray['property']];
+        }
+
+        return CalendarChangesResponse::map($parsedArray);
     }
 
     public function rateForStay(int $propertyId, Carbon $arrivalDate, Carbon $departureDate, int $numAdults, ?int $numChildren = null, ?int $numBabies = null): RateResponse
     {
         $params = [
             'request' => 'get_rate_for_stay',
-            'property_id' => $propertyId,
-            'arrival_date' => $arrivalDate->format('Ymd'),
-            'departure_date' => $departureDate->format('Ymd'),
+            'id' => $propertyId,
+            'arrival_date' => $arrivalDate->toDateString(),
+            'departure_date' => $departureDate->toDateString(),
             'adults' => $numAdults,
         ];
 
         if ($numChildren !== null) {
             $params['children'] = $numChildren;
         }
+
         if ($numBabies !== null) {
             $params['babies'] = $numBabies;
         }
 
         $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
-        return RateResponse::map($responseArray[0]);
+        $parsedArray = $responseArray[0] ?? [];
+
+        if (!$parsedArray || !isset($parsedArray['rate'])) {
+            throw new \RuntimeException('Invalid response structure for rate for stay');
+        }
+
+        return RateResponse::map($parsedArray['rate']);
     }
 
     public function createBooking(CreateBookingPayload $payload): CreateBookingResponse
