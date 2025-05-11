@@ -30,8 +30,8 @@ class XmlParser
                 throw new ParseException('Failed to decode JSON to array: ' . json_last_error_msg());
             }
             return $array;
-        } catch (Exception $e) { // Catches SimpleXMLElement's own exceptions for malformed XML
-            if ($e instanceof ParseException) { // Re-throw if it's already our ParseException
+        } catch (Exception $e) {
+            if ($e instanceof ParseException) {
                 throw $e;
             }
             throw new ParseException("Error parsing XML: " . $e->getMessage(), 0, $e);
@@ -43,7 +43,7 @@ class XmlParser
      */
     public static function hasError(array $response): bool
     {
-        // Check for OTA-style errors <Errors><Error Code="..." .../></Errors>
+        $otaErrorCollection = $response['Errors']['Error'] ?? null;
         $otaErrorCollection = $response['Errors']['Error'] ?? null;
         if ($otaErrorCollection) {
             $otaErrorItem = is_array($otaErrorCollection) && isset($otaErrorCollection[0]) ? $otaErrorCollection[0] : $otaErrorCollection;
@@ -55,13 +55,13 @@ class XmlParser
             }
         }
 
-        // Handle root-level <Error .../>
+        $rootError = $response['Error'] ?? null;
         $rootError = $response['Error'] ?? null;
         if (is_array($rootError) && isset($rootError['@attributes']['Code'])) {
             return true;
         }
 
-        // Handle lower-case <error .../>
+        $directErrorData = $response['error'] ?? null;
         $directErrorData = $response['error'] ?? null;
         if (is_array($directErrorData) && isset($directErrorData['@attributes']['code'])) {
             return true;
@@ -86,7 +86,7 @@ class XmlParser
         $message = 'Unknown API error';
         $rawFragment = [];
 
-        // OTA-style <Errors><Error .../></Errors>
+        $otaErrorCollection = $response['Errors']['Error'] ?? null;
         $otaErrorCollection = $response['Errors']['Error'] ?? null;
         if ($otaErrorCollection) {
             $errorItem = is_array($otaErrorCollection) && isset($otaErrorCollection[0]) ? $otaErrorCollection[0] : $otaErrorCollection;
@@ -101,7 +101,7 @@ class XmlParser
             }
         }
 
-        // Root-level <Error .../>
+        $rootError = $response['Error'] ?? null;
         $rootError = $response['Error'] ?? null;
         if (is_array($rootError) && isset($rootError['@attributes']['Code'])) {
             $code = (string) ($rootError['@attributes']['Code'] ?? null);
@@ -113,7 +113,7 @@ class XmlParser
             return new ErrorDetails($code, $message, $rawFragment);
         }
 
-        // Lower-case <error .../>
+        $directErrorData = $response['error'] ?? null;
         $directErrorData = $response['error'] ?? null;
         if (is_array($directErrorData) && isset($directErrorData['@attributes']['code'])) {
             $code = (string) ($directErrorData['@attributes']['code'] ?? null);

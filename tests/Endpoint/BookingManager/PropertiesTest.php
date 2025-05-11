@@ -5,15 +5,13 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Shelfwood\PhpPms\BookingManager\BookingManagerAPI;
 use Shelfwood\PhpPms\BookingManager\Responses\PropertiesResponse;
-use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\PropertyDetails; // Added import
-use Tests\Helpers\TestHelpers; // Corrected namespace
+use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\PropertyDetails;
+use Tests\Helpers\TestHelpers;
 
 test('it can fetch all properties', function () {
-    // Use the helper to get the mock file path
+
     $mockXmlPath = TestHelpers::getMockFilePath('all-properties.xml');
     $mockXmlResponse = file_get_contents($mockXmlPath);
-
-    // Add a check to ensure the mock file content is loaded
     if ($mockXmlResponse === false) {
         throw new \Exception("Failed to load mock XML file: {$mockXmlPath}");
     }

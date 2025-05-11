@@ -64,14 +64,11 @@ abstract class XMLClient
             $response = $this->httpClient->request($method, $url, $finalOptions);
             $body = $response->getBody()->getContents();
 
-            // Ensure body is not empty before parsing
             if (empty($body)) {
                 $this->logger->warning('Received empty response body from API.', [
                     'url' => $url,
                     'method' => $method,
                 ]);
-                // Return an empty array or handle as an error, depending on desired behavior.
-                // For now, let's throw a specific exception if an empty body is not expected.
                 throw new HttpClientException('Received empty response body from API.', 0);
             }
 
@@ -102,7 +99,6 @@ abstract class XMLClient
         }
 
         if (XMLParser::hasError($parsedResponse)) {
-            // Ensure $parsedResponse is an object if it's expected to have object properties like ->error
             if (is_array($parsedResponse) && isset($parsedResponse['error'])) {
                 $errorData = $parsedResponse['error'];
                 $errorMessage = '';
@@ -115,7 +111,7 @@ abstract class XMLClient
                     $errorMessage = (string) ($errorData->message ?? ($errorData->text ?? 'Unknown API error'));
                     $errorCode = isset($errorData->code) ? (int) $errorData->code : 0;
                 } else {
-                    $errorMessage = (string) $errorData; // Fallback if error is just a string
+                    $errorMessage = (string) $errorData;
                 }
 
             } elseif (is_object($parsedResponse) && isset($parsedResponse->error)) {

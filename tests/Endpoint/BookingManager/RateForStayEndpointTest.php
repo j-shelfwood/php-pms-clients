@@ -22,7 +22,7 @@ describe('RateForStayEndpointTest', function () {
             new NullLogger()
         );
     });
-    
+
     test('BookingManagerAPI::rateForStay returns RateResponse with correct values', function () {
         $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/get-rate-for-stay.xml');
         $mockResponse = $this->createMock(ResponseInterface::class);
@@ -30,11 +30,11 @@ describe('RateForStayEndpointTest', function () {
         $mockStream->method('getContents')->willReturn($xml);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
-    
+
         $arrival = Carbon::parse('2024-02-19');
         $departure = Carbon::parse('2024-02-20');
         $response = $this->api->rateForStay(21663, $arrival, $departure, 1);
-    
+
         expect($response)->toBeInstanceOf(RateResponse::class);
         expect($response->final_before_taxes)->toBeFloat()->toBe(220.0);
         expect($response->final_after_taxes)->toBeFloat()->toBe(255.20);
@@ -49,5 +49,5 @@ describe('RateForStayEndpointTest', function () {
         expect($response->available)->toBeFalse();
         expect($response->minimalNights)->toBe(1);
     });
-    
+
     });

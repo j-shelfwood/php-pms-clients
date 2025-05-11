@@ -34,7 +34,6 @@ class CreateBookingPayload
         public readonly ?float $rate_prepayment = null,
         public readonly ?float $balance_due = null
     ) {
-        //
     }
 
     /**

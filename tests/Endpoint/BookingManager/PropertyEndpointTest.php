@@ -22,7 +22,7 @@ describe('PropertyEndpointTest', function () {
             new NullLogger()
         );
     });
-    
+
     test('BookingManagerAPI::property returns PropertyResponse with populated PropertyDetails', function () {
         $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/property-by-id.xml');
         $mockResponse = $this->createMock(ResponseInterface::class);
@@ -30,9 +30,9 @@ describe('PropertyEndpointTest', function () {
         $mockStream->method('getContents')->willReturn($xml);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
-    
+
         $response = $this->api->property(21663);
-    
+
         expect($response)->toBeInstanceOf(PropertyResponse::class);
         expect($response->property)->toBeInstanceOf(PropertyDetails::class);
         expect($response->property->external_id)->toBe(21663);
@@ -49,5 +49,5 @@ describe('PropertyEndpointTest', function () {
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
         $this->api->property(1);
     })->throws(\Shelfwood\PhpPms\Exceptions\HttpClientException::class);
-    
+
     });

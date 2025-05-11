@@ -23,7 +23,7 @@ describe('CalendarChangesEndpointTest', function () {
             new NullLogger()
         );
     });
-    
+
     test('BookingManagerAPI::calendarChanges returns CalendarChangesResponse with changes', function () {
         $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/calendar-changes.xml');
         $mockResponse = $this->createMock(ResponseInterface::class);
@@ -31,10 +31,10 @@ describe('CalendarChangesEndpointTest', function () {
         $mockStream->method('getContents')->willReturn($xml);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
-    
+
         $since = Carbon::parse('2023-11-12 00:00:00');
         $response = $this->api->calendarChanges($since);
-    
+
         expect($response)->toBeInstanceOf(CalendarChangesResponse::class);
         expect($response->amount)->toBe(2);
         expect($response->changes)->toBeArray();
@@ -53,5 +53,5 @@ describe('CalendarChangesEndpointTest', function () {
         $this->mockHttpClient->method('request')->willReturn($mockResp);
         $this->api->calendarChanges(Carbon::now());
     })->throws(\Shelfwood\PhpPms\Exceptions\HttpClientException::class);
-    
+
     });

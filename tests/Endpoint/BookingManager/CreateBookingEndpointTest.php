@@ -22,7 +22,7 @@ describe('CreateBookingEndpointTest', function () {
             new NullLogger()
         );
     });
-    
+
     test('BookingManagerAPI::createBooking returns CreateBookingResponse with correct id and departure', function () {
         $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/create-booking.xml');
         $mockResponse = $this->createMock(ResponseInterface::class);
@@ -30,7 +30,7 @@ describe('CreateBookingEndpointTest', function () {
         $mockStream->method('getContents')->willReturn($xml);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
-    
+
         $payload = new CreateBookingPayload(
             21663,
             '2024-02-08',
@@ -45,10 +45,10 @@ describe('CreateBookingEndpointTest', function () {
             1
         );
         $response = $this->api->createBooking($payload);
-    
+
         expect($response)->toBeInstanceOf(CreateBookingResponse::class);
         expect($response->id)->toBe('171830');
         expect($response->departure)->toBe('2024-02-12');
     });
-    
+
     });

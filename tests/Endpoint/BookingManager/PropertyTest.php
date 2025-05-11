@@ -60,7 +60,6 @@ test('it can fetch a single property', function () {
 </response>
 XML;
 
-    // Assert that the mock XML (string in this case) is not empty
     expect($mockXmlResponse)->not->toBeEmpty('Mock XML string is empty.');
 
     $mockHandler = new MockHandler([
