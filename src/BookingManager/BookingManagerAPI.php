@@ -139,8 +139,19 @@ class BookingManagerAPI extends XMLClient
             'booking_id' => $externalBookingId,
             'overwrite_rates' => 1,
         ];
-        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
-        return FinalizeBookingResponse::map($responseArray[0]);
+        try {
+            $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
+            return FinalizeBookingResponse::map($responseArray[0]);
+        } catch (\Shelfwood\PhpPms\Exceptions\HttpClientException $e) {
+            // Attempt to extract error message from exception
+            $message = $e->getMessage();
+            return new \Shelfwood\PhpPms\BookingManager\Responses\FinalizeBookingResponse(
+                bookingId: 0,
+                identifier: '',
+                message: preg_replace('/^API Error: /', '', $message),
+                status: \Shelfwood\PhpPms\BookingManager\Enums\BookingStatus::ERROR
+            );
+        }
     }
 
     public function cancelBooking(int $bookingId, string $reason): CancelBookingResponse
@@ -150,8 +161,17 @@ class BookingManagerAPI extends XMLClient
             'booking_id' => $bookingId,
             'reason' => $reason,
         ];
-        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
-        return CancelBookingResponse::map($responseArray[0]);
+        try {
+            $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
+            return CancelBookingResponse::map($responseArray[0]);
+        } catch (\Shelfwood\PhpPms\Exceptions\HttpClientException $e) {
+            $message = $e->getMessage();
+            return new \Shelfwood\PhpPms\BookingManager\Responses\CancelBookingResponse(
+                success: false,
+                message: preg_replace('/^API Error: /', '', $message),
+                status: \Shelfwood\PhpPms\BookingManager\Enums\BookingStatus::ERROR
+            );
+        }
     }
 
     private function getEndpoint(string $type): string

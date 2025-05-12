@@ -3,12 +3,13 @@
 namespace Shelfwood\PhpPms\BookingManager\Responses\ValueObjects;
 
 use Carbon\Carbon;
+use Shelfwood\PhpPms\BookingManager\Enums\SeasonType; // Added import
 
 class CalendarDayInfo
 {
     public function __construct(
         public readonly Carbon $day,
-        public readonly string $season,
+        public readonly ?SeasonType $season, // Changed type to ?SeasonType
         public readonly Carbon $modified,
         public readonly ?int $available, // Changed from bool to ?int
         public readonly int $stayMinimum,
@@ -34,9 +35,12 @@ class CalendarDayInfo
                 $modified = Carbon::parse($attributes['modified']);
             } catch (\Exception $e) {}
         }
+
+        $seasonString = isset($attributes['season']) ? (string)$attributes['season'] : null; // get season string
+
         return new self(
             day: $day ?? Carbon::create(1970, 1, 1),
-            season: (string)($attributes['season'] ?? ''),
+            season: $seasonString ? SeasonType::tryFrom($seasonString) : null, // map to SeasonType
             modified: $modified ?? Carbon::create(1970, 1, 1),
             available: isset($infoData['available']) ? (int)$infoData['available'] : null, // Changed parsing
             stayMinimum: (int)($infoData['stay_minimum'] ?? 0),

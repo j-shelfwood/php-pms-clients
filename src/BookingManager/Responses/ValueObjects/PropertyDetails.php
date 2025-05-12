@@ -3,6 +3,16 @@
 namespace Shelfwood\PhpPms\BookingManager\Responses\ValueObjects;
 
 use Exception;
+use Shelfwood\PhpPms\BookingManager\Enums\PropertyStatus;
+use Shelfwood\PhpPms\BookingManager\Enums\ViewType;
+use Shelfwood\PhpPms\BookingManager\Enums\InternetType;
+use Shelfwood\PhpPms\BookingManager\Enums\InternetConnectionType;
+use Shelfwood\PhpPms\BookingManager\Enums\ParkingType;
+use Shelfwood\PhpPms\BookingManager\Enums\SwimmingPoolType;
+use Shelfwood\PhpPms\BookingManager\Enums\SaunaType;
+use Shelfwood\PhpPms\BookingManager\Enums\TvType;
+use Shelfwood\PhpPms\BookingManager\Enums\TvConnectionType;
+use Shelfwood\PhpPms\BookingManager\Enums\DvdType;
 use Carbon\Carbon;
 
 class PropertyDetails
@@ -11,7 +21,7 @@ class PropertyDetails
         public readonly int $external_id,
         public readonly string $name,
         public readonly ?string $identifier,
-        public readonly string $status,
+        public readonly ?PropertyStatus $status,
         public readonly array $property_types,
         public readonly PropertyProvider $provider,
         public readonly PropertyLocation $location,
@@ -32,19 +42,19 @@ class PropertyDetails
         public readonly int $bathrooms,
         public readonly int $toilets,
         public readonly bool $elevator,
-        public readonly ?string $view,
-        public readonly ?string $internet,
-        public readonly ?string $internet_connection,
-        public readonly ?string $parking,
+        public readonly ?ViewType $view,
+        public readonly ?InternetType $internet,
+        public readonly ?InternetConnectionType $internet_connection,
+        public readonly ?ParkingType $parking,
         public readonly bool $airco,
         public readonly bool $fans,
         public readonly bool $balcony,
         public readonly bool $patio,
         public readonly bool $garden,
         public readonly bool $roof_terrace,
-        public readonly ?string $tv,
-        public readonly ?string $tv_connection,
-        public readonly ?string $dvd,
+        public readonly ?TvType $tv,
+        public readonly ?TvConnectionType $tv_connection,
+        public readonly ?DvdType $dvd,
         public readonly bool $computer,
         public readonly bool $printer,
         public readonly bool $iron,
@@ -64,8 +74,8 @@ class PropertyDetails
         public readonly int $jacuzzi,
         public readonly int $shower_regular,
         public readonly int $shower_steam,
-        public readonly ?string $swimmingpool,
-        public readonly ?string $sauna,
+        public readonly ?SwimmingPoolType $swimmingpool,
+        public readonly ?SaunaType $sauna,
         public readonly bool $hairdryer,
         public readonly bool $entresol,
         public readonly bool $wheelchair_friendly,
@@ -105,7 +115,7 @@ class PropertyDetails
         $attributes = $propertyData['@attributes'] ?? [];
         $id = (int) ($attributes['id'] ?? 0);
         $name = (string) ($attributes['name'] ?? '');
-        $status = (string) ($attributes['status'] ?? '');
+        $status = PropertyStatus::tryFrom((string) ($attributes['status'] ?? ''));
         $identifier = isset($attributes['identifier']) ? (string) $attributes['identifier'] : null;
 
         $getString = function($key, $default = null) use ($propertyData) {
@@ -178,19 +188,19 @@ class PropertyDetails
             bathrooms: $getInt('bathrooms'),
             toilets: $getInt('toilets'),
             elevator: $getBool('elevator'),
-            view: $getString('view'),
-            internet: $getString('internet'),
-            internet_connection: $getString('internet_connection'),
-            parking: $getString('parking'),
+            view: ViewType::tryFrom($getString('view') ?? ''),
+            internet: InternetType::tryFrom($getString('internet') ?? ''),
+            internet_connection: InternetConnectionType::tryFrom($getString('internet_connection') ?? ''),
+            parking: ParkingType::tryFrom($getString('parking') ?? ''),
             airco: $getBool('airco'),
             fans: $getBool('fans'),
             balcony: $getBool('balcony'),
             patio: $getBool('patio'),
             garden: $getBool('garden'),
             roof_terrace: $getBool('roof_terrace'),
-            tv: $getString('tv'),
-            tv_connection: $getString('tv_connection'),
-            dvd: $getString('dvd'),
+            tv: TvType::tryFrom($getString('tv') ?? ''),
+            tv_connection: TvConnectionType::tryFrom($getString('tv_connection') ?? ''),
+            dvd: DvdType::tryFrom($getString('dvd') ?? ''),
             computer: $getBool('computer'),
             printer: $getBool('printer'),
             iron: $getBool('iron'),
@@ -210,8 +220,8 @@ class PropertyDetails
             jacuzzi: $getInt('jacuzzi'),
             shower_regular: $getInt('shower_regular'),
             shower_steam: $getInt('shower_steam'),
-            swimmingpool: $getString('swimmingpool'),
-            sauna: $getString('sauna'),
+            swimmingpool: SwimmingPoolType::tryFrom($getString('swimmingpool') ?? ''),
+            sauna: SaunaType::tryFrom($getString('sauna') ?? ''),
             hairdryer: $getBool('hairdryer'),
             entresol: $getBool('entresol'),
             wheelchair_friendly: $getBool('wheelchair_friendly'),

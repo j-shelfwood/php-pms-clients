@@ -9,6 +9,7 @@ use Psr\Log\NullLogger;
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use Shelfwood\PhpPms\BookingManager\Enums\BookingStatus;
 
 
 describe('CreateBookingEndpointTest', function () {
@@ -48,6 +49,8 @@ describe('CreateBookingEndpointTest', function () {
 
         expect($response)->toBeInstanceOf(CreateBookingResponse::class);
         expect($response->id)->toBe('171830');
+        expect($response->status)->toBeInstanceOf(BookingStatus::class);
+        expect($response->status->value)->toBe('open');
         expect($response->departure)->toBe('2024-02-12');
     });
 

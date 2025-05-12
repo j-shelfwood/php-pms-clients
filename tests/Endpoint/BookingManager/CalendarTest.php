@@ -5,6 +5,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Shelfwood\PhpPms\BookingManager\BookingManagerAPI;
+use Shelfwood\PhpPms\BookingManager\Enums\SeasonType;
 use Shelfwood\PhpPms\BookingManager\Responses\CalendarResponse;
 use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarDayInfo;
 use Tests\Helpers\TestHelpers;
@@ -29,8 +30,6 @@ test('it can fetch calendar for a date range', function () {
     $propertyId = 22958;
     $startDate = Carbon::parse('2023-10-01');
     $endDate = Carbon::parse('2023-10-02');
-    $startDate = Carbon::parse('2023-10-01');
-    $endDate = Carbon::parse('2023-10-02');
 
     $response = $api->calendar($propertyId, $startDate, $endDate);
 
@@ -43,6 +42,8 @@ test('it can fetch calendar for a date range', function () {
     expect($firstDay)->toBeInstanceOf(CalendarDayInfo::class);
     expect($firstDay->day)->toBeInstanceOf(Carbon::class);
     expect($firstDay->day->toDateString())->toBe('2023-11-01');
+    expect($firstDay->season)->toBeInstanceOf(SeasonType::class);
+    expect($firstDay->season)->toBe(SeasonType::HIGH);
     expect($firstDay->available)->toBe(0);
     expect($firstDay->rate->total)->toBe(173.00);
     expect($firstDay->stayMinimum)->toBe(3);
@@ -55,6 +56,8 @@ test('it can fetch calendar for a date range', function () {
     expect($secondDay)->toBeInstanceOf(CalendarDayInfo::class);
     expect($secondDay->day)->toBeInstanceOf(Carbon::class);
     expect($secondDay->day->toDateString())->toBe('2023-11-02');
+    expect($secondDay->season)->toBeInstanceOf(SeasonType::class);
+    expect($secondDay->season)->toBe(SeasonType::HIGH);
     expect($secondDay->available)->toBe(0);
     expect($secondDay->rate->total)->toBe(173.00);
     expect($secondDay->stayMinimum)->toBe(3);

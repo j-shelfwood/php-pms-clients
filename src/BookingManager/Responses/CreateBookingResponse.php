@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Shelfwood\PhpPms\BookingManager\Responses;
 
 use Shelfwood\PhpPms\Exceptions\MappingException;
+use Shelfwood\PhpPms\BookingManager\Enums\BookingStatus;
 
 /**
  * @phpstan-type BookingDetails array{
@@ -30,13 +31,25 @@ class CreateBookingResponse
     /**
      * Represents the successful response after creating a booking via the API.
      *
-     * @param  int  $bookingId  The unique identifier assigned by Booking Manager.
-     * @param  string  $identifier  The secondary identifier assigned by Booking Manager.
-     * @param  string  $message  A confirmation message from the API.
+     * @param  string  $id  The unique identifier assigned by Booking Manager.
+     * @param  ?BookingStatus  $status  The status of the booking.
+     * @param  string  $arrival  Arrival date.
+     * @param  string  $departure  Departure date.
+     * @param  string  $totalPrice  Total price of the booking.
+     * @param  string  $currency  Currency of the total price.
+     * @param  string  $guestName  Name of the guest.
+     * @param  string  $guestEmail  Email of the guest.
+     * @param  string  $guestPhone  Phone number of the guest.
+     * @param  string  $adults  Number of adults.
+     * @param  string  $children  Number of children.
+     * @param  string  $notes  Additional notes for the booking.
+     * @param  string  $propertyId  ID of the property.
+     * @param  string  $roomId  ID of the room.
+     * @param  string  $rateId  ID of the rate.
      */
     public function __construct(
         public readonly string $id,
-        public readonly string $status,
+        public readonly ?BookingStatus $status,
         public readonly string $arrival,
         public readonly string $departure,
         public readonly string $totalPrice,
@@ -66,7 +79,7 @@ class CreateBookingResponse
 
             return new self(
                 id: $attributes['id'] ?? '',
-                status: $attributes['status'] ?? '',
+                status: BookingStatus::tryFrom($sourceData['status'] ?? ''),
                 arrival: $attributes['arrival'] ?? ($sourceData['arrival'] ?? ''),
                 departure: $attributes['departure'] ?? ($sourceData['departure'] ?? ''),
                 totalPrice: $sourceData['totalPrice'] ?? '',

@@ -1,6 +1,6 @@
 <properties count="1244">
-  <property id="6743" name="Historical Heart apartment Amsterdam" identifier="BBA0052" status="inactive"/>
-  <property id="6786" name="Jordan Delight apartment Amsterdam" identifier="BBA0053" status="inactive"/>
+  <property id="6743" name="Historical Heart apartment Amsterdam" identifier="BBA0052" status="live"/>
+  <property id="6786" name="Jordan Delight apartment Amsterdam" identifier="BBA0053" status="live"/>
   <property id="6794" name="Canal Holiday apartment Amsterdam" identifier="#053" status="live" type="apartment">
     <provider id="93" code="AMS" name="Billy Blue Amsterdam"/>
     <location>
@@ -125,21 +125,21 @@ This amount will be returned to you in cash during check-out on the conditions t
 <p class="MsoNormal">Online payment is a prepayment with a balance due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 14 days before arrival will be charged with 100% of the booked amount.</li>
-	<li>By accepting the terms and conditions you agree to charge your credit card with the balance due in case of a late cancellation or no show situation.</li>
-	<li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
+  <li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 14 days before arrival will be charged with 100% of the booked amount.</li>
+  <li>By accepting the terms and conditions you agree to charge your credit card with the balance due in case of a late cancellation or no show situation.</li>
+  <li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
 <p class="MsoNormal"><span lang="NL">The apartment provider reserves the right to cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
+  <li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
+  <li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
+  <li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
+  <li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
+  <li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
+  <li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
 </ol>
 <p class="MsoNoSpacing"> </p>
 <p class="MsoNormal">The apartment provider will not be liable for any delay, loss, damage or expenses incurred if your booking needs to be altered or cancelled or the apartment provider is unable to perform the contractual obligations as a result of events beyond his reasonable control, which shall include but not be limited to events such as war, civil strife, terrorist activity, labor disputes, natural or man-made disaster, fire, flood, adverse weather conditions or change of local government laws.</p>
@@ -148,13 +148,13 @@ This amount will be returned to you in cash during check-out on the conditions t
 due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 14 days before
+  <li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 14 days before
 arrival will be charged with 100% of the booked amount.</li>
-	<li>By accepting the terms and conditions you agree
+  <li>By accepting the terms and conditions you agree
 to charge your credit card with the balance due in case of a late cancellation
 or no show situation.</li>
-	<li>Cancellations must be made by 12 midday CET
+  <li>Cancellations must be made by 12 midday CET
 (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
@@ -162,18 +162,18 @@ or no show situation.</li>
 cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online
+  <li>If the guest(s) are not able to pay the online
 payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their
+  <li>If the guest(s) are not able to show their
 passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a
+  <li>If the guest(s) are not able to provide a
 security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due
+  <li>The apartment(s) or part of it is closed due
 to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or
+  <li>It prejudices the reputation or causes or
 might cause in the apartment providers opinion, damage to the apartments and
 its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters
+  <li>The apartment provider becomes insolvent or enters
 into liquidation or receivership.</li>
 </ol>
 <p> </p>
@@ -565,21 +565,21 @@ allowed to smoke marihuana inside the apartments.</p>]]></tac>
 <p class="MsoNormal">Online payment is a prepayment with a balance due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 14 days before arrival will be charged with 100% of the booked amount.</li>
-	<li>By accepting the terms and conditions you agree to charge your credit card with the balance due in case of a late cancellation or no show situation.</li>
-	<li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
+  <li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 14 days before arrival will be charged with 100% of the booked amount.</li>
+  <li>By accepting the terms and conditions you agree to charge your credit card with the balance due in case of a late cancellation or no show situation.</li>
+  <li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
 <p class="MsoNormal"><span lang="NL">The apartment provider reserves the right to cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
+  <li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
+  <li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
+  <li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
+  <li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
+  <li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
+  <li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
 </ol>
 <p class="MsoNoSpacing"> </p>
 <p class="MsoNormal">The apartment provider will not be liable for any delay, loss, damage or expenses incurred if your booking needs to be altered or cancelled or the apartment provider is unable to perform the contractual obligations as a result of events beyond his reasonable control, which shall include but not be limited to events such as war, civil strife, terrorist activity, labor disputes, natural or man-made disaster, fire, flood, adverse weather conditions or change of local government laws.</p>
@@ -588,13 +588,13 @@ allowed to smoke marihuana inside the apartments.</p>]]></tac>
 due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 14 days before
+  <li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 14 days before
 arrival will be charged with 100% of the booked amount.</li>
-	<li>By accepting the terms and conditions you agree
+  <li>By accepting the terms and conditions you agree
 to charge your credit card with the balance due in case of a late cancellation
 or no show situation.</li>
-	<li>Cancellations must be made by 12 midday CET
+  <li>Cancellations must be made by 12 midday CET
 (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
@@ -602,18 +602,18 @@ or no show situation.</li>
 cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online
+  <li>If the guest(s) are not able to pay the online
 payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their
+  <li>If the guest(s) are not able to show their
 passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a
+  <li>If the guest(s) are not able to provide a
 security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due
+  <li>The apartment(s) or part of it is closed due
 to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or
+  <li>It prejudices the reputation or causes or
 might cause in the apartment providers opinion, damage to the apartments and
 its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters
+  <li>The apartment provider becomes insolvent or enters
 into liquidation or receivership.</li>
 </ol>
 <p> </p>
@@ -847,21 +847,21 @@ Kind regards,</p>
 <p class="MsoNormal">Online payment is a prepayment with a balance due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 14 days before arrival will be charged with 100% of the booked amount.</li>
-	<li>By accepting the terms and conditions you agree to charge your credit card with the balance due in case of a late cancellation or no show situation.</li>
-	<li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
+  <li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 14 days before arrival will be charged with 100% of the booked amount.</li>
+  <li>By accepting the terms and conditions you agree to charge your credit card with the balance due in case of a late cancellation or no show situation.</li>
+  <li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
 <p class="MsoNormal"><span lang="NL">The apartment provider reserves the right to cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
+  <li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
+  <li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
+  <li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
+  <li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
+  <li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
+  <li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
 </ol>
 <p class="MsoNoSpacing"> </p>
 <p class="MsoNormal">The apartment provider will not be liable for any delay, loss, damage or expenses incurred if your booking needs to be altered or cancelled or the apartment provider is unable to perform the contractual obligations as a result of events beyond his reasonable control, which shall include but not be limited to events such as war, civil strife, terrorist activity, labor disputes, natural or man-made disaster, fire, flood, adverse weather conditions or change of local government laws.</p>
@@ -870,13 +870,13 @@ Kind regards,</p>
 due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 14 days before
+  <li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 14 days before
 arrival will be charged with 100% of the booked amount.</li>
-	<li>By accepting the terms and conditions you agree
+  <li>By accepting the terms and conditions you agree
 to charge your credit card with the balance due in case of a late cancellation
 or no show situation.</li>
-	<li>Cancellations must be made by 12 midday CET
+  <li>Cancellations must be made by 12 midday CET
 (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
@@ -884,18 +884,18 @@ or no show situation.</li>
 cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online
+  <li>If the guest(s) are not able to pay the online
 payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their
+  <li>If the guest(s) are not able to show their
 passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a
+  <li>If the guest(s) are not able to provide a
 security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due
+  <li>The apartment(s) or part of it is closed due
 to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or
+  <li>It prejudices the reputation or causes or
 might cause in the apartment providers opinion, damage to the apartments and
 its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters
+  <li>The apartment provider becomes insolvent or enters
 into liquidation or receivership.</li>
 </ol>
 <p> </p>
@@ -1142,20 +1142,20 @@ Kind regards,</p>
 <p class="MsoNormal">Online payment is a pre-payment with a balance due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The 50% pre-payment is non-refundable at any time, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 21 days before the start of the stay will be charged with 100% of the balance due.</li>
-	<li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
+  <li><span lang="NL"></span>The 50% pre-payment is non-refundable at any time, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 21 days before the start of the stay will be charged with 100% of the balance due.</li>
+  <li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
 <p class="MsoNormal"><span lang="NL">The apartment provider reserves the right to cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
+  <li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
+  <li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
+  <li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
+  <li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
+  <li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
+  <li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
 </ol>
 <p> </p>
 <p class="MsoNormal">The apartment provider will not be liable for any delay, loss, damage or expenses incurred if your booking needs to be altered or cancelled or the apartment provider is unable to perform the contractual obligations as a result of events beyond his reasonable control, which shall include but not be limited to events such as war, civil strife, terrorist activity, labor disputes, natural or man-made disaster, fire, flood, adverse weather conditions or change of local government laws.</p>
@@ -1163,20 +1163,20 @@ Kind regards,</p>
 <p class="MsoNormal">Online payment is a pre-payment with a balance due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The 50% pre-payment is non-refundable at any time, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 21 days before the start of the stay will be charged with 100% of the balance due.</li>
-	<li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
+  <li><span lang="NL"></span>The 50% pre-payment is non-refundable at any time, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 21 days before the start of the stay will be charged with 100% of the balance due.</li>
+  <li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
 <p class="MsoNormal"><span lang="NL">The apartment provider reserves the right to cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
+  <li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
+  <li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
+  <li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
+  <li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
+  <li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
+  <li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
 </ol>
 <p> </p>
 <p class="MsoNormal">The apartment provider will not be liable for any delay, loss, damage or expenses incurred if your booking needs to be altered or cancelled or the apartment provider is unable to perform the contractual obligations as a result of events beyond his reasonable control, which shall include but not be limited to events such as war, civil strife, terrorist activity, labor disputes, natural or man-made disaster, fire, flood, adverse weather conditions or change of local government laws.</p>
@@ -1370,20 +1370,20 @@ Kind regards,</p>
 <p class="MsoNormal">Online payment is a pre-payment with a balance due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The 50% pre-payment is non-refundable at any time, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 21 days before the start of the stay will be charged with 100% of the balance due.</li>
-	<li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
+  <li><span lang="NL"></span>The 50% pre-payment is non-refundable at any time, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 21 days before the start of the stay will be charged with 100% of the balance due.</li>
+  <li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
 <p class="MsoNormal"><span lang="NL">The apartment provider reserves the right to cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
+  <li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
+  <li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
+  <li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
+  <li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
+  <li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
+  <li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
 </ol>
 <p> </p>
 <p class="MsoNormal">The apartment provider will not be liable for any delay, loss, damage or expenses incurred if your booking needs to be altered or cancelled or the apartment provider is unable to perform the contractual obligations as a result of events beyond his reasonable control, which shall include but not be limited to events such as war, civil strife, terrorist activity, labor disputes, natural or man-made disaster, fire, flood, adverse weather conditions or change of local government laws.</p>
@@ -1391,20 +1391,20 @@ Kind regards,</p>
 <p class="MsoNormal">Online payment is a pre-payment with a balance due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The 50% pre-payment is non-refundable at any time, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 21 days before the start of the stay will be charged with 100% of the balance due.</li>
-	<li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
+  <li><span lang="NL"></span>The 50% pre-payment is non-refundable at any time, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 21 days before the start of the stay will be charged with 100% of the balance due.</li>
+  <li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
 <p class="MsoNormal"><span lang="NL">The apartment provider reserves the right to cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
+  <li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
+  <li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
+  <li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
+  <li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
+  <li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
+  <li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
 </ol>
 <p> </p>
 <p class="MsoNormal">The apartment provider will not be liable for any delay, loss, damage or expenses incurred if your booking needs to be altered or cancelled or the apartment provider is unable to perform the contractual obligations as a result of events beyond his reasonable control, which shall include but not be limited to events such as war, civil strife, terrorist activity, labor disputes, natural or man-made disaster, fire, flood, adverse weather conditions or change of local government laws.</p>
@@ -1599,21 +1599,21 @@ Kind regards,</p>
 <p class="MsoNormal">Online payment is a prepayment with a balance due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 14 days before arrival will be charged with 100% of the booked amount.</li>
-	<li>By accepting the terms and conditions you agree to charge your credit card with the balance due in case of a late cancellation or no show situation.</li>
-	<li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
+  <li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 14 days before arrival will be charged with 100% of the booked amount.</li>
+  <li>By accepting the terms and conditions you agree to charge your credit card with the balance due in case of a late cancellation or no show situation.</li>
+  <li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
 <p class="MsoNormal"><span lang="NL">The apartment provider reserves the right to cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
+  <li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
+  <li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
+  <li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
+  <li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
+  <li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
+  <li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
 </ol>
 <p class="MsoNoSpacing"> </p>
 <p class="MsoNormal">The apartment provider will not be liable for any delay, loss, damage or expenses incurred if your booking needs to be altered or cancelled or the apartment provider is unable to perform the contractual obligations as a result of events beyond his reasonable control, which shall include but not be limited to events such as war, civil strife, terrorist activity, labor disputes, natural or man-made disaster, fire, flood, adverse weather conditions or change of local government laws.</p>
@@ -1622,13 +1622,13 @@ Kind regards,</p>
 due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 14 days before
+  <li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 14 days before
 arrival will be charged with 100% of the booked amount.</li>
-	<li>By accepting the terms and conditions you agree
+  <li>By accepting the terms and conditions you agree
 to charge your credit card with the balance due in case of a late cancellation
 or no show situation.</li>
-	<li>Cancellations must be made by 12 midday CET
+  <li>Cancellations must be made by 12 midday CET
 (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
@@ -1636,18 +1636,18 @@ or no show situation.</li>
 cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online
+  <li>If the guest(s) are not able to pay the online
 payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their
+  <li>If the guest(s) are not able to show their
 passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a
+  <li>If the guest(s) are not able to provide a
 security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due
+  <li>The apartment(s) or part of it is closed due
 to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or
+  <li>It prejudices the reputation or causes or
 might cause in the apartment providers opinion, damage to the apartments and
 its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters
+  <li>The apartment provider becomes insolvent or enters
 into liquidation or receivership.</li>
 </ol>
 <p> </p>
@@ -1847,21 +1847,21 @@ Kind regards,</p>
 <p class="MsoNormal">Online payment is a prepayment with a balance due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 14 days before arrival will be charged with 100% of the booked amount.</li>
-	<li>By accepting the terms and conditions you agree to charge your credit card with the balance due in case of a late cancellation or no show situation.</li>
-	<li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
+  <li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 14 days before arrival will be charged with 100% of the booked amount.</li>
+  <li>By accepting the terms and conditions you agree to charge your credit card with the balance due in case of a late cancellation or no show situation.</li>
+  <li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
 <p class="MsoNormal"><span lang="NL">The apartment provider reserves the right to cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
+  <li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
+  <li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
+  <li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
+  <li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
+  <li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
+  <li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
 </ol>
 <p class="MsoNoSpacing"> </p>
 <p class="MsoNormal">The apartment provider will not be liable for any delay, loss, damage or expenses incurred if your booking needs to be altered or cancelled or the apartment provider is unable to perform the contractual obligations as a result of events beyond his reasonable control, which shall include but not be limited to events such as war, civil strife, terrorist activity, labor disputes, natural or man-made disaster, fire, flood, adverse weather conditions or change of local government laws.</p>
@@ -1870,13 +1870,13 @@ Kind regards,</p>
 due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 14 days before
+  <li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 14 days before
 arrival will be charged with 100% of the booked amount.</li>
-	<li>By accepting the terms and conditions you agree
+  <li>By accepting the terms and conditions you agree
 to charge your credit card with the balance due in case of a late cancellation
 or no show situation.</li>
-	<li>Cancellations must be made by 12 midday CET
+  <li>Cancellations must be made by 12 midday CET
 (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
@@ -1884,18 +1884,18 @@ or no show situation.</li>
 cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online
+  <li>If the guest(s) are not able to pay the online
 payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their
+  <li>If the guest(s) are not able to show their
 passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a
+  <li>If the guest(s) are not able to provide a
 security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due
+  <li>The apartment(s) or part of it is closed due
 to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or
+  <li>It prejudices the reputation or causes or
 might cause in the apartment providers opinion, damage to the apartments and
 its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters
+  <li>The apartment provider becomes insolvent or enters
 into liquidation or receivership.</li>
 </ol>
 <p> </p>
@@ -2123,21 +2123,21 @@ Kind regards,</p>
 <p class="MsoNormal">Online payment is a prepayment with a balance due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 14 days before arrival will be charged with 100% of the booked amount.</li>
-	<li>By accepting the terms and conditions you agree to charge your credit card with the balance due in case of a late cancellation or no show situation.</li>
-	<li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
+  <li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 14 days before arrival will be charged with 100% of the booked amount.</li>
+  <li>By accepting the terms and conditions you agree to charge your credit card with the balance due in case of a late cancellation or no show situation.</li>
+  <li>Cancellations must be made by 12 midday CET (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
 <p class="MsoNormal"><span lang="NL">The apartment provider reserves the right to cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
+  <li>If the guest(s) are not able to pay the online payment and/or remaining balance upon arrival.</li>
+  <li>If the guest(s) are not able to show their passport, id card or driver’s license upon arrival.</li>
+  <li>If the guest(s) are not able to provide a security deposit in form of a valid credit card.</li>
+  <li>The apartment(s) or part of it is closed due to circumstances beyond its control.</li>
+  <li>It prejudices the reputation or causes or might cause in the apartment providers opinion, damage to the apartments and its common areas.</li>
+  <li>The apartment provider becomes insolvent or enters into liquidation or receivership.</li>
 </ol>
 <p class="MsoNoSpacing"> </p>
 <p class="MsoNormal">The apartment provider will not be liable for any delay, loss, damage or expenses incurred if your booking needs to be altered or cancelled or the apartment provider is unable to perform the contractual obligations as a result of events beyond his reasonable control, which shall include but not be limited to events such as war, civil strife, terrorist activity, labor disputes, natural or man-made disaster, fire, flood, adverse weather conditions or change of local government laws.</p>
@@ -2146,13 +2146,13 @@ Kind regards,</p>
 due upon arrival</p>
 <p class="MsoNormal"></p>
 <ul>
-	<li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
-	<li>Bookings cancelled less than 14 days before
+  <li><span lang="NL"></span>The prepayment is non-refundable, not even in case of force majeure.</li>
+  <li>Bookings cancelled less than 14 days before
 arrival will be charged with 100% of the booked amount.</li>
-	<li>By accepting the terms and conditions you agree
+  <li>By accepting the terms and conditions you agree
 to charge your credit card with the balance due in case of a late cancellation
 or no show situation.</li>
-	<li>Cancellations must be made by 12 midday CET
+  <li>Cancellations must be made by 12 midday CET
 (Central European Time) on the appropriate day </li>
 </ul>
 <p> </p>
@@ -2160,18 +2160,18 @@ or no show situation.</li>
 cancel or alter the booking:<o:p></o:p></span></p>
 <p class="MsoNormal"></p>
 <ol>
-	<li>If the guest(s) are not able to pay the online
+  <li>If the guest(s) are not able to pay the online
 payment and/or remaining balance upon arrival.</li>
-	<li>If the guest(s) are not able to show their
+  <li>If the guest(s) are not able to show their
 passport, id card or driver’s license upon arrival.</li>
-	<li>If the guest(s) are not able to provide a
+  <li>If the guest(s) are not able to provide a
 security deposit in form of a valid credit card.</li>
-	<li>The apartment(s) or part of it is closed due
+  <li>The apartment(s) or part of it is closed due
 to circumstances beyond its control.</li>
-	<li>It prejudices the reputation or causes or
+  <li>It prejudices the reputation or causes or
 might cause in the apartment providers opinion, damage to the apartments and
 its common areas.</li>
-	<li>The apartment provider becomes insolvent or enters
+  <li>The apartment provider becomes insolvent or enters
 into liquidation or receivership.</li>
 </ol>
 <p> </p>
