@@ -24,8 +24,6 @@ describe('CancelBookingEndpointTest', function () {
     });
 
     test('BookingManagerAPI::cancelBooking returns CancelBookingResponse with correct status on failure from mock', function () {
-        // This mock represents a failed cancellation where the API itself didn't error,
-        // but the cancellation was not successful (e.g. status "failed")
         $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/cancel-booking.xml');
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockStream = $this->createMock(StreamInterface::class);
@@ -36,11 +34,7 @@ describe('CancelBookingEndpointTest', function () {
         $response = $this->api->cancelBooking(171838, 'reason');
 
         expect($response)->toBeInstanceOf(CancelBookingResponse::class);
-        // The mock has <status>failed</status>, which is not a direct case in BookingStatus enum.
-        // The CancelBookingResponse::map logic currently defaults unmappable non-error statuses to BookingStatus::ERROR.
-        // If "failed" should be a specific enum case, BookingStatus enum and map logic would need adjustment.
-        // Based on current logic, this should be BookingStatus::ERROR.
-        expect($response->status)->toBe(BookingStatus::ERROR);
+        expect($response->status)->toBe(BookingStatus::FAILED);
         expect($response->message)->toBe('Other: '); // Message from the mock
     });
 
@@ -67,19 +61,13 @@ XML;
     });
 
     test('BookingManagerAPI::cancelBooking returns CancelBookingResponse with ERROR status on API error response', function () {
-        // This mock represents an API error (e.g. <error> tag in response)
         $errorXml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/generic-error.xml');
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockStream = $this->createMock(StreamInterface::class);
         $mockStream->method('getContents')->willReturn($errorXml);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
-
-        $response = $this->api->cancelBooking(99999, 'some reason');
-
-        expect($response)->toBeInstanceOf(CancelBookingResponse::class);
-        expect($response->status)->toBe(BookingStatus::ERROR);
-        expect($response->message)->toBe('Generic API Error'); // Message from generic-error.xml
-    });
+        $this->api->cancelBooking(99999, 'some reason');
+    })->throws(\Shelfwood\PhpPms\Exceptions\ApiException::class);
 
 });

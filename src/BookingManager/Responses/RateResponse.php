@@ -32,7 +32,9 @@ class RateResponse
         public readonly ?string $propertyIdentifier = null,
         public readonly ?int $maxPersons = null,
         public readonly ?bool $available = null,
-        public readonly ?int $minimalNights = null
+        public readonly ?int $minimalNights = null,
+        public readonly ?string $error = null,
+        public readonly ?string $message = null
     ) {
         //
     }
@@ -77,7 +79,7 @@ class RateResponse
                 minimalNights: (int) ($propertyAttributes['minimal_nights'] ?? null)
             );
         } catch (Exception $e) {
-            throw new Exception('Failed to map RateResponse: '.$e->getMessage(), 0, $e);
+            throw new \Shelfwood\PhpPms\Exceptions\MappingException($e->getMessage(), 0, $e);
         }
     }
 }

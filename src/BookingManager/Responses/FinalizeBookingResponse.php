@@ -4,6 +4,7 @@ namespace Shelfwood\PhpPms\BookingManager\Responses;
 
 use Exception;
 use Shelfwood\PhpPms\BookingManager\Enums\BookingStatus;
+use Shelfwood\PhpPms\Exceptions\MappingException;
 
 class FinalizeBookingResponse
 {
@@ -70,7 +71,7 @@ class FinalizeBookingResponse
                 status: $status
             );
         } catch (Exception $e) {
-            throw new Exception('Failed to map FinalizeBookingResponse: '.$e->getMessage(), 0, $e);
+            throw new MappingException('Failed to map FinalizeBookingResponse: '.$e->getMessage(), 0, $e);
         }
     }
 }

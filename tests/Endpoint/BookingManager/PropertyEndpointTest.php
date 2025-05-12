@@ -16,6 +16,7 @@ use Shelfwood\PhpPms\BookingManager\Enums\InternetConnectionType;
 use Shelfwood\PhpPms\BookingManager\Enums\ParkingType;
 use Shelfwood\PhpPms\BookingManager\Enums\SwimmingPoolType;
 use Shelfwood\PhpPms\BookingManager\Enums\SaunaType;
+use Tests\Helpers\TestHelpers;
 
 describe('PropertyEndpointTest', function () {
     beforeEach(function () {
@@ -30,13 +31,13 @@ describe('PropertyEndpointTest', function () {
     });
 
     test('BookingManagerAPI::property returns PropertyResponse with populated PropertyDetails', function () {
-        $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/property-by-id.xml');
+        $mockResponsePath = TestHelpers::getMockFilePath('property-by-id.xml');
+        $xml = file_get_contents($mockResponsePath);
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockStream = $this->createMock(StreamInterface::class);
         $mockStream->method('getContents')->willReturn($xml);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
-
         $response = $this->api->property(21663);
 
         expect($response)->toBeInstanceOf(PropertyResponse::class);
@@ -62,14 +63,15 @@ describe('PropertyEndpointTest', function () {
         expect($response->property->tax->otherType)->toBeInstanceOf(\Shelfwood\PhpPms\BookingManager\Enums\TaxType::class);
         expect($response->property->tax->otherType->value)->toBe('relative');
     });
-    test('BookingManagerAPI::property throws HttpClientException on generic API error', function () {
-        $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/generic-error.xml');
+
+    test('BookingManagerAPI::property throws ApiException on API error', function () {
+        $mockResponsePath = Tests\Helpers\TestHelpers::getMockFilePath('generic-error.xml');
+        $xml = file_get_contents($mockResponsePath);
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockStream = $this->createMock(StreamInterface::class);
         $mockStream->method('getContents')->willReturn($xml);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
-        $this->api->property(1);
-    })->throws(\Shelfwood\PhpPms\Exceptions\HttpClientException::class);
-
-    });
+        $this->api->property(123);
+    })->throws(\Shelfwood\PhpPms\Exceptions\ApiException::class);
+});

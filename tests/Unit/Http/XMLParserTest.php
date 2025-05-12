@@ -11,21 +11,21 @@ describe('XMLParserTest', function () {
         $result = XmlParser::parse($xml);
         expect($result['foo'])->toBe('bar');
     });
-    
+
     it('throws on empty XML string', function () {
-        XmlParser::parse('');
-    })->throws(ParseException::class);
-    
+        expect(fn() => XMLParser::parse(''))->toThrow(\Shelfwood\PhpPms\Exceptions\XmlParsingException::class);
+    });
+
     it('throws on malformed XML', function () {
-        XmlParser::parse('<root><foo></root>');
-    })->throws(ParseException::class);
-    
+        expect(fn() => XMLParser::parse('<not><closed>'))->toThrow(\Shelfwood\PhpPms\Exceptions\XmlParsingException::class);
+    });
+
     it('detects OTA-style error', function () {
         $xml = '<Errors><Error Code="123" ShortText="Failure"/></Errors>';
         $arr = XmlParser::parse($xml);
         expect(XmlParser::hasError($arr))->toBeTrue();
     });
-    
+
     it('extracts error details', function () {
         $xml = '<Errors><Error Code="123" ShortText="Failure"/></Errors>';
         $arr = XmlParser::parse($xml);
@@ -33,7 +33,7 @@ describe('XMLParserTest', function () {
         expect($details->code)->toBe('123')
             ->and($details->message)->toBe('Failure');
     });
-    
+
     it('gets string, int, float, bool safely', function () {
         $data = [
             'str' => 'abc',
@@ -48,5 +48,5 @@ describe('XMLParserTest', function () {
             ->and(XmlParser::getBool($data, 'bool'))->toBeTrue()
             ->and(XmlParser::getString($data, 'empty', 'default'))->toBe('default');
     });
-    
+
     });

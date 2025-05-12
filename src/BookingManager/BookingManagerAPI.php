@@ -6,15 +6,25 @@ use Carbon\Carbon;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\ClientInterface;
 use Shelfwood\PhpPms\Http\XMLClient;
+use Shelfwood\PhpPms\Http\XMLParser;
 use Shelfwood\PhpPms\BookingManager\Responses\RateResponse;
 use Shelfwood\PhpPms\BookingManager\Responses\CalendarResponse;
 use Shelfwood\PhpPms\BookingManager\Responses\PropertyResponse;
 use Shelfwood\PhpPms\BookingManager\Responses\PropertiesResponse;
 use Shelfwood\PhpPms\BookingManager\Payloads\CreateBookingPayload;
+use Shelfwood\PhpPms\BookingManager\Payloads\EditBookingPayload;
 use Shelfwood\PhpPms\BookingManager\Responses\CancelBookingResponse;
 use Shelfwood\PhpPms\BookingManager\Responses\CreateBookingResponse;
 use Shelfwood\PhpPms\BookingManager\Responses\CalendarChangesResponse;
 use Shelfwood\PhpPms\BookingManager\Responses\FinalizeBookingResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\ViewBookingResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\EditBookingResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\PendingBookingResponse;
+use Shelfwood\PhpPms\BookingManager\BookingManagerAPIException;
+use Shelfwood\PhpPms\Exceptions\NetworkException;
+use Shelfwood\PhpPms\Exceptions\XmlParsingException;
+use Shelfwood\PhpPms\Exceptions\ApiException;
+use Shelfwood\PhpPms\Exceptions\MappingException;
 
 class BookingManagerAPI extends XMLClient
 {
@@ -29,15 +39,51 @@ class BookingManagerAPI extends XMLClient
     }
 
     /**
+     * Centralized API call handler for BookingManager endpoints.
+     * Handles network, parsing, and API errors, throws exceptions on error.
+     */
+    protected function performApiCall(string $endpointName, string $requestCommand, array $apiParams = []): array
+    {
+        $url = $this->getEndpoint($endpointName);
+        $formData = array_merge(['request' => $requestCommand], $apiParams);
+        try {
+            $xmlBody = $this->executePostRequest($url, $formData);
+            $parsedData = XMLParser::parse($xmlBody);
+            if (XMLParser::hasError($parsedData)) {
+                $errorDetails = XMLParser::extractErrorDetails($parsedData);
+                throw new ApiException($errorDetails->message, $errorDetails->code ?? 0, null, $errorDetails);
+            }
+            return $parsedData;
+        } catch (NetworkException | XmlParsingException | ApiException $e) {
+            $this->logger->error("API call failed: {$e->getMessage()}", [
+                'endpoint' => $endpointName,
+                'request' => $requestCommand,
+                'params' => $apiParams,
+                'exception' => get_class($e),
+                'code' => $e->getCode(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        } catch (\Throwable $e) {
+            $this->logger->error("Unexpected error during API call: {$e->getMessage()}", [
+                'endpoint' => $endpointName,
+                'request' => $requestCommand,
+                'params' => $apiParams,
+                'exception' => get_class($e),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw new \Shelfwood\PhpPms\Exceptions\PmsClientException("Unexpected error: " . $e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
      * Get all properties from BookingManager
      *
      * @return PropertiesResponse
      */
     public function properties(): PropertiesResponse
     {
-        $params = ['request' => 'list_properties'];
-        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
-        $parsedArray = $responseArray[0] ?? [];
+        $parsedArray = $this->performApiCall('BEXML', 'list_properties');
         if (!$parsedArray || !isset($parsedArray['property'])) {
             $this->logger->warning('No <property> elements found directly under the root parsed XML for getAllProperties.', [
                 'parsed_xml_keys' => is_array($parsedArray) ? implode(',', array_keys($parsedArray)) : 'null',
@@ -52,126 +98,97 @@ class BookingManagerAPI extends XMLClient
 
     public function property(int $id): PropertyResponse
     {
-        $params = [
-            'request' => 'list_property',
-            'id' => $id,
-        ];
-        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
-        $parsedArray = $responseArray[0] ?? [];
-        if (!$parsedArray || !isset($parsedArray['property'])) {
-            throw new \RuntimeException('Invalid response structure for property');
+        $apiParams = ['id' => $id];
+        $parsedData = $this->performApiCall('BEXML', 'list_property', $apiParams);
+        if (!isset($parsedData['property'])) {
+            throw new MappingException('Invalid response structure for property: missing "property" key.');
         }
-        return PropertyResponse::map($parsedArray['property']);
+        return PropertyResponse::map($parsedData['property']);
     }
 
     public function calendar(int $propertyId, Carbon $startDate, Carbon $endDate): CalendarResponse
     {
-        $params = [
-            'request' => 'get_calendar',
+        $apiParams = [
             'property_id' => $propertyId,
             'date_from' => $startDate->format('Ymd'),
             'date_to' => $endDate->format('Ymd'),
         ];
-        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
-        return CalendarResponse::map($responseArray[0]);
+        $parsedData = $this->performApiCall('BEXML', 'get_calendar', $apiParams);
+        return CalendarResponse::map($parsedData);
     }
 
     public function calendarChanges(Carbon $since): CalendarChangesResponse
     {
-        $params = [
-            'request' => 'list_calendar_changes',
+        $apiParams = [
             'since' => $since->toIso8601String(),
         ];
-        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
-        $parsedArray = $responseArray[0] ?? [];
-
-        if (!$parsedArray || !isset($parsedArray['property'])) {
-            $parsedArray['property'] = [];
+        $parsedData = $this->performApiCall('BEXML', 'list_calendar_changes', $apiParams);
+        if (!$parsedData || !isset($parsedData['property'])) {
+            $parsedData['property'] = [];
         }
-        if (isset($parsedArray['property']) && !is_array($parsedArray['property'])) {
-            $parsedArray['property'] = [$parsedArray['property']];
-        } elseif (isset($parsedArray['property']) && isset($parsedArray['property']['@attributes'])){
-            $parsedArray['property'] = [$parsedArray['property']];
+        if (isset($parsedData['property']) && !is_array($parsedData['property'])) {
+            $parsedData['property'] = [$parsedData['property']];
+        } elseif (isset($parsedData['property']) && isset($parsedData['property']['@attributes'])){
+            $parsedData['property'] = [$parsedData['property']];
         }
-
-        return CalendarChangesResponse::map($parsedArray);
+        return CalendarChangesResponse::map($parsedData);
     }
 
     public function rateForStay(int $propertyId, Carbon $arrivalDate, Carbon $departureDate, int $numAdults, ?int $numChildren = null, ?int $numBabies = null): RateResponse
     {
-        $params = [
-            'request' => 'get_rate_for_stay',
+        $apiParams = [
             'id' => $propertyId,
             'arrival_date' => $arrivalDate->toDateString(),
             'departure_date' => $departureDate->toDateString(),
             'adults' => $numAdults,
         ];
-
         if ($numChildren !== null) {
-            $params['children'] = $numChildren;
+            $apiParams['children'] = $numChildren;
         }
-
         if ($numBabies !== null) {
-            $params['babies'] = $numBabies;
+            $apiParams['babies'] = $numBabies;
         }
-
-        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
-        $parsedArray = $responseArray[0] ?? [];
-
-        if (!$parsedArray || !isset($parsedArray['rate'])) {
-            throw new \RuntimeException('Invalid response structure for rate for stay');
+        $parsedData = $this->performApiCall('BEXML', 'get_rate_for_stay', $apiParams);
+        if (!$parsedData || !isset($parsedData['rate'])) {
+            throw new MappingException('Invalid response structure for rate for stay: missing "rate" key.');
         }
-
-        return RateResponse::map($parsedArray['rate']);
+        return RateResponse::map($parsedData['rate']);
     }
 
     public function createBooking(CreateBookingPayload $payload): CreateBookingResponse
     {
-        $params = array_merge(['request' => 'create_booking'], $payload->toArray());
-        $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
-        return CreateBookingResponse::map($responseArray[0]);
+        $apiParams = $payload->toArray();
+        $parsedData = $this->performApiCall('BEXML', 'create_booking', $apiParams);
+        return CreateBookingResponse::map($parsedData);
     }
 
     public function finalizeBooking(int $externalBookingId): FinalizeBookingResponse
     {
-        $params = [
-            'request' => 'finalize_booking',
+        $apiParams = [
             'booking_id' => $externalBookingId,
             'overwrite_rates' => 1,
         ];
-        try {
-            $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
-            return FinalizeBookingResponse::map($responseArray[0]);
-        } catch (\Shelfwood\PhpPms\Exceptions\HttpClientException $e) {
-            // Attempt to extract error message from exception
-            $message = $e->getMessage();
-            return new \Shelfwood\PhpPms\BookingManager\Responses\FinalizeBookingResponse(
-                bookingId: 0,
-                identifier: '',
-                message: preg_replace('/^API Error: /', '', $message),
-                status: \Shelfwood\PhpPms\BookingManager\Enums\BookingStatus::ERROR
-            );
-        }
+        $parsedData = $this->performApiCall('BEXML', 'finalize_booking', $apiParams);
+        return FinalizeBookingResponse::map($parsedData);
     }
 
     public function cancelBooking(int $bookingId, string $reason): CancelBookingResponse
     {
-        $params = [
-            'request' => 'cancel_booking',
+        $apiParams = [
             'booking_id' => $bookingId,
             'reason' => $reason,
         ];
-        try {
-            $responseArray = $this->sendRequest('POST', $this->getEndpoint('BEXML'), ['form_params' => $params]);
-            return CancelBookingResponse::map($responseArray[0]);
-        } catch (\Shelfwood\PhpPms\Exceptions\HttpClientException $e) {
-            $message = $e->getMessage();
-            return new \Shelfwood\PhpPms\BookingManager\Responses\CancelBookingResponse(
-                success: false,
-                message: preg_replace('/^API Error: /', '', $message),
-                status: \Shelfwood\PhpPms\BookingManager\Enums\BookingStatus::ERROR
-            );
-        }
+        $parsedData = $this->performApiCall('BEXML', 'cancel_booking', $apiParams);
+        return CancelBookingResponse::map($parsedData);
+    }
+
+    public function viewBooking(int $bookingId): ViewBookingResponse
+    {
+        $apiParams = [
+            'bookingid' => $bookingId,
+        ];
+        $parsedData = $this->performApiCall('BEXML', 'booking_view', $apiParams);
+        return ViewBookingResponse::map($parsedData);
     }
 
     private function getEndpoint(string $type): string

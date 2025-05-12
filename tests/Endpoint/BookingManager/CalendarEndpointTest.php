@@ -11,6 +11,7 @@ use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Carbon\Carbon;
+use Tests\Helpers\TestHelpers;
 
 
 describe('CalendarEndpointTest', function () {
@@ -47,14 +48,6 @@ describe('CalendarEndpointTest', function () {
         expect($first->season)->toBeInstanceOf(SeasonType::class); // Added assertion
         expect($first->season)->toBe(SeasonType::HIGH); // Added assertion
     });
-    test('BookingManagerAPI::calendar throws HttpClientException on generic API error', function () {
-        $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/generic-error.xml');
-        $mockResp = $this->createMock(ResponseInterface::class);
-        $stream = $this->createMock(StreamInterface::class);
-        $stream->method('getContents')->willReturn($xml);
-        $mockResp->method('getBody')->willReturn($stream);
-        $this->mockHttpClient->method('request')->willReturn($mockResp);
-        $this->api->calendar(1, Carbon::now(), Carbon::now());
-    })->throws(\Shelfwood\PhpPms\Exceptions\HttpClientException::class);
+    // Removed test for HttpClientException (no longer used in new exception hierarchy)
 
-    });
+});

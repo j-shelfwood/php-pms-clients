@@ -4,6 +4,7 @@ namespace Shelfwood\PhpPms\BookingManager\Responses;
 
 use Exception;
 use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarDayInfo;
+use Shelfwood\PhpPms\Exceptions\MappingException;
 
 class CalendarResponse
 {
@@ -12,7 +13,9 @@ class CalendarResponse
 
     public function __construct(
         public readonly int $propertyId,
-        array $days
+        array $days,
+        public readonly ?string $error = null,
+        public readonly ?string $message = null
     ) {
         $this->days = $days;
     }
@@ -63,7 +66,7 @@ class CalendarResponse
             return new self($propertyId, $days);
 
         } catch (Exception $e) {
-            throw new Exception('Failed to map CalendarResponse: '.$e->getMessage(), 0, $e);
+            throw new MappingException($e->getMessage(), 0, $e);
         }
     }
 }

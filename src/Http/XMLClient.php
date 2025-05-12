@@ -10,6 +10,7 @@ use Shelfwood\PhpPms\Http\XMLParser;
 use Shelfwood\PhpPms\Exceptions\ParseException;
 use Shelfwood\PhpPms\Exceptions\HttpClientException;
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
+use Shelfwood\PhpPms\Exceptions\NetworkException;
 
 abstract class XMLClient
 {
@@ -134,5 +135,39 @@ abstract class XMLClient
         }
 
         return [$parsedResponse];
+    }
+
+    /**
+     * Execute a POST request with form data, injects credentials, returns raw XML string.
+     * Throws NetworkException on network/transport errors.
+     */
+    protected function executePostRequest(string $url, array $formData): string
+    {
+        $options = [
+            'headers' => $this->defaultHeaders,
+            'timeout' => $this->defaultTimeout,
+            'form_params' => array_merge($formData, [
+                'key' => $this->apiKey,
+                'username' => $this->username,
+            ]),
+        ];
+        try {
+            $response = $this->httpClient->request('POST', $url, $options);
+            $body = $response->getBody()->getContents();
+            if (empty($body)) {
+                $this->logger->warning('Received empty response body from API.', [
+                    'url' => $url,
+                ]);
+                throw new NetworkException('Received empty response body from API.');
+            }
+            return $body;
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            $this->logger->error('HTTP request failed', [
+                'url' => $url,
+                'error' => $e->getMessage(),
+                'response_body' => $e->hasResponse() ? (string) $e->getResponse()->getBody() : null,
+            ]);
+            throw new NetworkException('HTTP request failed: ' . $e->getMessage(), $e->getCode(), $e);
+        }
     }
 }

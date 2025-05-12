@@ -3,18 +3,25 @@
 namespace Shelfwood\PhpPms\BookingManager\Responses;
 
 use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\PropertyDetails;
+use Shelfwood\PhpPms\Exceptions\MappingException;
 
 
 class PropertyResponse
 {
     public function __construct(
-        public readonly PropertyDetails $property
+        public readonly ?PropertyDetails $property,
+        public readonly ?string $error = null,
+        public readonly ?string $message = null
     ) {}
 
     public static function map(array $data): self
     {
-        return new self(
-            property: PropertyDetails::map($data)
-        );
+        try {
+            return new self(
+                property: PropertyDetails::map($data)
+            );
+        } catch (\Throwable $e) {
+            throw new MappingException($e->getMessage(), 0, $e);
+        }
     }
 }

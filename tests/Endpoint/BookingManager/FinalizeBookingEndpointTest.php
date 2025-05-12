@@ -74,21 +74,14 @@ describe('FinalizeBookingEndpointTest', function () {
         expect($response->message)->toBe('Booking finalized successfully.'); // Default message from map logic
     });
 
-
-    test('finalizeBooking returns FinalizeBookingResponse with ERROR status for generic error mock', function () {
-        $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/generic-error.xml');
+    test('finalizeBooking throws ApiException on generic API error', function () {
+        $mockResponsePath = Tests\Helpers\TestHelpers::getMockFilePath('generic-error.xml');
+        $xml = file_get_contents($mockResponsePath);
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockStream = $this->createMock(StreamInterface::class);
         $mockStream->method('getContents')->willReturn($xml);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
-
-        $response = $this->api->finalizeBooking(999);
-
-        expect($response)->toBeInstanceOf(FinalizeBookingResponse::class);
-        expect($response->bookingId)->toBe(0);
-        expect($response->identifier)->toBe('');
-        expect($response->status)->toBe(BookingStatus::ERROR);
-        expect($response->message)->toBe('Generic API Error');
-    });
+        $this->api->finalizeBooking(12345);
+    })->throws(\Shelfwood\PhpPms\Exceptions\ApiException::class);
 });

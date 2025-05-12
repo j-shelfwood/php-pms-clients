@@ -15,6 +15,7 @@ use Shelfwood\PhpPms\BookingManager\Enums\ParkingType;
 use Shelfwood\PhpPms\BookingManager\Enums\SwimmingPoolType;
 use Shelfwood\PhpPms\BookingManager\Enums\SaunaType;
 use Shelfwood\PhpPms\BookingManager\Enums\TaxType;
+use Tests\Helpers\TestHelpers;
 
 
 describe('PropertiesEndpointTest', function () {
@@ -31,7 +32,7 @@ describe('PropertiesEndpointTest', function () {
 
     test('BookingManagerAPI::properties returns PropertiesResponse with PropertyDetails objects', function () {
 
-        $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/all-properties.xml');
+        $xml = file_get_contents(TestHelpers::getMockFilePath('all-properties.xml'));
 
         $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
         $mockStream = $this->createMock(\Psr\Http\Message\StreamInterface::class);

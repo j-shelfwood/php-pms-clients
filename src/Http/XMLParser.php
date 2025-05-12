@@ -5,36 +5,36 @@ namespace Shelfwood\PhpPms\Http;
 use Exception;
 use SimpleXMLElement;
 use Shelfwood\PhpPms\Exceptions\ErrorDetails;
-use Shelfwood\PhpPms\Exceptions\ParseException;
+use Shelfwood\PhpPms\Exceptions\XmlParsingException;
 
-class XmlParser
+class XMLParser
 {
     /**
      * Parses an XML string into an array.
      *
-     * @throws ParseException If XML parsing or conversion fails.
+     * @throws XmlParsingException If XML parsing or conversion fails.
      */
     public static function parse(string $xml): array
     {
         try {
             if (empty(trim($xml))) {
-                throw new ParseException('Cannot parse empty XML string.');
+                throw new XmlParsingException('Cannot parse empty XML string.');
             }
             $element = new SimpleXMLElement($xml, LIBXML_NOCDATA | LIBXML_NOERROR | LIBXML_NOWARNING);
             $json = json_encode($element);
             if ($json === false) {
-                throw new ParseException('Failed to encode XML to JSON. Error: ' . json_last_error_msg());
+                throw new XmlParsingException('Failed to encode XML to JSON. Error: ' . json_last_error_msg());
             }
             $array = json_decode($json, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new ParseException('Failed to decode JSON to array: ' . json_last_error_msg());
+                throw new XmlParsingException('Failed to decode JSON to array: ' . json_last_error_msg());
             }
             return $array;
         } catch (Exception $e) {
-            if ($e instanceof ParseException) {
+            if ($e instanceof XmlParsingException) {
                 throw $e;
             }
-            throw new ParseException("Error parsing XML: " . $e->getMessage(), 0, $e);
+            throw new XmlParsingException("Error parsing XML: " . $e->getMessage(), 0, $e);
         }
     }
 
@@ -62,9 +62,14 @@ class XmlParser
         }
 
         $directErrorData = $response['error'] ?? null;
-        $directErrorData = $response['error'] ?? null;
-        if (is_array($directErrorData) && isset($directErrorData['@attributes']['code'])) {
-            return true;
+        if (is_array($directErrorData)) {
+            if (isset($directErrorData['@attributes']['code'])) {
+                return true;
+            }
+            // BookingManager error structure: <error><code>...</code><message>...</message></error>
+            if (isset($directErrorData['code']) && !empty($directErrorData['code'])) {
+                return true;
+            }
         }
 
         $rootAttributes = $response['@attributes'] ?? null;
