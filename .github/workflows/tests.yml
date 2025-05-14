@@ -1,19 +1,19 @@
-name: CI
+name: Tests
 
 on:
   push:
     branches:
-      - "**"
+      - main
     tags-ignore:
-      - "v*.*.*" # Don't run on tags, release workflow will handle it
+      - v*.*.*
   pull_request:
     branches:
-      - "**" # all branches
+      - main
 
 jobs:
   test:
     name: Run Tests
-    runs-on: macos-latest # For act compatibility as requested
+    runs-on: macos-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('''**/composer.lock''') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
 
