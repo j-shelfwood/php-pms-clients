@@ -32,9 +32,7 @@ class RateResponse
         public readonly ?string $propertyIdentifier = null,
         public readonly ?int $maxPersons = null,
         public readonly ?bool $available = null,
-        public readonly ?int $minimalNights = null,
-        public readonly ?string $error = null,
-        public readonly ?string $message = null
+        public readonly ?int $minimalNights = null
     ) {
         //
     }

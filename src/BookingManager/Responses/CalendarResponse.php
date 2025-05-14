@@ -13,9 +13,7 @@ class CalendarResponse
 
     public function __construct(
         public readonly int $propertyId,
-        array $days,
-        public readonly ?string $error = null,
-        public readonly ?string $message = null
+        array $days
     ) {
         $this->days = $days;
     }

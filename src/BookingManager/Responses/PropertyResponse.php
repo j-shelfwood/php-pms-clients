@@ -9,9 +9,7 @@ use Shelfwood\PhpPms\Exceptions\MappingException;
 class PropertyResponse
 {
     public function __construct(
-        public readonly ?PropertyDetails $property,
-        public readonly ?string $error = null,
-        public readonly ?string $message = null
+        public readonly PropertyDetails $property
     ) {}
 
     public static function map(array $data): self

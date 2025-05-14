@@ -2,6 +2,8 @@
 
 namespace Shelfwood\PhpPms\BookingManager\Responses\ValueObjects;
 
+use Shelfwood\PhpPms\Exceptions\MappingException;
+
 class StayRate
 {
     public function __construct(
@@ -13,11 +15,15 @@ class StayRate
 
     public static function fromXml(array $rateData): self
     {
-        return new self(
-            final: (float) ($rateData['final'] ?? 0.0),
-            prepayment: (float) ($rateData['prepayment'] ?? 0.0),
-            balanceDue: (float) ($rateData['balance_due'] ?? 0.0),
-            tax: StayTax::fromXml($rateData['tax'] ?? [])
-        );
+        try {
+            return new self(
+                final: (float) ($rateData['final'] ?? 0.0),
+                prepayment: (float) ($rateData['prepayment'] ?? 0.0),
+                balanceDue: (float) ($rateData['balance_due'] ?? 0.0),
+                tax: StayTax::fromXml($rateData['tax'] ?? [])
+            );
+        } catch (\Throwable $e) {
+            throw new MappingException('Failed to map StayRate: ' . $e->getMessage(), 0, $e);
+        }
     }
 }

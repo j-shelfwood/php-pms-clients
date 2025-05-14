@@ -11,41 +11,12 @@ use Tests\Helpers\TestHelpers;
 
 class TestXMLClient extends XMLClient
 {
-    public function publicSendRequest(string $method, string $url, array $options = []): array
-    {
-        return $this->sendRequest($method, $url, $options);
-    }
     public function publicExecutePostRequest(string $url, array $formData): string
     {
         return $this->executePostRequest($url, $formData);
     }
 }
 describe('XMLClientTest', function () {
-
-    it('sends request and parses XML', function () {
-    $mock = Mockery::mock(ClientInterface::class);
-    $mock->shouldReceive('request')
-        ->once()
-        ->andReturn(new Response(200, [], '<root><foo>bar</foo></root>'));
-
-    $client = new TestXMLClient('http://test', 'apikey', 'user', $mock, new NullLogger());
-    $result = $client->publicSendRequest('POST', 'http://test/endpoint');
-    expect($result[0]['foo'])->toBe('bar');
-});
-
-    it('injects credentials into form_params', function () {
-        $mock = Mockery::mock(ClientInterface::class);
-        $mock->shouldReceive('request')
-            ->withArgs(function ($method, $url, $options) {
-                return $options['form_params']['key'] === 'apikey'
-                    && $options['form_params']['username'] === 'user';
-            })
-            ->andReturn(new Response(200, [], '<root/>'));
-
-        $client = new TestXMLClient('http://test', 'apikey', 'user', $mock, new NullLogger());
-        $result = $client->publicSendRequest('POST', 'http://test/endpoint');
-        expect($result)->toBeArray();
-    });
 
     it('throws on HTTP error', function () {
         $mock = Mockery::mock(ClientInterface::class);

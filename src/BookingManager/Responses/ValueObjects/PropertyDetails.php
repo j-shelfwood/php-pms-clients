@@ -100,147 +100,149 @@ class PropertyDetails
 
     public static function map(array $data): self
     {
-
-        $propertyData = $data;
-        if (isset($data['properties']['property'])) {
-            $propertyData = $data['properties']['property'];
-        } elseif (isset($data['property'])) {
-            $propertyData = $data['property'];
-        }
-
-        if (empty($propertyData)) {
-            throw new Exception('Invalid response structure: Missing property data.');
-        }
-
-        $attributes = $propertyData['@attributes'] ?? [];
-        $id = (int) ($attributes['id'] ?? 0);
-        $name = (string) ($attributes['name'] ?? '');
-        $status = PropertyStatus::tryFrom((string) ($attributes['status'] ?? ''));
-        $identifier = isset($attributes['identifier']) ? (string) $attributes['identifier'] : null;
-
-        $getString = function($key, $default = null) use ($propertyData) {
-            $value = $propertyData[$key] ?? $default;
-            if (is_array($value) && empty($value)) {
-                return $default;
+        try {
+            $propertyData = $data;
+            if (isset($data['properties']['property'])) {
+                $propertyData = $data['properties']['property'];
+            } elseif (isset($data['property'])) {
+                $propertyData = $data['property'];
             }
-            if (!is_scalar($value) && $value !== null) {
-                return $default;
+
+            if (empty($propertyData)) {
+                throw new \Exception('Invalid response structure: Missing property data.');
             }
-            return $value === null ? null : (string) $value;
-        };
 
-        $getInt = function($key, $default = 0) use ($propertyData) {
-            $value = $propertyData[$key] ?? $default;
-            return is_numeric($value) ? (int) $value : $default;
-        };
+            $attributes = $propertyData['@attributes'] ?? [];
+            $id = (int) ($attributes['id'] ?? 0);
+            $name = (string) ($attributes['name'] ?? '');
+            $status = PropertyStatus::tryFrom((string) ($attributes['status'] ?? ''));
+            $identifier = isset($attributes['identifier']) ? (string) $attributes['identifier'] : null;
 
-        $getFloat = function($key, $default = 0.0) use ($propertyData) {
-            $value = $propertyData[$key] ?? $default;
-            return is_numeric($value) ? (float) $value : $default;
-        };
+            $getString = function($key, $default = null) use ($propertyData) {
+                $value = $propertyData[$key] ?? $default;
+                if (is_array($value) && empty($value)) {
+                    return $default;
+                }
+                if (!is_scalar($value) && $value !== null) {
+                    return $default;
+                }
+                return $value === null ? null : (string) $value;
+            };
 
-        $getBool = function($key, $default = false) use ($propertyData) {
-            $value = $propertyData[$key] ?? $default;
-            return is_bool($value) ? $value : (bool) $default;
-        };
+            $getInt = function($key, $default = 0) use ($propertyData) {
+                $value = $propertyData[$key] ?? $default;
+                return is_numeric($value) ? (int) $value : $default;
+            };
 
-        $getDate = function($key) use ($propertyData) {
-            $value = $propertyData[$key] ?? null;
-            return ($value !== null && !empty($value) && !is_array($value)) ? Carbon::parse((string) $value) : null;
-        };
+            $getFloat = function($key, $default = 0.0) use ($propertyData) {
+                $value = $propertyData[$key] ?? $default;
+                return is_numeric($value) ? (float) $value : $default;
+            };
 
-        $typesString = $getString('type', '');
-        $propertyTypes = !empty($typesString) ? explode(',', $typesString) : [];
+            $getBool = function($key, $default = false) use ($propertyData) {
+                $value = $propertyData[$key] ?? $default;
+                return is_bool($value) ? $value : (bool) $default;
+            };
 
+            $getDate = function($key) use ($propertyData) {
+                $value = $propertyData[$key] ?? null;
+                return ($value !== null && !empty($value) && !is_array($value)) ? \Carbon\Carbon::parse((string) $value) : null;
+            };
 
-        $imagesData = $propertyData['images']['image'] ?? [];
-        if (!is_array($imagesData)) {
-            $imagesData = [];
-        } elseif (isset($imagesData['@attributes']) || isset($imagesData['name'])) {
-            $imagesData = [$imagesData];
+            $typesString = $getString('type', '');
+            $propertyTypes = !empty($typesString) ? explode(',', $typesString) : [];
+
+            $imagesData = $propertyData['images']['image'] ?? [];
+            if (!is_array($imagesData)) {
+                $imagesData = [];
+            } elseif (isset($imagesData['@attributes']) || isset($imagesData['name'])) {
+                $imagesData = [$imagesData];
+            }
+            $imagesData = array_filter($imagesData, function ($img) {
+                return is_array($img) && isset($img['@attributes']);
+            });
+
+            return new self(
+                external_id: $id,
+                name: $name,
+                identifier: $identifier,
+                status: $status,
+                property_types: $propertyTypes,
+                provider: PropertyProvider::fromXml($propertyData['provider'] ?? []),
+                location: PropertyLocation::fromXml($propertyData['location'] ?? []),
+                max_persons: $getInt('max_persons'),
+                minimal_nights: $getInt('minimal_nights'),
+                maximal_nights: $getInt('maximal_nights'),
+                available_start: $getDate('available_start'),
+                available_end: $getDate('available_end'),
+                floor: $getInt('floor'),
+                stairs: $getBool('stairs'),
+                size: $getFloat('size'),
+                bedrooms: $getInt('bedrooms'),
+                single_bed: $getInt('single_bed'),
+                double_bed: $getInt('double_bed'),
+                single_sofa: $getInt('single_sofa'),
+                double_sofa: $getInt('double_sofa'),
+                single_bunk: $getInt('single_bunk'),
+                bathrooms: $getInt('bathrooms'),
+                toilets: $getInt('toilets'),
+                elevator: $getBool('elevator'),
+                view: ViewType::tryFrom($getString('view') ?? ''),
+                internet: InternetType::tryFrom($getString('internet') ?? ''),
+                internet_connection: InternetConnectionType::tryFrom($getString('internet_connection') ?? ''),
+                parking: ParkingType::tryFrom($getString('parking') ?? ''),
+                airco: $getBool('airco'),
+                fans: $getBool('fans'),
+                balcony: $getBool('balcony'),
+                patio: $getBool('patio'),
+                garden: $getBool('garden'),
+                roof_terrace: $getBool('roof_terrace'),
+                tv: TvType::tryFrom($getString('tv') ?? ''),
+                tv_connection: TvConnectionType::tryFrom($getString('tv_connection') ?? ''),
+                dvd: DvdType::tryFrom($getString('dvd') ?? ''),
+                computer: $getBool('computer'),
+                printer: $getBool('printer'),
+                iron: $getBool('iron'),
+                dishwasher: $getBool('dishwasher'),
+                oven: $getBool('oven'),
+                microwave: $getBool('microwave'),
+                grill: $getBool('grill'),
+                hob: $getBool('hob'),
+                fridge: $getBool('fridge'),
+                freezer: $getBool('freezer'),
+                washingmachine: $getBool('washingmachine'),
+                dryer: $getBool('dryer'),
+                toaster: $getBool('toaster'),
+                kettle: $getBool('kettle'),
+                coffeemachine: $getBool('coffeemachine'),
+                bathtub: $getInt('bathtub'),
+                jacuzzi: $getInt('jacuzzi'),
+                shower_regular: $getInt('shower_regular'),
+                shower_steam: $getInt('shower_steam'),
+                swimmingpool: SwimmingPoolType::tryFrom($getString('swimmingpool') ?? ''),
+                sauna: SaunaType::tryFrom($getString('sauna') ?? ''),
+                hairdryer: $getBool('hairdryer'),
+                entresol: $getBool('entresol'),
+                wheelchair_friendly: $getBool('wheelchair_friendly'),
+                smoking_allowed: $getBool('smoking_allowed'),
+                pets_allowed: $getBool('pets_allowed'),
+                heating: $getBool('heating'),
+                supplies: PropertySupplies::fromXml($propertyData['supplies'] ?? []),
+                service: PropertyService::fromXml($propertyData['service'] ?? []),
+                cleaning_costs: $getFloat('cleaning_costs'),
+                deposit_costs: $getFloat('deposit_costs'),
+                check_in: $getString('check_in'),
+                check_out: $getString('check_out'),
+                tax: PropertyTax::fromXml($propertyData['tax'] ?? []),
+                prepayment: $getFloat('prepayment'),
+                fee: $getFloat('fee'),
+                content: PropertyContent::fromXml($propertyData['content'] ?? []),
+                images: array_map(fn($imageData) => PropertyImage::fromXml($imageData), $imagesData),
+                external_created_at: $getDate('external_created_at'),
+                external_updated_at: $getDate('external_updated_at')
+            );
+        } catch (\Throwable $e) {
+            throw new \Shelfwood\PhpPms\Exceptions\MappingException('Failed to map PropertyDetails: ' . $e->getMessage(), 0, $e);
         }
-        $imagesData = array_filter($imagesData, function ($img) {
-            return is_array($img) && isset($img['@attributes']);
-        });
-
-        return new self(
-            external_id: $id,
-            name: $name,
-            identifier: $identifier,
-            status: $status,
-            property_types: $propertyTypes,
-            provider: PropertyProvider::fromXml($propertyData['provider'] ?? []),
-            location: PropertyLocation::fromXml($propertyData['location'] ?? []),
-            max_persons: $getInt('max_persons'),
-            minimal_nights: $getInt('minimal_nights'),
-            maximal_nights: $getInt('maximal_nights'),
-            available_start: $getDate('available_start'),
-            available_end: $getDate('available_end'),
-            floor: $getInt('floor'),
-            stairs: $getBool('stairs'),
-            size: $getFloat('size'),
-            bedrooms: $getInt('bedrooms'),
-            single_bed: $getInt('single_bed'),
-            double_bed: $getInt('double_bed'),
-            single_sofa: $getInt('single_sofa'),
-            double_sofa: $getInt('double_sofa'),
-            single_bunk: $getInt('single_bunk'),
-            bathrooms: $getInt('bathrooms'),
-            toilets: $getInt('toilets'),
-            elevator: $getBool('elevator'),
-            view: ViewType::tryFrom($getString('view') ?? ''),
-            internet: InternetType::tryFrom($getString('internet') ?? ''),
-            internet_connection: InternetConnectionType::tryFrom($getString('internet_connection') ?? ''),
-            parking: ParkingType::tryFrom($getString('parking') ?? ''),
-            airco: $getBool('airco'),
-            fans: $getBool('fans'),
-            balcony: $getBool('balcony'),
-            patio: $getBool('patio'),
-            garden: $getBool('garden'),
-            roof_terrace: $getBool('roof_terrace'),
-            tv: TvType::tryFrom($getString('tv') ?? ''),
-            tv_connection: TvConnectionType::tryFrom($getString('tv_connection') ?? ''),
-            dvd: DvdType::tryFrom($getString('dvd') ?? ''),
-            computer: $getBool('computer'),
-            printer: $getBool('printer'),
-            iron: $getBool('iron'),
-            dishwasher: $getBool('dishwasher'),
-            oven: $getBool('oven'),
-            microwave: $getBool('microwave'),
-            grill: $getBool('grill'),
-            hob: $getBool('hob'),
-            fridge: $getBool('fridge'),
-            freezer: $getBool('freezer'),
-            washingmachine: $getBool('washingmachine'),
-            dryer: $getBool('dryer'),
-            toaster: $getBool('toaster'),
-            kettle: $getBool('kettle'),
-            coffeemachine: $getBool('coffeemachine'),
-            bathtub: $getInt('bathtub'),
-            jacuzzi: $getInt('jacuzzi'),
-            shower_regular: $getInt('shower_regular'),
-            shower_steam: $getInt('shower_steam'),
-            swimmingpool: SwimmingPoolType::tryFrom($getString('swimmingpool') ?? ''),
-            sauna: SaunaType::tryFrom($getString('sauna') ?? ''),
-            hairdryer: $getBool('hairdryer'),
-            entresol: $getBool('entresol'),
-            wheelchair_friendly: $getBool('wheelchair_friendly'),
-            smoking_allowed: $getBool('smoking_allowed'),
-            pets_allowed: $getBool('pets_allowed'),
-            heating: $getBool('heating'),
-            supplies: PropertySupplies::fromXml($propertyData['supplies'] ?? []),
-            service: PropertyService::fromXml($propertyData['service'] ?? []),
-            cleaning_costs: $getFloat('cleaning_costs'),
-            deposit_costs: $getFloat('deposit_costs'),
-            check_in: $getString('check_in'),
-            check_out: $getString('check_out'),
-            tax: PropertyTax::fromXml($propertyData['tax'] ?? []),
-            prepayment: $getFloat('prepayment'),
-            fee: $getFloat('fee'),
-            content: PropertyContent::fromXml($propertyData['content'] ?? []),
-            images: array_map(fn($imageData) => PropertyImage::fromXml($imageData), $imagesData),
-            external_created_at: $getDate('external_created_at'),
-            external_updated_at: $getDate('external_updated_at')
-        );
     }
 }

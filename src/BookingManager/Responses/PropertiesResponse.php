@@ -8,9 +8,7 @@ class PropertiesResponse
 {
     public function __construct(
         /** @var PropertyDetails[] */
-        public readonly array $properties,
-        public readonly ?string $error = null,
-        public readonly ?string $message = null
+        public readonly array $properties
     ) {}
     public static function map(array $data): self
     {

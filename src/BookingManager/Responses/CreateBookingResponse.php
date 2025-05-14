@@ -46,8 +46,6 @@ class CreateBookingResponse
      * @param  string  $propertyId  ID of the property.
      * @param  string  $roomId  ID of the room.
      * @param  string  $rateId  ID of the rate.
-     * @param  ?string $error  Optional error type.
-     * @param  ?string $message Optional error message.
      */
     public function __construct(
         public readonly string $id,
@@ -64,9 +62,7 @@ class CreateBookingResponse
         public readonly string $notes,
         public readonly string $propertyId,
         public readonly string $roomId,
-        public readonly string $rateId,
-        public readonly ?string $error = null,
-        public readonly ?string $message = null
+        public readonly string $rateId
     ) {}
 
     /**

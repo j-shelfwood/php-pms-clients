@@ -27,7 +27,6 @@ class ViewBookingResponse
      * @param string $propertyId ID of the property.
      * @param string $roomId ID of the room (if applicable, often part of propertyId or not specified).
      * @param string $rateId ID of the rate (if applicable).
-     * @param ?string $message Optional message, typically for errors.
      * @param ?string $providerIdentifier Provider's unique identifier for the booking.
      * @param ?string $channelIdentifier Channel's unique identifier for the booking.
      * @param ?string $address1 Guest's address line 1.
@@ -66,7 +65,6 @@ class ViewBookingResponse
         public readonly string $propertyId,
         public readonly string $roomId, // Often, propertyId itself is the unique unit identifier
         public readonly string $rateId, // May not always be present in view response
-        public readonly ?string $message = null,
         public readonly ?string $providerIdentifier = null,
         public readonly ?string $channelIdentifier = null, // Not in create-booking.xml example, but good to have
         public readonly ?string $address1 = null,
@@ -147,7 +145,6 @@ class ViewBookingResponse
                 propertyId: $propertyId,
                 roomId: (string) ($attributes['room_id'] ?? ''), // Placeholder, adjust if API provides this
                 rateId: (string) ($attributes['rate_id'] ?? ''), // Placeholder, adjust if API provides this
-                message: $message ?: null,
                 providerIdentifier: (string) ($attributes['provider_identifier'] ?? null),
                 channelIdentifier: (string) ($attributes['channel_identifier'] ?? null),
                 address1: (string) ($sourceData['address_1'] ?? null),

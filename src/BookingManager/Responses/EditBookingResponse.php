@@ -34,7 +34,6 @@ class EditBookingResponse
      * @param ?string $propertyId ID of the property.
      * @param ?string $propertyName Name of the property.
      * @param ?string $propertyIdentifier Provider's identifier for the property.
-     * @param ?string $message Optional message, typically for errors.
      * @param ?float $rateTotal Total rate excluding discounts and taxes.
      * @param ?float $rateFinal Final rate including discounts, excluding taxes.
      * @param ?float $taxTotal Total tax amount.
@@ -69,7 +68,6 @@ class EditBookingResponse
         public readonly ?string $propertyId = null,
         public readonly ?string $propertyName = null,
         public readonly ?string $propertyIdentifier = null,
-        public readonly ?string $message = null,
         public readonly ?float $rateTotal = null,
         public readonly ?float $rateFinal = null,
         public readonly ?float $taxTotal = null,
@@ -143,7 +141,6 @@ class EditBookingResponse
                 propertyId: $propertyId ?: null,
                 propertyName: $propertyName,
                 propertyIdentifier: $propertyIdentifier ?: null,
-                message: $message ?: null,
                 rateTotal: isset($rateInfo['total']) ? (float)$rateInfo['total'] : null,
                 rateFinal: isset($rateInfo['final']) ? (float)$rateInfo['final'] : null,
                 taxTotal: isset($taxInfo['@attributes']['total']) ? (float)$taxInfo['@attributes']['total'] : null,
