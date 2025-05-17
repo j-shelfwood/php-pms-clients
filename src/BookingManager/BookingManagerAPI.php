@@ -39,6 +39,36 @@ class BookingManagerAPI extends XMLClient
     }
 
     /**
+     * Edits a booking using the provided payload.
+     *
+     * @param EditBookingPayload $payload
+     * @return EditBookingResponse
+     * @throws ApiException|MappingException|NetworkException|XmlParsingException
+     */
+    public function editBooking(EditBookingPayload $payload): EditBookingResponse
+    {
+        $apiParams = $payload->toArray();
+        $parsedData = $this->performApiCall('BEXML', 'edit_booking', $apiParams);
+        return EditBookingResponse::map($parsedData);
+    }
+
+    /**
+     * Returns pending bookings for a given booking id.
+     *
+     * @param int $bookingId
+     * @return PendingBookingResponse
+     * @throws ApiException|MappingException|NetworkException|XmlParsingException
+     */
+    public function pendingBookings(int $bookingId): PendingBookingResponse
+    {
+        $apiParams = [
+            'bookingid' => $bookingId,
+        ];
+        $parsedData = $this->performApiCall('BEXML', 'pending_bookings', $apiParams);
+        return PendingBookingResponse::map($parsedData);
+    }
+
+    /**
      * Centralized API call handler for BookingManager endpoints.
      * Handles network, parsing, and API errors, throws exceptions on error.
      */

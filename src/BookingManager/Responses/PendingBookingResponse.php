@@ -7,12 +7,14 @@ use Shelfwood\PhpPms\BookingManager\Responses\Objects\PendingBooking; // Updated
 
 class PendingBookingResponse
 {
-    /** @var PendingBooking[] */
-    public readonly array $bookings;
+    /**
+     * @var PendingBooking[]
+     */
+    public readonly array $pendingBookings;
 
-    public function __construct(array $bookings)
+    public function __construct(array $pendingBookings)
     {
-        $this->bookings = $bookings;
+        $this->pendingBookings = $pendingBookings;
     }
 
     public static function map(array $data): self

@@ -1,0 +1,30 @@
+<booking id="16" identifier="BILL-16-AMSLOC-1723-2012-05-22" provider_identifier="Provider-1234-54353" arrival="2012-05-22" departure="2012-05-25">
+    <name first="tim" last="gerritsen" />
+    <email>tim@mannetje.org</email>
+    <address_1>chassestraat 18</address_1>
+    <address_2></address_2>
+    <city>amsterdam</city>
+    <country>NL</country>
+    <phone>+31617260066</phone>
+    <amount_adults>2</amount_adults>
+    <amount_childs>1</amount_childs>
+    <time_arrival>14:00</time_arrival>
+    <flight>WZ2237</flight>
+    <notes></notes>
+    <property id="209" identifier="1723">Amstel Studio 2</property>
+    <status>open</status>
+    <rate>
+        <total>550</total>
+        <final>500</final>
+        <tax total="55">
+            <other>30</other>
+            <vat>25</vat>
+            <final>555</final>
+        </tax>
+        <fee>115</fee>
+        <prepayment>55</prepayment>
+        <balance_due>455</balance_due>
+    </rate>
+    <created>2011-11-03 21:45:46</created>
+    <modified>2011-11-03 21:45:46</modified>
+</booking>
