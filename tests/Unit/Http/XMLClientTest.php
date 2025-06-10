@@ -23,7 +23,7 @@ describe('XMLClientTest', function () {
         $mock->shouldReceive('request')
             ->andThrow(new \GuzzleHttp\Exception\RequestException('fail', new \GuzzleHttp\Psr7\Request('POST', 'test')));
 
-        $client = new TestXMLClient('http://test', 'apikey', 'user', $mock, new NullLogger());
+        $client = new TestXMLClient('http://test', 'apikey', $mock, new NullLogger());
         $client->publicExecutePostRequest('http://test/endpoint', []);
     })->throws(NetworkException::class);
 
@@ -32,7 +32,7 @@ describe('XMLClientTest', function () {
         $mock->shouldReceive('request')
             ->andReturn(new Response(200, [], '<Errors><Error Code="123" ShortText="Failure"/></Errors>'));
 
-        $client = new TestXMLClient('http://test', 'apikey', 'user', $mock, new NullLogger());
+        $client = new TestXMLClient('http://test', 'apikey', $mock, new NullLogger());
         // Simulate the new flow: parse XML and check for API error
         $xml = '<Errors><Error Code="123" ShortText="Failure"/></Errors>';
         $parsed = \Shelfwood\PhpPms\Http\XMLParser::parse($xml);

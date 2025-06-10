@@ -1,6 +1,6 @@
 {
   "name": "shelfwood/php-pms-clients",
-  "description": "PHP clients for various Property Management Systems (PMS) like Cubilis, Mews, and Booking Manager.",
+  "description": "PHP clients for various Property Management Systems (PMS) like Mews and Booking Manager.",
   "type": "library",
   "license": "MIT",
   "authors": [

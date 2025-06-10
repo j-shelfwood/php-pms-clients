@@ -18,20 +18,17 @@ abstract class XMLClient
     protected LoggerInterface $logger;
     protected string $baseUrl;
     protected string $apiKey;
-    protected string $username;
     protected int $defaultTimeout = 30;
     protected array $defaultHeaders = ['Accept' => 'application/xml'];
 
     public function __construct(
         string $baseUrl,
         string $apiKey,
-        string $username,
         ?ClientInterface $httpClient = null,
         ?LoggerInterface $logger = null
     ) {
         $this->baseUrl = $baseUrl;
         $this->apiKey = $apiKey;
-        $this->username = $username;
         $this->httpClient = $httpClient ?? new Client();
         $this->logger = $logger ?? new NullLogger();
     }
@@ -47,7 +44,6 @@ abstract class XMLClient
             'timeout' => $this->defaultTimeout,
             'form_params' => array_merge($formData, [
                 'key' => $this->apiKey,
-                'username' => $this->username,
             ]),
         ];
         try {

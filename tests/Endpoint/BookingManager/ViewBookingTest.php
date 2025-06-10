@@ -14,7 +14,6 @@ describe('ViewBookingTest', function () {
         $this->api = new BookingManagerAPI(
             $this->mockHttpClient,
             'dummy-api-key',
-            'dummy-username',
             'https://dummy-url',
             new NullLogger()
         );
@@ -29,7 +28,9 @@ describe('ViewBookingTest', function () {
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
 
         $response = $this->api->viewBooking(16);
-        expect($response)->not()->toBeNull();        expect((int)$response->id)->toBe(16);
-        expect($response->guestName)->toBeString();
+        expect($response)->not()->toBeNull();
+        expect((int)$response->id)->toBe(16);
+        expect($response->guestFirstName)->toBeString();
+        expect($response->guestLastName)->toBeString();
     });
 });

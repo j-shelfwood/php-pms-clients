@@ -17,7 +17,6 @@ describe('RateForStayEndpointTest', function () {
         $this->api = new BookingManagerAPI(
             $this->mockHttpClient,
             'dummy-api-key',
-            'dummy-username',
             'https://dummy-url',
             new NullLogger()
         );

@@ -31,11 +31,10 @@ class BookingManagerAPI extends XMLClient
     public function __construct(
         ClientInterface $httpClient,
         string $apiKey,
-        string $username,
         string $baseUrl,
         ?LoggerInterface $logger = null
     ) {
-        parent::__construct($baseUrl, $apiKey, $username, $httpClient, $logger);
+        parent::__construct($baseUrl, $apiKey, $httpClient, $logger);
     }
 
     /**

@@ -9,6 +9,5 @@ enum BookingStatus: string
     case ERROR = 'error';
     case SUCCESS = 'success';
     case CANCELLED = 'cancelled';
-    case EXPIRED = 'expired';
     case FAILED = 'failed';
 }

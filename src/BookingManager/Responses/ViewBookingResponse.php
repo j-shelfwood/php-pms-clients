@@ -6,207 +6,162 @@ namespace Shelfwood\PhpPms\BookingManager\Responses;
 
 use Shelfwood\PhpPms\Exceptions\MappingException;
 use Shelfwood\PhpPms\BookingManager\Enums\BookingStatus;
-use Throwable; // Import Throwable
 
 class ViewBookingResponse
 {
     /**
      * Represents the response after viewing a booking via the API.
-     *
-     * @param string $id The unique identifier assigned by Booking Manager.
-     * @param ?BookingStatus $status The status of the booking.
-     * @param string $arrival Arrival date.
-     * @param string $departure Departure date.
-     * @param string $totalPrice Total price of the booking.
-     * @param string $currency Currency of the total price.
-     * @param string $guestName Name of the guest.
-     * @param string $guestEmail Email of the guest.
-     * @param string $guestPhone Phone number of the guest.
-     * @param int $adults Number of adults.
-     * @param int $children Number of children.
-     * @param string $notes Additional notes for the booking.
-     * @param string $propertyId ID of the property.
-     * @param string $roomId ID of the room (if applicable, often part of propertyId or not specified).
-     * @param string $rateId ID of the rate (if applicable).
-     * @param ?string $providerIdentifier Provider's unique identifier for the booking.
-     * @param ?string $channelIdentifier Channel's unique identifier for the booking.
-     * @param ?string $address1 Guest's address line 1.
-     * @param ?string $address2 Guest's address line 2.
-     * @param ?string $city Guest's city.
-     * @param ?string $country Guest's country code.
-     * @param ?string $timeArrival Estimated time of arrival.
-     * @param ?string $flight Guest's flight number.
-     * @param ?string $propertyName Name of the property.
-     * @param ?string $propertyIdentifier Provider's identifier for the property.
-     * @param ?float $rateTotal Total rate excluding discounts and taxes.
-     * @param ?float $rateFinal Final rate including discounts, excluding taxes.
-     * @param ?float $taxTotal Total tax amount.
-     * @param ?float $taxOther Other taxes/fees.
-     * @param ?float $taxVat VAT amount.
-     * @param ?float $rateWithTaxFinal Final rate including all taxes.
-     * @param ?float $prepayment Prepayment amount.
-     * @param ?float $balanceDue Balance due amount.
-     * @param ?float $fee Channel fee.
-     * @param ?string $created Booking creation timestamp.
-     * @param ?string $modified Booking modification timestamp.
      */
     public function __construct(
         public readonly string $id,
-        public readonly ?BookingStatus $status,
+        public readonly string $identifier,
+        public readonly ?string $providerIdentifier,
         public readonly string $arrival,
         public readonly string $departure,
-        public readonly string $totalPrice, // Retained for simplicity, though rate breakdown is more detailed
-        public readonly string $currency, // Retained for simplicity
-        public readonly string $guestName,
+        public readonly ?BookingStatus $status,
+        public readonly string $guestFirstName,
+        public readonly string $guestLastName,
         public readonly string $guestEmail,
         public readonly string $guestPhone,
-        public readonly int $adults,
-        public readonly int $children,
-        public readonly string $notes,
+        public readonly string $address1,
+        public readonly ?string $address2,
+        public readonly string $city,
+        public readonly string $country,
+        public readonly int $amountAdults,
+        public readonly int $amountChilds,
+        public readonly ?string $timeArrival,
+        public readonly ?string $flight,
+        public readonly ?string $notes,
         public readonly string $propertyId,
-        public readonly string $roomId, // Often, propertyId itself is the unique unit identifier
-        public readonly string $rateId, // May not always be present in view response
-        public readonly ?string $providerIdentifier = null,
-        public readonly ?string $channelIdentifier = null, // Not in create-booking.xml example, but good to have
-        public readonly ?string $address1 = null,
-        public readonly ?string $address2 = null,
-        public readonly ?string $city = null,
-        public readonly ?string $country = null,
-        public readonly ?string $timeArrival = null,
-        public readonly ?string $flight = null,
-        public readonly ?string $propertyName = null,
-        public readonly ?string $propertyIdentifier = null,
-        public readonly ?float $rateTotal = null,
-        public readonly ?float $rateFinal = null,
-        public readonly ?float $taxTotal = null,
-        public readonly ?float $taxOther = null,
-        public readonly ?float $taxVat = null,
-        public readonly ?float $rateWithTaxFinal = null,
-        public readonly ?float $prepayment = null,
-        public readonly ?float $balanceDue = null,
-        public readonly ?float $fee = null,
-        public readonly ?string $created = null,
-        public readonly ?string $modified = null
+        public readonly string $propertyIdentifier,
+        public readonly string $propertyName,
+        public readonly float $rateTotal,
+        public readonly float $rateFinal,
+        public readonly float $taxTotal,
+        public readonly float $taxOther,
+        public readonly float $taxVat,
+        public readonly float $taxFinal,
+        public readonly float $fee,
+        public readonly float $prepayment,
+        public readonly float $balanceDue,
+        public readonly string $created,
+        public readonly string $modified
     ) {}
 
     /**
      * Maps the raw XML response data to a ViewBookingResponse object.
-     *
-     * @param array $rawResponse The raw response data (content of the <booking> tag or error).
-     * @return self The mapped ViewBookingResponse object.
-     * @throws MappingException If essential data is missing or invalid.
      */
     public static function map(array $rawResponse): self
     {
         try {
-            $sourceData = $rawResponse;
-            $attributes = $sourceData['@attributes'] ?? [];
+            $attributes = $rawResponse['@attributes'] ?? [];
 
-            $getStringOrNull = function ($value): ?string {
-                if ($value === null) return null;
-                $val = is_array($value) ? current($value) : $value;
-                return ($val === false || $val === null) ? null : (string)$val;
-            };
+            // Extract basic booking information
+            $id = (string) ($attributes['id'] ?? '');
+            $identifier = (string) ($attributes['identifier'] ?? '');
+            $providerIdentifier = isset($attributes['provider_identifier']) ? (string) $attributes['provider_identifier'] : null;
+            $arrival = (string) ($attributes['arrival'] ?? '');
+            $departure = (string) ($attributes['departure'] ?? '');
 
-            $getRequiredString = function ($value, string $default = ''): string {
-                if ($value === null) return $default;
-                $val = is_array($value) ? current($value) : $value;
-                return ($val === false || $val === null) ? $default : (string)$val;
-            };
+            // Extract guest name
+            $nameData = $rawResponse['name'] ?? [];
+            $nameAttributes = $nameData['@attributes'] ?? $nameData ?? [];
+            $guestFirstName = (string) ($nameAttributes['first'] ?? '');
+            $guestLastName = (string) ($nameAttributes['last'] ?? '');
 
-            $bookingIdVal = $attributes['id'] ?? null;
-            $bookingId = $getRequiredString($bookingIdVal, '');
+            // Extract guest details
+            $guestEmail = (string) ($rawResponse['email'] ?? '');
+            $guestPhone = (string) ($rawResponse['phone'] ?? '');
+            $address1 = (string) ($rawResponse['address_1'] ?? '');
+            $address2 = isset($rawResponse['address_2']) && !is_array($rawResponse['address_2']) && !empty($rawResponse['address_2']) ? (string) $rawResponse['address_2'] : null;
+            $city = (string) ($rawResponse['city'] ?? '');
+            $country = is_array($rawResponse['country'] ?? '') ? '' : (string) ($rawResponse['country'] ?? '');
 
+            // Extract guest count
+            $amountAdults = (int) ($rawResponse['amount_adults'] ?? 0);
+            $amountChilds = (int) ($rawResponse['amount_childs'] ?? 0);
 
-            if ($bookingId === '') {
-                throw new MappingException("Booking ID is missing or invalid in the response.");
+            // Extract optional fields
+            $timeArrival = isset($rawResponse['time_arrival']) && !is_array($rawResponse['time_arrival']) && !empty($rawResponse['time_arrival']) ? (string) $rawResponse['time_arrival'] : null;
+            $flight = isset($rawResponse['flight']) && !is_array($rawResponse['flight']) && !empty($rawResponse['flight']) ? (string) $rawResponse['flight'] : null;
+            $notes = isset($rawResponse['notes']) && !is_array($rawResponse['notes']) && !empty($rawResponse['notes']) ? (string) $rawResponse['notes'] : null;
+
+            // Extract property information
+            $propertyData = $rawResponse['property'] ?? '';
+            if (is_string($propertyData)) {
+                // Simple string case - property name only
+                $propertyName = $propertyData;
+                $propertyId = '';
+                $propertyIdentifier = '';
+            } else {
+                // Complex structure case
+                $propertyAttributes = $propertyData['@attributes'] ?? [];
+                $propertyId = (string) ($propertyAttributes['id'] ?? '');
+                $propertyIdentifier = (string) ($propertyAttributes['identifier'] ?? '');
+                $propertyName = (string) ($propertyData['#text'] ?? $propertyData ?? '');
             }
 
-            $guestNameParts = [];
-            $nameAttributes = $sourceData['name']['@attributes'] ?? $sourceData['name'] ?? [];
-            $firstName = $getStringOrNull($nameAttributes['first'] ?? null);
-            $lastName = $getStringOrNull($nameAttributes['last'] ?? null);
+            // Extract status
+            $statusString = (string) ($rawResponse['status'] ?? '');
+            $status = BookingStatus::tryFrom($statusString);
 
-            if ($firstName) {
-                $guestNameParts[] = $firstName;
-            }
-            if ($lastName) {
-                $guestNameParts[] = $lastName;
-            }
-            $guestName = implode(' ', $guestNameParts);
-            if (empty($guestName) && !empty($sourceData['name']) && is_string($sourceData['name'])) {
-                 $guestName = (string)$sourceData['name'];
-            }
-            $guestName = $getRequiredString($guestName, '');
+            // Extract rate information
+            $rateData = $rawResponse['rate'] ?? [];
+            $rateTotal = (float) ($rateData['total'] ?? 0);
+            $rateFinal = (float) ($rateData['final'] ?? 0);
+            $fee = (float) ($rateData['fee'] ?? 0);
+            $prepayment = (float) ($rateData['prepayment'] ?? 0);
+            $balanceDue = (float) ($rateData['balance_due'] ?? 0);
 
+            // Extract tax information
+            $taxData = $rateData['tax'] ?? [];
+            $taxAttributes = $taxData['@attributes'] ?? [];
+            $taxTotal = (float) ($taxAttributes['total'] ?? 0);
+            $taxOther = (float) ($taxData['other'] ?? 0);
+            $taxVat = (float) ($taxData['vat'] ?? 0);
+            $taxFinal = (float) ($taxData['final'] ?? 0);
 
-            $statusValue = $sourceData['status'] ?? null;
-            $status = $statusValue ? BookingStatus::tryFrom($getRequiredString($statusValue)) : null;
-
-            $rateDetails = $sourceData['rate'] ?? [];
-            $taxDetails = $rateDetails['tax'] ?? [];
-            $taxAttributes = $taxDetails['@attributes'] ?? [];
-            $taxFinalValue = $taxDetails['final'] ?? null;
-
-            $propertyName = null;
-            $propertyId = null;
-            $propertyIdentifier = null;
-
-            if (isset($sourceData['property'])) {
-                $propertyData = $sourceData['property'];
-                if (is_string($propertyData)) {
-                    $propertyName = $propertyData;
-                } elseif (is_array($propertyData)) {
-                    $propertyName = $getStringOrNull($propertyData['#text'] ?? ($propertyData['#'] ?? null));
-                    $propertyId = $getStringOrNull($propertyData['@attributes']['id'] ?? null);
-                    $propertyIdentifier = $getStringOrNull($propertyData['@attributes']['identifier'] ?? null);
-                }
-            }
-            // Ensure required propertyId is set, even if from attributes directly if not in complex property node
-            $propertyId = $getRequiredString($propertyId ?: ($attributes['propertyid'] ?? null));
-
+            // Extract timestamps
+            $created = (string) ($rawResponse['created'] ?? '');
+            $modified = (string) ($rawResponse['modified'] ?? '');
 
             return new self(
-                id: $bookingId,
+                id: $id,
+                identifier: $identifier,
+                providerIdentifier: $providerIdentifier,
+                arrival: $arrival,
+                departure: $departure,
                 status: $status,
-                arrival: $getRequiredString($attributes['arrival'] ?? null),
-                departure: $getRequiredString($attributes['departure'] ?? null),
-                totalPrice: $getRequiredString($attributes['totalprice'] ?? null),
-                currency: $getRequiredString($attributes['currency'] ?? null),
-                guestName: $guestName,
-                guestEmail: $getRequiredString($sourceData['email'] ?? null),
-                guestPhone: $getRequiredString($sourceData['phone'] ?? null),
-                adults: isset($sourceData['adults']) ? (int)$sourceData['adults'] : 0,
-                children: isset($sourceData['children']) ? (int)$sourceData['children'] : 0,
-                notes: $getRequiredString($sourceData['notes'] ?? null),
+                guestFirstName: $guestFirstName,
+                guestLastName: $guestLastName,
+                guestEmail: $guestEmail,
+                guestPhone: $guestPhone,
+                address1: $address1,
+                address2: $address2,
+                city: $city,
+                country: $country,
+                amountAdults: $amountAdults,
+                amountChilds: $amountChilds,
+                timeArrival: $timeArrival,
+                flight: $flight,
+                notes: $notes,
                 propertyId: $propertyId,
-                roomId: $getRequiredString($attributes['roomid'] ?? null), // Assuming roomid might be an attribute
-                rateId: $getRequiredString($attributes['rateid'] ?? null), // Assuming rateid might be an attribute
-                providerIdentifier: $getStringOrNull($attributes['provider_identifier'] ?? null),
-                channelIdentifier: $getStringOrNull($attributes['channel_identifier'] ?? null),
-                address1: $getStringOrNull($sourceData['address_1'] ?? null),
-                address2: $getStringOrNull($sourceData['address_2'] ?? null),
-                city: $getStringOrNull($sourceData['city'] ?? null),
-                country: $getStringOrNull($sourceData['country'] ?? null),
-                timeArrival: $getStringOrNull($sourceData['time_arrival'] ?? null),
-                flight: $getStringOrNull($sourceData['flight'] ?? null),
-                propertyName: $propertyName,
                 propertyIdentifier: $propertyIdentifier,
-                rateTotal: isset($rateDetails['total']) ? (float)$rateDetails['total'] : null,
-                rateFinal: isset($rateDetails['final']) ? (float)$rateDetails['final'] : null,
-                taxTotal: isset($taxAttributes['total']) ? (float)$taxAttributes['total'] : null,
-                taxOther: isset($taxDetails['other']) ? (float)$taxDetails['other'] : null,
-                taxVat: isset($taxDetails['vat']) ? (float)$taxDetails['vat'] : null,
-                rateWithTaxFinal: $taxFinalValue !== null ? (float)$taxFinalValue : null,
-                prepayment: isset($rateDetails['prepayment']) ? (float)$rateDetails['prepayment'] : null,
-                balanceDue: isset($rateDetails['balance_due']) ? (float)$rateDetails['balance_due'] : null,
-                fee: isset($rateDetails['fee']) ? (float)$rateDetails['fee'] : null,
-                created: $getStringOrNull($sourceData['created'] ?? null),
-                modified: $getStringOrNull($sourceData['modified'] ?? null)
+                propertyName: $propertyName,
+                rateTotal: $rateTotal,
+                rateFinal: $rateFinal,
+                taxTotal: $taxTotal,
+                taxOther: $taxOther,
+                taxVat: $taxVat,
+                taxFinal: $taxFinal,
+                fee: $fee,
+                prepayment: $prepayment,
+                balanceDue: $balanceDue,
+                created: $created,
+                modified: $modified
             );
-        } catch (Throwable $e) { // Use imported Throwable
-            // error_log("Mapping error in ViewBookingResponse: " . $e->getMessage() . "\nStack trace: " . $e->getTraceAsString());
-            throw new MappingException("Error mapping ViewBookingResponse: " . $e->getMessage(), 0, $e);
+        } catch (\Throwable $e) {
+            throw new MappingException($e->getMessage(), 0, $e);
         }
     }
 }

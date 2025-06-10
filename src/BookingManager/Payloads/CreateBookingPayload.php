@@ -9,7 +9,7 @@ class CreateBookingPayload
 
     /**
      * Represents the data necessary to create a booking via the BookingManager API.
-     * This includes personal information, booking details, property information, and optional rate details.
+     * This includes personal information, booking details, and property information.
      * Based on the create-booking.xml API documentation.
      */
     public function __construct(
@@ -28,11 +28,7 @@ class CreateBookingPayload
         public readonly ?int $amount_childs = null,
         public readonly ?string $time_arrival = null,
         public readonly ?string $flight = null,
-        public readonly ?string $notes = null,
-        public readonly ?float $rate_final = null,
-        public readonly ?int $rate_incl = null,
-        public readonly ?float $rate_prepayment = null,
-        public readonly ?float $balance_due = null
+        public readonly ?string $notes = null
     ) {
     }
 
