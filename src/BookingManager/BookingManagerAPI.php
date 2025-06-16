@@ -47,7 +47,7 @@ class BookingManagerAPI extends XMLClient
     public function editBooking(EditBookingPayload $payload): EditBookingResponse
     {
         $apiParams = $payload->toArray();
-        $parsedData = $this->performApiCall('BEXML', 'edit_booking', $apiParams);
+        $parsedData = $this->performApiCall('edit_booking', $apiParams);
         return EditBookingResponse::map($parsedData);
     }
 
@@ -63,7 +63,7 @@ class BookingManagerAPI extends XMLClient
         $apiParams = [
             'bookingid' => $bookingId,
         ];
-        $parsedData = $this->performApiCall('BEXML', 'pending_bookings', $apiParams);
+        $parsedData = $this->performApiCall('pending_bookings', $apiParams);
         return PendingBookingResponse::map($parsedData);
     }
 
@@ -71,9 +71,9 @@ class BookingManagerAPI extends XMLClient
      * Centralized API call handler for BookingManager endpoints.
      * Handles network, parsing, and API errors, throws exceptions on error.
      */
-    protected function performApiCall(string $endpointName, string $requestCommand, array $apiParams = []): array
+    protected function performApiCall(string $requestCommand, array $apiParams = []): array
     {
-        $url = $this->getEndpoint($endpointName);
+        $url = $this->getEndpoint();
         $formData = array_merge(['request' => $requestCommand], $apiParams);
         try {
             $xmlBody = $this->executePostRequest($url, $formData);
@@ -85,7 +85,6 @@ class BookingManagerAPI extends XMLClient
             return $parsedData;
         } catch (NetworkException | XmlParsingException | ApiException $e) {
             $this->logger->error("API call failed: {$e->getMessage()}", [
-                'endpoint' => $endpointName,
                 'request' => $requestCommand,
                 'params' => $apiParams,
                 'exception' => get_class($e),
@@ -95,7 +94,6 @@ class BookingManagerAPI extends XMLClient
             throw $e;
         } catch (\Throwable $e) {
             $this->logger->error("Unexpected error during API call: {$e->getMessage()}", [
-                'endpoint' => $endpointName,
                 'request' => $requestCommand,
                 'params' => $apiParams,
                 'exception' => get_class($e),
@@ -112,7 +110,7 @@ class BookingManagerAPI extends XMLClient
      */
     public function properties(): PropertiesResponse
     {
-        $parsedArray = $this->performApiCall('BEXML', 'list_properties');
+        $parsedArray = $this->performApiCall('list_properties');
         if (!$parsedArray || !isset($parsedArray['property'])) {
             $this->logger->warning('No <property> elements found directly under the root parsed XML for getAllProperties.', [
                 'parsed_xml_keys' => is_array($parsedArray) ? implode(',', array_keys($parsedArray)) : 'null',
@@ -128,7 +126,7 @@ class BookingManagerAPI extends XMLClient
     public function property(int $id): PropertyResponse
     {
         $apiParams = ['id' => $id];
-        $parsedData = $this->performApiCall('BEXML', 'list_property', $apiParams);
+        $parsedData = $this->performApiCall('list_property', $apiParams);
         if (!isset($parsedData['property'])) {
             throw new MappingException('Invalid response structure for property: missing "property" key.');
         }
@@ -142,7 +140,7 @@ class BookingManagerAPI extends XMLClient
             'date_from' => $startDate->format('Ymd'),
             'date_to' => $endDate->format('Ymd'),
         ];
-        $parsedData = $this->performApiCall('BEXML', 'get_calendar', $apiParams);
+        $parsedData = $this->performApiCall('get_calendar', $apiParams);
         return CalendarResponse::map($parsedData);
     }
 
@@ -151,7 +149,7 @@ class BookingManagerAPI extends XMLClient
         $apiParams = [
             'since' => $since->toIso8601String(),
         ];
-        $parsedData = $this->performApiCall('BEXML', 'list_calendar_changes', $apiParams);
+        $parsedData = $this->performApiCall('list_calendar_changes', $apiParams);
         if (!$parsedData || !isset($parsedData['property'])) {
             $parsedData['property'] = [];
         }
@@ -177,7 +175,7 @@ class BookingManagerAPI extends XMLClient
         if ($numBabies !== null) {
             $apiParams['babies'] = $numBabies;
         }
-        $parsedData = $this->performApiCall('BEXML', 'get_rate_for_stay', $apiParams);
+        $parsedData = $this->performApiCall('get_rate_for_stay', $apiParams);
         if (!$parsedData || !isset($parsedData['rate'])) {
             throw new MappingException('Invalid response structure for rate for stay: missing "rate" key.');
         }
@@ -187,7 +185,7 @@ class BookingManagerAPI extends XMLClient
     public function createBooking(CreateBookingPayload $payload): CreateBookingResponse
     {
         $apiParams = $payload->toArray();
-        $parsedData = $this->performApiCall('BEXML', 'create_booking', $apiParams);
+        $parsedData = $this->performApiCall('create_booking', $apiParams);
         return CreateBookingResponse::map($parsedData);
     }
 
@@ -197,7 +195,7 @@ class BookingManagerAPI extends XMLClient
             'booking_id' => $externalBookingId,
             'overwrite_rates' => 1,
         ];
-        $parsedData = $this->performApiCall('BEXML', 'finalize_booking', $apiParams);
+        $parsedData = $this->performApiCall('finalize_booking', $apiParams);
         return FinalizeBookingResponse::map($parsedData);
     }
 
@@ -207,7 +205,7 @@ class BookingManagerAPI extends XMLClient
             'booking_id' => $bookingId,
             'reason' => $reason,
         ];
-        $parsedData = $this->performApiCall('BEXML', 'cancel_booking', $apiParams);
+        $parsedData = $this->performApiCall('cancel_booking', $apiParams);
         return CancelBookingResponse::map($parsedData);
     }
 
@@ -216,12 +214,12 @@ class BookingManagerAPI extends XMLClient
         $apiParams = [
             'bookingid' => $bookingId,
         ];
-        $parsedData = $this->performApiCall('BEXML', 'booking_view', $apiParams);
+        $parsedData = $this->performApiCall('booking_view', $apiParams);
         return ViewBookingResponse::map($parsedData);
     }
 
-    private function getEndpoint(string $type): string
+    private function getEndpoint(): string
     {
-        return "{$this->baseUrl}/{$type}";
+        return "{$this->baseUrl}/api";
     }
 }
