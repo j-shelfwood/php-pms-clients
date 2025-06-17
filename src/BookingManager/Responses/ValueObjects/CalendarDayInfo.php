@@ -50,4 +50,59 @@ class CalendarDayInfo
             throw new MappingException('Failed to map CalendarDayInfo: ' . $e->getMessage(), 0, $e);
         }
     }
+
+    public static function fromInfoXml(array $propertyData): self
+    {
+        try {
+            $attributes = isset($propertyData['@attributes']) ? $propertyData['@attributes'] : [];
+
+            // For info.xml, we create a single calendar day info based on property availability
+            $available = isset($attributes['available']) ? (int)$attributes['available'] : null;
+
+            // Extract rate information if present
+            $rateData = $propertyData['rate'] ?? [];
+
+            return new self(
+                day: Carbon::now(), // info.xml doesn't provide specific dates, use current
+                season: null, // Season info not available in info.xml format
+                modified: Carbon::now(),
+                available: $available,
+                stayMinimum: 1, // Default minimum stay
+                rate: CalendarRate::fromXml($rateData),
+                maxStay: isset($attributes['max_persons']) ? (int)$attributes['max_persons'] : null,
+                closedOnArrival: null,
+                closedOnDeparture: null,
+                stopSell: $available === 0 ? true : null
+            );
+        } catch (\Throwable $e) {
+            throw new MappingException('Failed to map CalendarDayInfo from info.xml: ' . $e->getMessage(), 0, $e);
+        }
+    }
+
+    public static function fromAvailabilityXml(array $unavailableData): self
+    {
+        try {
+            $attributes = isset($unavailableData['@attributes']) ? $unavailableData['@attributes'] : [];
+
+            // For availability.xml, we create a calendar day info based on unavailable periods
+            $startDate = isset($unavailableData['start']) ? Carbon::parse($unavailableData['start']) : Carbon::now();
+            $endDate = isset($unavailableData['end']) ? Carbon::parse($unavailableData['end']) : Carbon::now();
+            $modified = isset($unavailableData['modified']) ? Carbon::parse($unavailableData['modified']) : Carbon::now();
+
+            return new self(
+                day: $startDate, // Use start date as the calendar day
+                season: null, // Season info not available in availability.xml format
+                modified: $modified,
+                available: 0, // Unavailable period = not available
+                stayMinimum: 1, // Default minimum stay
+                rate: CalendarRate::fromXml([]), // No rate info in availability.xml
+                maxStay: null,
+                closedOnArrival: true, // Unavailable period = closed
+                closedOnDeparture: true,
+                stopSell: true
+            );
+        } catch (\Throwable $e) {
+            throw new MappingException('Failed to map CalendarDayInfo from availability.xml: ' . $e->getMessage(), 0, $e);
+        }
+    }
 }

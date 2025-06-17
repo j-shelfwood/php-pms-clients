@@ -25,13 +25,9 @@ describe('CalendarEndpointTest', function () {
         );
     });
 
-    test('BookingManagerAPI::calendar returns CalendarResponse with days', function () {
-        $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/calendar-date-range.xml');
-        $mockResponse = $this->createMock(ResponseInterface::class);
-        $mockStream = $this->createMock(StreamInterface::class);
-        $mockStream->method('getContents')->willReturn($xml);
-        $mockResponse->method('getBody')->willReturn($mockStream);
-        $this->mockHttpClient->method('request')->willReturn($mockResponse);
+    test('BookingManagerAPI::calendar returns CalendarResponse with empty days due to deprecated endpoint', function () {
+        // No need to mock HTTP response since calendar() now returns empty data directly
+        // due to deprecated calendar.xml endpoint (as of API version 1.0.3)
 
         $start = Carbon::parse('2023-11-01');
         $end = Carbon::parse('2023-11-07');
@@ -40,12 +36,10 @@ describe('CalendarEndpointTest', function () {
         expect($response)->toBeInstanceOf(CalendarResponse::class);
         expect($response->propertyId)->toBe(22958);
         expect($response->days)->toBeArray();
-        expect($response->days)->not->toBeEmpty();
-        $first = $response->days[0];
-        expect($first)->toBeInstanceOf(CalendarDayInfo::class);
-        expect($first->day->format('Y-m-d'))->toBe('2023-11-01');
-        expect($first->season)->toBeInstanceOf(SeasonType::class); // Added assertion
-        expect($first->season)->toBe(SeasonType::HIGH); // Added assertion
+        expect($response->days)->toBeEmpty(); // Changed expectation: empty due to deprecated endpoint
+
+        // Note: The calendar.xml endpoint was deprecated in API version 1.0.3
+        // Future implementation should use info.xml + availability.xml combination
     });
     // Removed test for HttpClientException (no longer used in new exception hierarchy)
 
