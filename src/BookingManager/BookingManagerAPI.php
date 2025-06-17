@@ -104,13 +104,16 @@ class BookingManagerAPI extends XMLClient
     }
 
     /**
-     * Get all properties from BookingManager
+     * Get all properties from BookingManager with comprehensive details.
+     *
+     * This method now calls the details.xml endpoint to get full property information
+     * including all amenities, services, costs, taxes, and other detailed fields.
      *
      * @return PropertiesResponse
      */
     public function properties(): PropertiesResponse
     {
-        $parsedArray = $this->performApiCall('list_properties');
+        $parsedArray = $this->performApiCall('list_property_details');
         if (!$parsedArray || !isset($parsedArray['property'])) {
             $this->logger->warning('No <property> elements found directly under the root parsed XML for getAllProperties.', [
                 'parsed_xml_keys' => is_array($parsedArray) ? implode(',', array_keys($parsedArray)) : 'null',
