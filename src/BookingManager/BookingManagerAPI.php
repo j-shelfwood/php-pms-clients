@@ -302,11 +302,36 @@ class BookingManagerAPI extends XMLClient
             'departure' => $departureDate->format('Y-m-d'),
             'guests' => $numAdults + ($numChildren ?? 0) + ($numBabies ?? 0),
         ];
+
+        echo "=== DEBUG: rateForStay API Call ===" . PHP_EOL;
+        echo "Property ID: {$propertyId}" . PHP_EOL;
+        echo "Date: {$arrivalDate->format('Y-m-d')} to {$departureDate->format('Y-m-d')}" . PHP_EOL;
+        echo "Guests: " . ($numAdults + ($numChildren ?? 0) + ($numBabies ?? 0)) . PHP_EOL;
+
         $parsedData = $this->performApiCall('info', $apiParams);
+
+        echo "Raw parsed XML data:" . PHP_EOL;
+        echo json_encode($parsedData, JSON_PRETTY_PRINT) . PHP_EOL;
+
         if (!$parsedData || !isset($parsedData['rate'])) {
+            echo "ERROR: Missing rate key in response!" . PHP_EOL;
+            echo "Available keys: " . implode(', ', array_keys($parsedData ?? [])) . PHP_EOL;
             throw new MappingException('Invalid response structure for rate for stay: missing "rate" key.');
         }
-        return RateResponse::map($parsedData['rate']);
+
+        echo "Rate data from XML:" . PHP_EOL;
+        echo json_encode($parsedData['rate'], JSON_PRETTY_PRINT) . PHP_EOL;
+
+        $rateResponse = RateResponse::map($parsedData['rate']);
+
+        echo "Mapped RateResponse object:" . PHP_EOL;
+        echo "- available: " . ($rateResponse->available ? 'true' : 'false') . PHP_EOL;
+        echo "- final_before_taxes: " . ($rateResponse->final_before_taxes ?? 'null') . PHP_EOL;
+        echo "- final_after_taxes: " . ($rateResponse->final_after_taxes ?? 'null') . PHP_EOL;
+        echo "- tax_total: " . ($rateResponse->tax_total ?? 'null') . PHP_EOL;
+        echo "=================================" . PHP_EOL;
+
+        return $rateResponse;
     }
 
     public function createBooking(CreateBookingPayload $payload): CreateBookingResponse
