@@ -3,7 +3,9 @@
 namespace Shelfwood\PhpPms\BookingManager\Responses;
 
 use Exception;
+use Carbon\Carbon;
 use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarDayInfo;
+use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarRate;
 use Shelfwood\PhpPms\Exceptions\MappingException;
 
 class CalendarResponse
@@ -25,12 +27,54 @@ class CalendarResponse
      *
      * @throws Exception If mapping fails.
      */
-        public static function map(array $rawResponse): self
+    public static function map(array $rawResponse, Carbon $startDate = null, Carbon $endDate = null): self
     {
         try {
             $sourceData = $rawResponse;
 
-            // Note: This mapping handles both legacy calendar.xml and new approaches
+            // Handle availability.xml response format (direct unavailable elements)
+            // Note: availability.xml may have no unavailable elements if everything is available
+            if ($startDate && $endDate && (isset($sourceData['unavailable']) || empty($sourceData) || (count($sourceData) === 0))) {
+                return self::mapFromAvailabilityResponse($sourceData, $startDate, $endDate);
+            }
+
+            // Handle rate.xml response format (from info.xml endpoint)
+            if (isset($sourceData['rate'])) {
+                $rateData = $sourceData['rate'];
+                $infoData = $rateData['info'] ?? [];
+
+                // Extract property information
+                $propertyData = $infoData['property'] ?? [];
+                $propertyId = (int) ($propertyData['@attributes']['id'] ?? 0);
+
+                // For info.xml response, we get availability info for a range
+                // We need to create calendar days for the range
+                $arrival = isset($infoData['@attributes']['arrival']) ?
+                    Carbon::parse($infoData['@attributes']['arrival']) : Carbon::now();
+                $departure = isset($infoData['@attributes']['departure']) ?
+                    Carbon::parse($infoData['@attributes']['departure']) : Carbon::now()->addDay();
+
+                $isAvailable = (bool)($propertyData['@attributes']['available'] ?? false);
+                $minimalNights = (int)($propertyData['@attributes']['minimal_nights'] ?? 1);
+
+                $days = [];
+                for ($date = $arrival->copy(); $date->lt($departure); $date->addDay()) {
+                    $days[] = new CalendarDayInfo(
+                        day: $date->copy(),
+                        season: null,
+                        modified: Carbon::now(),
+                        available: $isAvailable ? 1 : 0,
+                        stayMinimum: $minimalNights,
+                        rate: CalendarRate::fromXml($propertyData['rate'] ?? []),
+                        maxStay: (int)($propertyData['@attributes']['max_persons'] ?? null),
+                        closedOnArrival: !$isAvailable,
+                        closedOnDeparture: !$isAvailable,
+                        stopSell: !$isAvailable
+                    );
+                }
+
+                return new self($propertyId, $days);
+            }
 
             // Handle availability.xml response format (new approach)
             if (isset($sourceData['availability'])) {
@@ -61,30 +105,6 @@ class CalendarResponse
                         return null;
                     }
                 }, $unavailableItems));
-
-                return new self($propertyId, $days);
-            }
-
-            // Handle info.xml response format (fallback)
-            if (isset($sourceData['info'])) {
-                $infoData = $sourceData['info'];
-                $propertyId = (int) ($infoData['property']['@attributes']['id'] ?? 0);
-
-                // Extract calendar info from property data in info.xml response
-                $propertyData = $infoData['property'] ?? [];
-                if (isset($propertyData['@attributes'])) {
-                    // Single property response
-                    $days = [CalendarDayInfo::fromInfoXml($propertyData)];
-                } else {
-                    // Multiple properties (shouldn't happen for calendar calls but handle gracefully)
-                    $days = array_filter(array_map(function ($prop) {
-                        try {
-                            return CalendarDayInfo::fromInfoXml($prop);
-                        } catch (Exception $e) {
-                            return null;
-                        }
-                    }, is_array($propertyData) ? $propertyData : [$propertyData]));
-                }
 
                 return new self($propertyId, $days);
             }
@@ -128,5 +148,75 @@ class CalendarResponse
         } catch (Exception $e) {
             throw new MappingException($e->getMessage(), 0, $e);
         }
+    }
+
+    /**
+     * Map availability.xml response to calendar format
+     */
+    private static function mapFromAvailabilityResponse(array $sourceData, Carbon $startDate, Carbon $endDate): self
+    {
+        $unavailableRanges = [];
+        $unavailableData = $sourceData['unavailable'] ?? [];
+
+        // Handle single unavailable period
+        if (isset($unavailableData['@attributes'])) {
+            $unavailableData = [$unavailableData];
+        }
+
+        $propertyId = 0;
+
+        // Extract unavailable date ranges
+        foreach ($unavailableData as $unavailable) {
+            if (!isset($unavailable['start']) || !isset($unavailable['end'])) {
+                continue;
+            }
+
+            // Get property ID from first unavailable item
+            if ($propertyId === 0 && isset($unavailable['@attributes']['property_id'])) {
+                $propertyId = (int) $unavailable['@attributes']['property_id'];
+            }
+
+            $rangeStart = Carbon::createFromFormat('Y-m-d', $unavailable['start']);
+            $rangeEnd = Carbon::createFromFormat('Y-m-d', $unavailable['end']);
+
+            $unavailableRanges[] = [
+                'start' => $rangeStart,
+                'end' => $rangeEnd
+            ];
+        }
+
+        // Generate calendar days for the requested date range
+        $days = [];
+        $current = $startDate->copy();
+
+        while ($current->lte($endDate)) {
+            $isAvailable = true;
+
+            // Check if current date falls within any unavailable range
+            foreach ($unavailableRanges as $range) {
+                if ($current->between($range['start'], $range['end'])) {
+                    $isAvailable = false;
+                    break;
+                }
+            }
+
+            $dayInfo = new CalendarDayInfo(
+                day: $current->copy(),
+                season: null,
+                modified: Carbon::now(),
+                available: $isAvailable ? 1 : 0,
+                stayMinimum: 1, // Default minimum stay
+                rate: CalendarRate::fromXml([]), // Rate information not available from availability.xml
+                maxStay: null,
+                closedOnArrival: !$isAvailable,
+                closedOnDeparture: !$isAvailable,
+                stopSell: !$isAvailable
+            );
+
+            $days[] = $dayInfo;
+            $current->addDay();
+        }
+
+        return new self($propertyId, $days);
     }
 }

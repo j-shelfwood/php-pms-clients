@@ -175,26 +175,101 @@ class BookingManagerAPI extends XMLClient
         return PropertyResponse::map($parsedData['property']);
     }
 
-                public function calendar(int $propertyId, Carbon $startDate, Carbon $endDate): CalendarResponse
+    public function calendar(int $propertyId, Carbon $startDate, Carbon $endDate): CalendarResponse
     {
-        // The calendar.xml endpoint is deprecated as of API version 1.0.3
-        // For now, return empty calendar data to prevent sync failures
-        // TODO: Implement proper calendar sync using info.xml + availability.xml combination
+        $days = [];
+        $current = $startDate->copy();
 
-        $this->logger->info("Calendar endpoint called for property {$propertyId}", [
-            'property_id' => $propertyId,
-            'start_date' => $startDate->toDateString(),
-            'end_date' => $endDate->toDateString(),
-            'note' => 'Returning empty calendar data due to deprecated calendar.xml endpoint'
-        ]);
+        // Fetch rate and availability for each day in the range
+        while ($current->lte($endDate)) {
+            try {
+                // Use info.xml endpoint to get rates for each day
+                $rateResponse = $this->rateForStay(
+                    $propertyId,
+                    $current,
+                    $current->copy()->addDay(),
+                    1 // Default to 1 adult for availability check
+                );
 
-        return new CalendarResponse($propertyId, []);
+                $days[] = new \Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarDayInfo(
+                    day: $current->copy(),
+                    season: null, // info.xml does not provide season information
+                    modified: Carbon::now(),
+                    available: $rateResponse->available ? 1 : 0,
+                    stayMinimum: $rateResponse->minimalNights ?? 1,
+                    rate: new \Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarRate(
+                        percentage: 0.0, // Not provided by info.xml
+                        currency: 'EUR', // Default currency
+                        total: $rateResponse->final_before_taxes ?? 0.0,
+                        final: $rateResponse->final_before_taxes ?? 0.0,
+                        tax: new \Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarTax(
+                            total: $rateResponse->tax_total ?? 0.0,
+                            other: $rateResponse->tax_other ?? 0.0,
+                            otherType: '', // Not provided by info.xml
+                            otherValue: 0.0, // Not provided by info.xml
+                            vat: $rateResponse->tax_vat ?? 0.0,
+                            vatValue: 0.0, // Not provided by info.xml
+                            final: $rateResponse->final_after_taxes ?? 0.0
+                        ),
+                        fee: 0.0, // Not provided by info.xml
+                        prepayment: $rateResponse->prepayment ?? 0.0,
+                        balanceDue: $rateResponse->balance_due_remaining ?? 0.0
+                    ),
+                    maxStay: $rateResponse->maxPersons ?? null,
+                    closedOnArrival: !$rateResponse->available,
+                    closedOnDeparture: !$rateResponse->available,
+                    stopSell: !$rateResponse->available
+                );
+            } catch (\Exception $e) {
+                // Log the error for a specific day but continue the loop
+                $this->logger?->error("Failed to fetch calendar data for property {$propertyId} on {$current->toDateString()}", [
+                    'error' => $e->getMessage(),
+                    'property_id' => $propertyId,
+                    'date' => $current->toDateString()
+                ]);
+
+                // Create a default unavailable day entry
+                $days[] = new \Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarDayInfo(
+                    day: $current->copy(),
+                    season: null,
+                    modified: Carbon::now(),
+                    available: 0,
+                    stayMinimum: 1,
+                    rate: new \Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarRate(
+                        percentage: 0.0,
+                        currency: 'EUR',
+                        total: 0.0,
+                        final: 0.0,
+                        tax: new \Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarTax(
+                            total: 0.0,
+                            other: 0.0,
+                            otherType: '',
+                            otherValue: 0.0,
+                            vat: 0.0,
+                            vatValue: 0.0,
+                            final: 0.0
+                        ),
+                        fee: 0.0,
+                        prepayment: 0.0,
+                        balanceDue: 0.0
+                    ),
+                    maxStay: null,
+                    closedOnArrival: true,
+                    closedOnDeparture: true,
+                    stopSell: true
+                );
+            }
+
+            $current->addDay();
+        }
+
+        return new CalendarResponse($propertyId, $days);
     }
 
     public function calendarChanges(Carbon $since): CalendarChangesResponse
     {
         $apiParams = [
-            'since' => $since->toIso8601String(),
+            'time' => $since->format('Y-m-d H:i:s'),
         ];
         $parsedData = $this->performApiCall('changes', $apiParams);
         if (!$parsedData || !isset($parsedData['property'])) {
@@ -212,16 +287,10 @@ class BookingManagerAPI extends XMLClient
     {
         $apiParams = [
             'id' => $propertyId,
-            'arrival_date' => $arrivalDate->toDateString(),
-            'departure_date' => $departureDate->toDateString(),
-            'adults' => $numAdults,
+            'arrival' => $arrivalDate->format('Y-m-d'),
+            'departure' => $departureDate->format('Y-m-d'),
+            'guests' => $numAdults + ($numChildren ?? 0) + ($numBabies ?? 0),
         ];
-        if ($numChildren !== null) {
-            $apiParams['children'] = $numChildren;
-        }
-        if ($numBabies !== null) {
-            $apiParams['babies'] = $numBabies;
-        }
         $parsedData = $this->performApiCall('info', $apiParams);
         if (!$parsedData || !isset($parsedData['rate'])) {
             throw new MappingException('Invalid response structure for rate for stay: missing "rate" key.');
