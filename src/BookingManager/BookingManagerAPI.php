@@ -191,6 +191,17 @@ class BookingManagerAPI extends XMLClient
                     1 // Default to 1 adult for availability check
                 );
 
+                // DEBUG: Dump the raw rate response to see what properties are available
+                echo "=== DEBUG: Rate Response for {$current->toDateString()} ===" . PHP_EOL;
+                echo "Available: " . ($rateResponse->available ? 'true' : 'false') . PHP_EOL;
+                echo "Final before taxes: " . ($rateResponse->final_before_taxes ?? 'null') . PHP_EOL;
+                echo "Final after taxes: " . ($rateResponse->final_after_taxes ?? 'null') . PHP_EOL;
+                echo "Tax total: " . ($rateResponse->tax_total ?? 'null') . PHP_EOL;
+                echo "Minimal nights: " . ($rateResponse->minimalNights ?? 'null') . PHP_EOL;
+                echo "Max persons: " . ($rateResponse->maxPersons ?? 'null') . PHP_EOL;
+                echo "Raw response object: " . json_encode($rateResponse, JSON_PRETTY_PRINT) . PHP_EOL;
+                echo "========================================" . PHP_EOL;
+
                 $days[] = new \Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarDayInfo(
                     day: $current->copy(),
                     season: null, // info.xml does not provide season information
