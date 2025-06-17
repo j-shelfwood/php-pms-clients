@@ -72,21 +72,36 @@ class BookingManagerAPI extends XMLClient
      * Centralized API call handler for BookingManager endpoints.
      * Handles network, parsing, and API errors, throws exceptions on error.
      */
-        protected function performApiCall(string $endpoint, array $apiParams = [], int $attempt = 1): array
+    protected function performApiCall(string $endpoint, array $apiParams = [], int $attempt = 1): array
     {
         $url = $this->getEndpointUrl($endpoint);
         $formData = $apiParams; // No 'request' parameter needed for XML endpoints
 
-                try {
+        echo "=== DEBUG: API Call ===" . PHP_EOL;
+        echo "URL: {$url}" . PHP_EOL;
+        echo "Form data: " . json_encode($formData, JSON_PRETTY_PRINT) . PHP_EOL;
+
+        try {
             $xmlBody = $this->executePostRequest($url, $formData);
+
+            echo "Raw XML Response:" . PHP_EOL;
+            echo substr($xmlBody, 0, 1000) . (strlen($xmlBody) > 1000 ? '...[truncated]' : '') . PHP_EOL;
+
             $parsedData = XMLParser::parse($xmlBody);
 
             if (XMLParser::hasError($parsedData)) {
                 $errorDetails = XMLParser::extractErrorDetails($parsedData);
+                echo "API Error detected:" . PHP_EOL;
+                echo "- Message: " . $errorDetails->message . PHP_EOL;
+                echo "- Code: " . ($errorDetails->code ?? 'none') . PHP_EOL;
                 throw new ApiException($errorDetails->message, $errorDetails->code ?? 0, null, $errorDetails);
             }
+
+            echo "Parsed data keys: " . implode(', ', array_keys($parsedData)) . PHP_EOL;
+            echo "======================" . PHP_EOL;
+
             return $parsedData;
-                } catch (NetworkException | XmlParsingException | ApiException $e) {
+        } catch (NetworkException | XmlParsingException | ApiException $e) {
             // Handle rate limiting with progressive backoff
             if ($this->isRateLimitError($e) && $attempt <= 5) {
                 $this->handleRateLimit($e, $attempt);
@@ -102,7 +117,7 @@ class BookingManagerAPI extends XMLClient
                 'trace' => $e->getTraceAsString()
             ]);
             throw $e;
-                } catch (\Throwable $e) {
+        } catch (\Throwable $e) {
             $this->logger->error("Unexpected error during API call: {$e->getMessage()}", [
                 'endpoint' => $endpoint,
                 'params' => $apiParams,
