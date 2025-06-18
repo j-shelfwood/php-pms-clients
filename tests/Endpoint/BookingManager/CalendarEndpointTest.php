@@ -25,7 +25,42 @@ describe('CalendarEndpointTest', function () {
         );
     });
 
-        test('BookingManagerAPI::calendar uses availability.xml and correctly maps availability data', function () {
+    test('BookingManagerAPI::calendar uses calendar.xml and correctly maps calendar data with rates', function () {
+        // Use the calendar-date-range.xml mock which contains rate information
+        $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/calendar-date-range.xml');
+
+        $mockHttpResponse = $this->createMock(ResponseInterface::class);
+        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream->method('getContents')->willReturn($xml);
+        $mockHttpResponse->method('getBody')->willReturn($mockStream);
+        $this->mockHttpClient->method('request')->willReturn($mockHttpResponse);
+
+        $startDate = Carbon::parse('2023-11-01');
+        $endDate = Carbon::parse('2023-11-07');
+
+        // Call the calendar method
+        $response = $this->api->calendar(22958, $startDate, $endDate);
+
+        // Assertions
+        expect($response)->toBeInstanceOf(CalendarResponse::class);
+        expect($response->propertyId)->toBe(22958);
+        expect($response->days)->toBeArray();
+        expect($response->days)->not()->toBeEmpty();
+
+        // Check that we have calendar data with rate information
+        expect($response->days)->toHaveCount(7);
+
+        $firstDay = $response->days[0];
+        expect($firstDay)->toBeInstanceOf(CalendarDayInfo::class);
+        expect($firstDay->available)->toBe(0); // From mock data
+        expect($firstDay->day->toDateString())->toBe('2023-11-01');
+        expect($firstDay->rate->final)->toBe(179.92); // Rate data from calendar.xml
+        expect($firstDay->rate->currency)->toBe('EUR');
+        expect($firstDay->rate->total)->toBe(173.0);
+        expect($firstDay->season)->toBe(SeasonType::HIGH);
+    });
+
+    test('BookingManagerAPI::availability uses availability.xml and correctly maps availability data', function () {
         // Create a mock XML response for availability.xml with unavailable period
         $mockXml = '<?xml version="1.0" encoding="UTF-8"?>
 <response>
@@ -45,8 +80,8 @@ describe('CalendarEndpointTest', function () {
         $startDate = Carbon::parse('2024-02-19');
         $endDate = Carbon::parse('2024-02-20');
 
-        // Call the calendar method
-        $response = $this->api->calendar(21663, $startDate, $endDate);
+        // Call the availability method (not calendar)
+        $response = $this->api->availability(21663, $startDate, $endDate);
 
         // Assertions
         expect($response)->toBeInstanceOf(CalendarResponse::class);
@@ -54,7 +89,7 @@ describe('CalendarEndpointTest', function () {
         expect($response->days)->toBeArray();
         expect($response->days)->not()->toBeEmpty();
 
-        // Check that we have calendar data for the requested dates (2 days)
+        // Check that we have availability data for the requested dates (2 days)
         expect($response->days)->toHaveCount(2);
 
         $firstDay = $response->days[0];
@@ -68,44 +103,6 @@ describe('CalendarEndpointTest', function () {
         expect($secondDay->available)->toBe(0); // Unavailable (in unavailable range)
         expect($secondDay->day->toDateString())->toBe('2024-02-20');
         expect($secondDay->rate->final)->toBe(0.0); // No rate data from availability.xml
-    });
-
-    test('BookingManagerAPI::calendar handles empty availability response (all dates available)', function () {
-        // Create a mock XML response for availability.xml with no unavailable periods
-        $mockXml = '<?xml version="1.0" encoding="UTF-8"?>
-<response>
-</response>';
-
-        $mockHttpResponse = $this->createMock(ResponseInterface::class);
-        $mockStream = $this->createMock(StreamInterface::class);
-        $mockStream->method('getContents')->willReturn($mockXml);
-        $mockHttpResponse->method('getBody')->willReturn($mockStream);
-        $this->mockHttpClient->method('request')->willReturn($mockHttpResponse);
-
-        $startDate = Carbon::parse('2024-02-19');
-        $endDate = Carbon::parse('2024-02-20');
-
-        // Call the calendar method
-        $response = $this->api->calendar(21663, $startDate, $endDate);
-
-        // Assertions
-        expect($response)->toBeInstanceOf(CalendarResponse::class);
-        expect($response->days)->toBeArray();
-        expect($response->days)->not()->toBeEmpty();
-
-        // Check that we have calendar data for the requested dates (2 days)
-        expect($response->days)->toHaveCount(2);
-
-        // All days should be available since no unavailable periods are specified
-        $firstDay = $response->days[0];
-        expect($firstDay)->toBeInstanceOf(CalendarDayInfo::class);
-        expect($firstDay->available)->toBe(1); // Available
-        expect($firstDay->day->toDateString())->toBe('2024-02-19');
-
-        $secondDay = $response->days[1];
-        expect($secondDay)->toBeInstanceOf(CalendarDayInfo::class);
-        expect($secondDay->available)->toBe(1); // Available
-        expect($secondDay->day->toDateString())->toBe('2024-02-20');
     });
 
 });

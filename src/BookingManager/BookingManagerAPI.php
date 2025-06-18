@@ -178,7 +178,32 @@ class BookingManagerAPI extends XMLClient
 
     public function calendar(int $propertyId, Carbon $startDate, Carbon $endDate): CalendarResponse
     {
-        // Use availability.xml endpoint for efficient calendar data retrieval
+        // Use calendar.xml endpoint to get full calendar data with rates
+        $apiParams = [
+            'id' => $propertyId,
+            'start' => $startDate->format('Y-m-d'),
+            'end' => $endDate->format('Y-m-d'),
+        ];
+
+        $parsedData = $this->performApiCall('calendar', $apiParams);
+
+        // CalendarResponse::map() handles calendar.xml format when no startDate/endDate are provided
+        return CalendarResponse::map($parsedData);
+    }
+
+    /**
+     * Get availability-only data for a property within a date range.
+     * This is faster than calendar() but doesn't include rate information.
+     * Use this when you only need to check availability, not pricing.
+     *
+     * @param int $propertyId
+     * @param Carbon $startDate
+     * @param Carbon $endDate
+     * @return CalendarResponse
+     */
+    public function availability(int $propertyId, Carbon $startDate, Carbon $endDate): CalendarResponse
+    {
+        // Use availability.xml endpoint for fast availability-only data
         $apiParams = [
             'id' => $propertyId,
             'start' => $startDate->format('Y-m-d'),

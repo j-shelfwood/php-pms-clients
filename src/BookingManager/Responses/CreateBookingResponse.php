@@ -6,27 +6,7 @@ namespace Shelfwood\PhpPms\BookingManager\Responses;
 
 use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\BookingDetails;
 use Shelfwood\PhpPms\Exceptions\MappingException;
-use Shelfwood\PhpPms\BookingManager\Enums\BookingStatus;
 
-/**
- * @phpstan-type BookingDetails array{
- *   id: string,
- *   status: string,
- *   arrival: string,
- *   departure: string,
- *   totalPrice: string,
- *   currency: string,
- *   guestName: string,
- *   guestEmail: string,
- *   guestPhone: string,
- *   adults: string,
- *   children: string,
- *   notes: string,
- *   propertyId: string,
- *   roomId: string,
- *   rateId: string
- * }
- */
 class CreateBookingResponse
 {
     /**
