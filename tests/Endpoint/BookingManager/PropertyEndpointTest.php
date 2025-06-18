@@ -9,14 +9,10 @@ use Psr\Log\NullLogger;
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use Shelfwood\PhpPms\BookingManager\Enums\PropertyStatus;
-use Shelfwood\PhpPms\BookingManager\Enums\ViewType;
-use Shelfwood\PhpPms\BookingManager\Enums\InternetType;
-use Shelfwood\PhpPms\BookingManager\Enums\InternetConnectionType;
-use Shelfwood\PhpPms\BookingManager\Enums\ParkingType;
-use Shelfwood\PhpPms\BookingManager\Enums\SwimmingPoolType;
-use Shelfwood\PhpPms\BookingManager\Enums\SaunaType;
 use Tests\Helpers\TestHelpers;
+
+// Import the Golden Master assertion functions
+use function Tests\Helpers\assertPropertyDetailsMatchesExpected;
 
 describe('PropertyEndpointTest', function () {
     beforeEach(function () {
@@ -29,7 +25,7 @@ describe('PropertyEndpointTest', function () {
         );
     });
 
-    test('BookingManagerAPI::property returns PropertyResponse with populated PropertyDetails', function () {
+    test('Golden Master: property correctly maps all fields from rich response', function () {
         $mockResponsePath = TestHelpers::getMockFilePath('property-by-id.xml');
         $xml = file_get_contents($mockResponsePath);
         $mockResponse = $this->createMock(ResponseInterface::class);
@@ -37,30 +33,14 @@ describe('PropertyEndpointTest', function () {
         $mockStream->method('getContents')->willReturn($xml);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
+
         $response = $this->api->property(21663);
 
         expect($response)->toBeInstanceOf(PropertyResponse::class);
         expect($response->property)->toBeInstanceOf(PropertyDetails::class);
-        expect($response->property->external_id)->toBe(21663);
-        expect($response->property->name)->toBe('Runstraat suite Amsterdam');
-        expect($response->property->identifier)->toBe('#487');
-        expect($response->property->status)->toBeInstanceOf(PropertyStatus::class);
-        expect($response->property->status->value)->toBe('live');
-        expect($response->property->view)->toBeInstanceOf(ViewType::class);
-        expect($response->property->view->value)->toBe('street');
-        expect($response->property->internet)->toBeInstanceOf(InternetType::class);
-        expect($response->property->internet->value)->toBe('wifi');
-        expect($response->property->internet_connection)->toBeInstanceOf(InternetConnectionType::class);
-        expect($response->property->internet_connection->value)->toBe('highspeed');
-        expect($response->property->parking)->toBeInstanceOf(ParkingType::class);
-        expect($response->property->parking->value)->toBe('none');
-        expect($response->property->swimmingpool)->toBeInstanceOf(SwimmingPoolType::class);
-        expect($response->property->swimmingpool->value)->toBe('none');
-        expect($response->property->sauna)->toBeInstanceOf(SaunaType::class);
-        expect($response->property->sauna->value)->toBe('none');
-        expect($response->property->tax)->toBeInstanceOf(\Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\PropertyTax::class);
-        expect($response->property->tax->otherType)->toBeInstanceOf(\Shelfwood\PhpPms\BookingManager\Enums\TaxType::class);
-        expect($response->property->tax->otherType->value)->toBe('relative');
+
+        // Golden Master validation - validates ALL fields
+        assertPropertyDetailsMatchesExpected($response->property);
     });
 
     test('BookingManagerAPI::property throws ApiException on API error', function () {
