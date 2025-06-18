@@ -1,4 +1,3 @@
-
 <?php
 
 
@@ -35,7 +34,7 @@ describe('EditBookingTest', function () {
         );
         $response = $this->api->editBooking($payload);
         expect($response)->not()->toBeNull();
-        expect((int)$response->id)->toBe(16);
-        expect($response->amount_childs)->toBe(1);
+        expect($response->booking->id)->toBe(16);
+        expect($response->booking->amount_children)->toBe(1);
     });
 });

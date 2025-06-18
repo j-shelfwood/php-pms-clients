@@ -36,16 +36,20 @@ describe('CalendarChangesEndpointTest', function () {
         $response = $this->api->calendarChanges($since);
 
         expect($response)->toBeInstanceOf(CalendarChangesResponse::class);
-        expect($response->amount)->toBeGreaterThanOrEqual(0);
+        expect($response->amount)->toBe(2);
+        expect($response->time)->toBeInstanceOf(Carbon::class);
+        expect($response->time->format('Y-m-d H:i:s'))->toBe('2023-11-12 12:00:00');
         expect($response->changes)->toBeArray();
-        if ($response->amount > 0) {
-            expect($response->changes)->not->toBeEmpty();
-            $first = $response->changes[0];
-            expect($first)->toBeInstanceOf(CalendarChange::class);
-            expect($first->propertyId)->toBe(22958);
-            expect($first->months)->toContain('2024-02');
-        } else {
-            expect($response->changes)->toBeEmpty();
-        }
+        expect($response->changes)->toHaveCount(2);
+
+        $first = $response->changes[0];
+        expect($first)->toBeInstanceOf(CalendarChange::class);
+        expect($first->propertyId)->toBe(22958);
+        expect($first->months)->toContain('2024-02');
+
+        $second = $response->changes[1];
+        expect($second)->toBeInstanceOf(CalendarChange::class);
+        expect($second->propertyId)->toBe(23180);
+        expect($second->months)->toContain('2024-02');
     });
 });

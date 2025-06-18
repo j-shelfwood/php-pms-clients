@@ -47,10 +47,10 @@ describe('CreateBookingEndpointTest', function () {
         $response = $this->api->createBooking($payload);
 
         expect($response)->toBeInstanceOf(CreateBookingResponse::class);
-        expect($response->id)->toBe('171830');
-        expect($response->status)->toBeInstanceOf(BookingStatus::class);
-        expect($response->status->value)->toBe('open');
-        expect($response->departure)->toBe('2024-02-12');
+        expect($response->booking->id)->toBe(171830);
+        expect($response->booking->status)->toBeInstanceOf(BookingStatus::class);
+        expect($response->booking->status->value)->toBe('open');
+        expect($response->booking->departure->format('Y-m-d'))->toBe('2024-02-12');
     });
 
     });

@@ -126,7 +126,7 @@ class PropertyDetails
                 if (!is_scalar($value) && $value !== null) {
                     return $default;
                 }
-                return $value === null ? null : (string) $value;
+                return $value === null ? $default : (string) $value;
             };
 
             $getInt = function($key, $default = 0) use ($propertyData) {
@@ -141,12 +141,22 @@ class PropertyDetails
 
             $getBool = function($key, $default = false) use ($propertyData) {
                 $value = $propertyData[$key] ?? $default;
-                return is_bool($value) ? $value : (bool) $default;
+                if (is_numeric($value)) {
+                    return (bool)(int)$value;
+                }
+                return is_bool($value) ? $value : $default;
             };
 
             $getDate = function($key) use ($propertyData) {
                 $value = $propertyData[$key] ?? null;
-                return ($value !== null && !empty($value) && !is_array($value)) ? \Carbon\Carbon::parse((string) $value) : null;
+                if ($value === null || empty($value) || is_array($value)) {
+                    return null;
+                }
+                try {
+                    return Carbon::parse((string) $value);
+                } catch (\Exception $e) {
+                    return null;
+                }
             };
 
             $typesString = $getString('type', '');
@@ -177,7 +187,7 @@ class PropertyDetails
                 available_end: $getDate('available_end'),
                 floor: $getInt('floor'),
                 stairs: $getBool('stairs'),
-                size: $getFloat('size'),
+                size: $getFloat('size') ?: null,
                 bedrooms: $getInt('bedrooms'),
                 single_bed: $getInt('single_bed'),
                 double_bed: $getInt('double_bed'),
@@ -234,14 +244,14 @@ class PropertyDetails
                 check_in: $getString('check_in'),
                 check_out: $getString('check_out'),
                 tax: PropertyTax::fromXml($propertyData['tax'] ?? []),
-                prepayment: $getFloat('prepayment'),
-                fee: $getFloat('fee'),
+                prepayment: $getFloat('prepayment') ?: null,
+                fee: $getFloat('fee') ?: null,
                 content: PropertyContent::fromXml($propertyData['content'] ?? []),
-                images: array_map(fn($imageData) => PropertyImage::fromXml($imageData), $imagesData),
-                external_created_at: $getDate('external_created_at'),
-                external_updated_at: $getDate('external_updated_at')
+                images: array_map(fn($img) => PropertyImage::fromXml($img), $imagesData),
+                external_created_at: $getDate('created'),
+                external_updated_at: $getDate('modified')
             );
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             throw new \Shelfwood\PhpPms\Exceptions\MappingException('Failed to map PropertyDetails: ' . $e->getMessage(), 0, $e);
         }
     }

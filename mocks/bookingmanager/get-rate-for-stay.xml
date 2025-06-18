@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <response>
-    <rate>
-        <info arrival="2024-02-19" departure="2024-02-20" nights="1">
-            <property id="21663" identifier="#487" max_persons="2" available="0" minimal_nights="1">
-                <rate currency="EUR">
-                    <total>220.00</total>
-                    <final>220.00</final>
-                    <tax total="35.20">
-                        <vat value="9">19.80</vat>
-                        <other type="relative" value="7">15.40</other>
-                        <final>255.20</final>
-                    </tax>
-                    <fee>0.00</fee>
-                    <prepayment>66.00</prepayment>
-                    <balance_due>189.20</balance_due>
-                </rate>
-            </property>
-        </info>
-    </rate>
+    <info arrival="2024-02-19" departure="2024-02-20" nights="1">
+        <property id="21663" identifier="#487" max_persons="2" available="0" minimal_nights="1">
+            <rate currency="EUR">
+                <total>220.00</total>
+                <final>220.00</final>
+                <tax total="35.20">
+                    <vat value="9">19.80</vat>
+                    <other type="relative" value="7">15.40</other>
+                    <final>255.20</final>
+                </tax>
+                <fee>0.00</fee>
+                <prepayment>66.00</prepayment>
+                <balance_due>189.20</balance_due>
+            </rate>
+        </property>
+    </info>
 </response>

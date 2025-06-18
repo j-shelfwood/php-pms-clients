@@ -73,7 +73,7 @@ class RateResponse
                 propertyId: (int) ($propertyAttributes['id'] ?? null),
                 propertyIdentifier: (string) ($propertyAttributes['identifier'] ?? null),
                 maxPersons: (int) ($propertyAttributes['max_persons'] ?? null),
-                available: (bool) ($propertyAttributes['available'] ?? null),
+                available: isset($propertyAttributes['available']) ? (bool) (int) $propertyAttributes['available'] : null,
                 minimalNights: (int) ($propertyAttributes['minimal_nights'] ?? null)
             );
         } catch (Exception $e) {

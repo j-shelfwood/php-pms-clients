@@ -2,43 +2,29 @@
 
 namespace Shelfwood\PhpPms\BookingManager\Responses;
 
+use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\BookingDetails;
 use Shelfwood\PhpPms\Exceptions\MappingException;
-
-use Shelfwood\PhpPms\BookingManager\Enums\BookingStatus;
 
 class CancelBookingResponse
 {
-    public readonly bool $success;
-    public readonly ?string $message;
-    public readonly BookingStatus $status;
-
-    public function __construct(bool $success, ?string $message = null, BookingStatus $status = BookingStatus::ERROR)
-    {
-        $this->success = $success;
-        $this->message = $message;
-        $this->status = $status;
-    }
+    public function __construct(
+        public readonly BookingDetails $booking
+    ) {}
 
     /**
-     * @throws MappingException
+     * Maps the raw XML response data to a CancelBookingResponse object.
+     *
+     * @param array $rawResponse The raw response data from the XMLClient.
+     * @throws MappingException If mapping fails.
      */
-    public static function map(array $data): self
+    public static function map(array $rawResponse): self
     {
         try {
-            if (isset($data['error'])) {
-                $message = is_array($data['error']) && isset($data['error']['message']) ? (string)$data['error']['message'] : (string)$data['error'];
-                return new self(false, $message, BookingStatus::ERROR);
-            }
-            $statusString = strtolower((string)($data['status'] ?? ''));
-            $message = isset($data['message']) ? (string) $data['message'] : '';
-            $success = $statusString === 'cancelled';
-            $status = BookingStatus::tryFrom($statusString) ?? BookingStatus::ERROR;
-            if ($message === '') {
-                $message = $success ? 'Booking cancelled successfully.' : 'Failed to cancel booking.';
-            }
-            return new self($success, $message, $status);
-        } catch (\Throwable $e) {
-            throw new \Shelfwood\PhpPms\Exceptions\MappingException($e->getMessage(), 0, $e);
+            return new self(
+                booking: BookingDetails::map($rawResponse)
+            );
+        } catch (\Exception $e) {
+            throw new MappingException('Failed to map CancelBookingResponse: ' . $e->getMessage(), 0, $e);
         }
     }
 }

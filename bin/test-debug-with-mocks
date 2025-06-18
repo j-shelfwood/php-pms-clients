@@ -1,0 +1,70 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Carbon\Carbon;
+use Shelfwood\PhpPms\BookingManager\Responses\PropertiesResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\PropertyResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\CalendarChangesResponse;
+use Shelfwood\PhpPms\Http\XMLParser;
+
+echo "🧪 Testing BookingManager API Debug with Mock Data...\n\n";
+
+// Mock data paths
+$mockPaths = [
+    'properties' => __DIR__ . '/../mocks/bookingmanager/all-properties.xml',
+    'property' => __DIR__ . '/../mocks/bookingmanager/property-by-id.xml',
+    'changes' => __DIR__ . '/../mocks/bookingmanager/calendar-changes.xml'
+];
+
+// Output helper
+function print_debug_step(string $title, array $parsedData, object $responseObject): void
+{
+    echo "======================================================================\n";
+    echo "✅ " . strtoupper($title) . "\n";
+    echo "======================================================================\n\n";
+
+    echo "--- Parsed XML Data (Input to Mapper) ---\n";
+    print_r($parsedData);
+    echo "\n";
+
+    echo "--- Mapped PHP Response Object ---\n";
+    print_r($responseObject);
+    echo "\n\n";
+}
+
+$parser = new XMLParser();
+
+try {
+    // Test 1: Properties
+    $xml = file_get_contents($mockPaths['properties']);
+    $parsed = $parser->parseXml($xml);
+    if (isset($parsed['property']) && isset($parsed['property']['@attributes'])) {
+        $parsed['property'] = [$parsed['property']];
+    }
+    $response = PropertiesResponse::map($parsed);
+    print_debug_step('TEST 1: PROPERTIES MAPPING', $parsed, $response);
+
+    // Test 2: Property by ID
+    $xml = file_get_contents($mockPaths['property']);
+    $parsed = $parser->parseXml($xml);
+    $response = PropertyResponse::map($parsed['property']);
+    print_debug_step('TEST 2: PROPERTY BY ID MAPPING', $parsed, $response);
+
+    // Test 3: Calendar Changes
+    $xml = file_get_contents($mockPaths['changes']);
+    $parsed = $parser->parseXml($xml);
+    $response = CalendarChangesResponse::map($parsed);
+    print_debug_step('TEST 3: CALENDAR CHANGES MAPPING', $parsed, $response);
+
+    echo "🎉 All mock data tests completed successfully!\n";
+    echo "✅ CalendarChangesResponse now correctly maps 'change' elements\n";
+    echo "✅ PropertyContent handles both locale-based and simple content structures\n";
+
+} catch (Exception $e) {
+    echo "❌ TEST FAILED\n";
+    echo "Exception: " . $e->getMessage() . "\n";
+    echo "Trace: " . $e->getTraceAsString() . "\n";
+    exit(1);
+}

@@ -1,4 +1,3 @@
-
 <?php
 
 use Shelfwood\PhpPms\BookingManager\BookingManagerAPI;
@@ -29,8 +28,8 @@ describe('ViewBookingTest', function () {
 
         $response = $this->api->viewBooking(16);
         expect($response)->not()->toBeNull();
-        expect((int)$response->id)->toBe(16);
-        expect($response->guestFirstName)->toBeString();
-        expect($response->guestLastName)->toBeString();
+        expect($response->booking->id)->toBe(16);
+        expect($response->booking->first_name)->toBeString();
+        expect($response->booking->last_name)->toBeString();
     });
 });

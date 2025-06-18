@@ -9,9 +9,9 @@ use Carbon\Carbon;
 class CalendarChangesResponse
 {
     public function __construct(
-        public readonly array $properties,
+        public readonly array $changes,
         public readonly ?int $amount = null,
-        public readonly ?array $changes = null
+        public readonly ?Carbon $time = null
     ) {}
 
     /**
@@ -22,14 +22,36 @@ class CalendarChangesResponse
     public static function map(array $data): self
     {
         try {
-            $properties = [];
-            foreach ($data['property'] as $property) {
-                $properties[] = CalendarChange::fromXml($property);
+            $changes = [];
+            $amount = null;
+            $time = null;
+
+            // Extract root attributes
+            if (isset($data['@attributes'])) {
+                $amount = isset($data['@attributes']['amount']) ? (int)$data['@attributes']['amount'] : null;
+                $time = isset($data['@attributes']['time']) ? Carbon::parse($data['@attributes']['time']) : null;
             }
+
+            // Handle change elements
+            if (isset($data['change'])) {
+                $changeData = $data['change'];
+
+                // Handle single change vs multiple changes
+                if (isset($changeData['@attributes'])) {
+                    // Single change
+                    $changes[] = CalendarChange::fromXml($changeData);
+                } else {
+                    // Multiple changes
+                    foreach ($changeData as $change) {
+                        $changes[] = CalendarChange::fromXml($change);
+                    }
+                }
+            }
+
             return new self(
-                properties: $properties,
-                amount: count($properties),
-                changes: $properties
+                changes: $changes,
+                amount: $amount ?? count($changes),
+                time: $time
             );
         } catch (\Throwable $e) {
             throw new \Shelfwood\PhpPms\Exceptions\MappingException($e->getMessage(), 0, $e);

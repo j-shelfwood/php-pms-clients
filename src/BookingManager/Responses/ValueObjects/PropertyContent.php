@@ -18,11 +18,28 @@ class PropertyContent
     {
         $getText = function ($key) use ($data) {
             $value = $data[$key] ?? null;
+
             if (is_array($value)) {
-                return (string)($value['#text'] ?? '');
+                // Handle locale-based content like: <short locale="en_gb">...</short>
+                if (isset($value['#text'])) {
+                    return (string)$value['#text'];
+                }
+                // Handle simple language codes like: <en>...</en>, <nl>...</nl>
+                // Prefer English if available, otherwise take first available
+                if (isset($value['en'])) {
+                    return (string)$value['en'];
+                }
+                if (isset($value['nl'])) {
+                    return (string)$value['nl'];
+                }
+                // Take first available value
+                $firstValue = reset($value);
+                return is_string($firstValue) ? $firstValue : '';
             }
+
             return (string)($value ?? '');
         };
+
         return new self(
             short: $getText('short'),
             full: $getText('full'),

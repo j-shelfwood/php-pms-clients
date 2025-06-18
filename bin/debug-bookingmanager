@@ -1,0 +1,199 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use Carbon\Carbon;
+use GuzzleHttp\Client;
+use Psr\Log\NullLogger;
+use Shelfwood\PhpPms\BookingManager\BookingManagerAPI;
+use Shelfwood\PhpPms\BookingManager\Responses\PropertiesResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\PropertyResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\RateResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\CalendarChangesResponse;
+use Shelfwood\PhpPms\Exceptions\PmsClientException;
+
+// --- Helper Class for Debugging ---
+/**
+ * Extends the original API client to expose the raw parsed data alongside the mapped response.
+ * This is done without modifying the original library code.
+ */
+class DebuggableBookingManagerAPI extends BookingManagerAPI
+{
+    /**
+     * @return array{'parsed': array, 'response': PropertiesResponse}
+     */
+    public function propertiesWithParsedData(): array
+    {
+        $parsedData = $this->performApiCall('details');
+        if (isset($parsedData['property']) && isset($parsedData['property']['@attributes'])) {
+            $parsedData['property'] = [$parsedData['property']];
+        }
+        $response = PropertiesResponse::map($parsedData);
+        return ['parsed' => $parsedData, 'response' => $response];
+    }
+
+    /**
+     * @return array{'parsed': array, 'response': PropertyResponse}
+     */
+    public function propertyWithParsedData(int $id): array
+    {
+        $parsedData = $this->performApiCall('details', ['id' => $id]);
+        $response = PropertyResponse::map($parsedData['property']);
+        return ['parsed' => $parsedData, 'response' => $response];
+    }
+
+    /**
+     * @return array{'parsed': array, 'response': RateResponse}
+     */
+    public function rateForStayWithParsedData(int $propertyId, Carbon $arrival, Carbon $departure, int $adults): array
+    {
+        $apiParams = [
+            'id' => $propertyId,
+            'arrival' => $arrival->format('Y-m-d'),
+            'departure' => $departure->format('Y-m-d'),
+            'adults' => $adults,
+        ];
+        $parsedData = $this->performApiCall('info.xml', $apiParams);
+
+        // ⚠️ DEBUG: Show what the API actually returns
+        echo "\n🔍 DEBUG - Raw rate API response:\n";
+        print_r($parsedData);
+        echo "\n";
+
+        // Handle both API response structures:
+        // Mock/Test: parsedData['info']['property']['rate']
+        // Live API: parsedData['property']['rate']
+        $hasRate = isset($parsedData['info']['property']['rate']) || isset($parsedData['property']['rate']);
+
+        if (!$parsedData || !$hasRate) {
+            echo "❌ No rate data found in response!\n";
+            return ['parsed' => $parsedData, 'response' => null];
+        }
+
+        $response = RateResponse::map($parsedData);
+        return ['parsed' => $parsedData, 'response' => $response];
+    }
+
+    /**
+     * @return array{'parsed': array, 'response': CalendarChangesResponse}
+     */
+    public function calendarChangesWithParsedData(Carbon $since): array
+    {
+        $apiParams = [
+            'time' => $since->format('Y-m-d H:i:s'),
+        ];
+        $parsedData = $this->performApiCall('changes', $apiParams);
+        $response = CalendarChangesResponse::map($parsedData);
+        return ['parsed' => $parsedData, 'response' => $response];
+    }
+}
+
+// --- Output Helper ---
+function print_debug_step(string $title, array $parsedData, object $responseObject): void
+{
+    echo "======================================================================\n";
+    echo "✅ " . strtoupper($title) . "\n";
+    echo "======================================================================\n\n";
+
+    echo "--- Parsed XML Data (Input to Mapper) ---\n";
+    print_r($parsedData);
+    echo "\n";
+
+    echo "--- Mapped PHP Response Object ---\n";
+    print_r($responseObject);
+    echo "\n\n";
+    usleep(500000); // Pause for half a second to make the flow readable
+}
+
+// --- Main Script Logic ---
+
+// 1. Argument Validation
+if (!isset($argv[1])) {
+    echo "Error: Missing API Key.\n\n";
+    echo "Usage: php " . basename(__FILE__) . " <YOUR_BOOKINGMANAGER_API_KEY> [PROPERTY_ID]\n";
+    echo "If PROPERTY_ID is not provided, the script will use the first property from the list.\n";
+    exit(1);
+}
+
+$apiKey = $argv[1];
+$targetPropertyId = isset($argv[2]) ? (int)$argv[2] : null;
+
+// The production base URL from the API documentation
+define('BOOKINGMANAGER_BASE_URL', 'https://xml.billypds.com');
+
+echo "🚀 Starting BookingManager API Debug Sequence...\n";
+echo "Using Base URL: " . BOOKINGMANAGER_BASE_URL . "\n\n";
+
+// 2. Setup API Client
+$httpClient = new Client();
+$logger = new NullLogger();
+$api = new DebuggableBookingManagerAPI($httpClient, $apiKey, BOOKINGMANAGER_BASE_URL, $logger);
+
+try {
+    // 3. --- STEP 1: Get all properties ---
+    $propertiesResult = $api->propertiesWithParsedData();
+    print_debug_step('STEP 1: GET ALL PROPERTIES', $propertiesResult['parsed'], $propertiesResult['response']);
+
+    if (empty($propertiesResult['response']->properties)) {
+        echo "❌ No properties found. Cannot continue debug sequence.\n";
+        exit(1);
+    }
+
+    if ($targetPropertyId === null) {
+        $targetPropertyId = $propertiesResult['response']->properties[0]->external_id;
+        echo "ℹ️ No Property ID provided. Using the first property found: ID {$targetPropertyId}\n\n";
+    }
+
+    // 4. --- STEP 2: Get details for a single property ---
+    $propertyResult = $api->propertyWithParsedData($targetPropertyId);
+    print_debug_step("STEP 2: GET PROPERTY (ID: {$targetPropertyId})", $propertyResult['parsed'], $propertyResult['response']);
+
+    // 5. --- STEP 3: Get calendar changes ---
+    $since = Carbon::now()->subDays(7);
+    $changesResult = $api->calendarChangesWithParsedData($since);
+    print_debug_step("STEP 3: GET CALENDAR CHANGES (Since: {$since->toDateTimeString()})", $changesResult['parsed'], $changesResult['response']);
+
+    // 6. --- STEP 4: Get calendar for the next 30 days ---
+    echo "======================================================================\n";
+    echo "✅ " . strtoupper("STEP 4: GET CALENDAR (ID: {$targetPropertyId})") . "\n";
+    echo "======================================================================\n\n";
+    echo "ℹ️ The calendar method iterates daily using the 'info.xml' endpoint.\n";
+    echo "   Only the final mapped response object is shown below.\n\n";
+
+    $calendarStart = Carbon::now()->startOfDay();
+    $calendarEnd = Carbon::now()->addDays(30)->endOfDay();
+    $calendarResponse = $api->calendar($targetPropertyId, $calendarStart, $calendarEnd);
+    echo "--- Mapped PHP Response Object ---\n";
+    print_r($calendarResponse);
+    echo "\n\n";
+
+    // 7. --- STEP 5: Get a rate for a specific stay ---
+    $arrival = Carbon::now()->addDays(14)->startOfDay();
+    $departure = $arrival->copy()->addDays(3);
+    echo "5️⃣ Rate for stay (Property: $targetPropertyId)...\n";
+    $rateResult = $api->rateForStayWithParsedData($targetPropertyId, $arrival, $departure, 2);
+
+    if ($rateResult['response'] === null) {
+        echo "❌ Rate endpoint returned no rate data (property not available for these dates)\n\n";
+    } else {
+        print_debug_step('Rate for Stay', $rateResult['parsed'], $rateResult['response']);
+    }
+
+    echo "🎉 Debug sequence completed successfully!\n";
+
+} catch (PmsClientException $e) {
+    echo "❌ AN API ERROR OCCURRED\n";
+    echo "======================================================================\n";
+    echo "Exception Type: " . get_class($e) . "\n";
+    echo "Message: " . $e->getMessage() . "\n";
+    echo "Trace:\n" . $e->getTraceAsString() . "\n";
+    exit(1);
+} catch (Exception $e) {
+    echo "❌ AN UNEXPECTED ERROR OCCURRED\n";
+    echo "======================================================================\n";
+    echo "Exception Type: " . get_class($e) . "\n";
+    echo "Message: " . $e->getMessage() . "\n";
+    echo "Trace:\n" . $e->getTraceAsString() . "\n";
+    exit(1);
+}
