@@ -38,7 +38,7 @@ describe('XMLClientTest', function () {
         $parsed = \Shelfwood\PhpPms\Http\XMLParser::parse($xml);
         if (\Shelfwood\PhpPms\Http\XMLParser::hasError($parsed)) {
             $errorDetails = \Shelfwood\PhpPms\Http\XMLParser::extractErrorDetails($parsed);
-            throw new ApiException($errorDetails->message, $errorDetails->code ?? 0, null, $errorDetails);
+            throw new ApiException($errorDetails->message, is_numeric($errorDetails->code) ? (int)$errorDetails->code : 0, null, $errorDetails);
         }
     })->throws(ApiException::class);
 

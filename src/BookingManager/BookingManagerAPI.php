@@ -83,7 +83,7 @@ class BookingManagerAPI extends XMLClient
 
             if (XMLParser::hasError($parsedData)) {
                 $errorDetails = XMLParser::extractErrorDetails($parsedData);
-                throw new ApiException($errorDetails->message, $errorDetails->code ?? 0, null, $errorDetails);
+                throw new ApiException($errorDetails->message, is_numeric($errorDetails->code) ? (int)$errorDetails->code : 0, null, $errorDetails);
             }
 
             return $parsedData;

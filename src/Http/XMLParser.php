@@ -184,12 +184,21 @@ class XMLParser
 
         $directErrorData = $response['error'] ?? null;
         $directErrorData = $response['error'] ?? null;
-        if (is_array($directErrorData) && isset($directErrorData['@attributes']['code'])) {
-            $code = (string) ($directErrorData['@attributes']['code'] ?? null);
-            $msgContent = $directErrorData[0] ?? $directErrorData['message'] ?? $directErrorData['@attributes']['message'] ?? 'Error details not provided.';
-            $message = is_string($msgContent) ? trim($msgContent) : json_encode($msgContent);
-            $rawFragment = $directErrorData;
-            return new ErrorDetails($code, $message, $rawFragment);
+        if (is_array($directErrorData)) {
+            if (isset($directErrorData['@attributes']['code'])) {
+                $code = (string) ($directErrorData['@attributes']['code'] ?? null);
+                $msgContent = $directErrorData[0] ?? $directErrorData['message'] ?? $directErrorData['@attributes']['message'] ?? 'Error details not provided.';
+                $message = is_string($msgContent) ? trim($msgContent) : json_encode($msgContent);
+                $rawFragment = $directErrorData;
+                return new ErrorDetails($code, $message, $rawFragment);
+            }
+            // Handle direct code and message children (e.g., BookingManager <error><code>...</code><message>...</message></error>)
+            if (isset($directErrorData['code']) && !empty($directErrorData['code'])) {
+                $code = (string) $directErrorData['code'];
+                $message = (string) ($directErrorData['message'] ?? 'Error details not provided.');
+                $rawFragment = $directErrorData;
+                return new ErrorDetails($code, $message, $rawFragment);
+            }
         }
 
         $rootAttributes = $response['@attributes'] ?? null;

@@ -49,4 +49,47 @@ describe('XMLParserTest', function () {
             ->and(XmlParser::getString($data, 'empty', 'default'))->toBe('default');
     });
 
+    it('detects BookingManager error structure', function () {
+        $xml = '<response><e><code>ERR001</code><message>Generic API Error</message></e></response>';
+        $arr = XmlParser::parse($xml);
+        expect(XmlParser::hasError($arr))->toBeTrue();
+    });
+
+    it('extracts BookingManager error details', function () {
+        $xml = '<response><e><code>ERR001</code><message>Generic API Error</message></e></response>';
+        $arr = XmlParser::parse($xml);
+        $details = XmlParser::extractErrorDetails($arr);
+        expect($details->code)->toBe('ERR001')
+            ->and($details->message)->toBe('Generic API Error');
+    });
+
+    it('detects error structure with direct code children', function () {
+        $xml = '<response><error><code>ERR002</code><message>Direct Error Message</message></error></response>';
+        $arr = XmlParser::parse($xml);
+        expect(XmlParser::hasError($arr))->toBeTrue();
+    });
+
+    it('extracts error details with direct code children', function () {
+        $xml = '<response><error><code>ERR002</code><message>Direct Error Message</message></error></response>';
+        $arr = XmlParser::parse($xml);
+        $details = XmlParser::extractErrorDetails($arr);
+        expect($details->code)->toBe('ERR002')
+            ->and($details->message)->toBe('Direct Error Message');
+    });
+
+    it('handles error structure that hasError detects but extraction previously missed', function () {
+        // This tests the exact scenario described in the user's issue
+        $xml = '<response><error><code>TEST123</code><message>Test error message</message></error></response>';
+        $arr = XmlParser::parse($xml);
+
+        // hasError should detect this
+        expect(XmlParser::hasError($arr))->toBeTrue();
+
+        // extractErrorDetails should now properly extract the details
+        $details = XmlParser::extractErrorDetails($arr);
+        expect($details->code)->toBe('TEST123')
+            ->and($details->message)->toBe('Test error message')
+            ->and($details->rawResponseFragment)->toBeArray();
+    });
+
     });
