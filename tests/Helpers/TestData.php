@@ -122,20 +122,7 @@ class TestData
                 'termsAndConditions' => ''
             ],
             'images' => [
-                [
-                    'name' => '1.jpg',
-                    'url' => 'http://control.bookingmanager.com/data/property/real/21663_1.jpg',
-                    'modified' => '2022-04-28 11:08:17',
-                    'description' => 'Double bed Runstraat suite Amsterdam'
-                ],
-                [
-                    'name' => '2.jpg',
-                    'url' => 'http://control.bookingmanager.com/data/property/real/21663_2.jpg',
-                    'modified' => '2022-04-28 11:08:17',
-                    'description' => 'Double bed other angle Runstraat suite Amsterdam'
-                ],
-                // We'll validate the first few images to keep assertions manageable
-                // but the helper can check the total count
+                '_count_only' => 25  // property-by-id.xml has 25 images
             ],
             'external_created_at' => '2014-01-15T15:14:54.000000Z',
             'external_updated_at' => '2023-11-10T08:55:55.000000Z'

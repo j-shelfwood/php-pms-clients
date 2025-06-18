@@ -136,6 +136,13 @@ class XMLParser
                 return true;
             }
         }
+
+        // Check for BookingManager <e> error structure
+        $bookingManagerError = $response['e'] ?? null;
+        if (is_array($bookingManagerError) && isset($bookingManagerError['code']) && !empty($bookingManagerError['code'])) {
+            return true;
+        }
+
         return false;
     }
 
@@ -196,6 +203,16 @@ class XMLParser
                 return new ErrorDetails($code, $message, $rawFragment);
             }
         }
+
+        // Check for BookingManager <e> error structure
+        $bookingManagerError = $response['e'] ?? null;
+        if (is_array($bookingManagerError) && isset($bookingManagerError['code']) && !empty($bookingManagerError['code'])) {
+            $code = (string) $bookingManagerError['code'];
+            $message = (string) ($bookingManagerError['message'] ?? 'Error details not provided.');
+            $rawFragment = $bookingManagerError;
+            return new ErrorDetails($code, $message, $rawFragment);
+        }
+
         return new ErrorDetails($code, $message, $response);
     }
 

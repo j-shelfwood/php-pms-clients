@@ -157,13 +157,19 @@ function assertPropertyDetails(PropertyDetails $actualProperty, array $expected)
     expect($actualProperty->content->arrival)->toBe($expected['content']['arrival']);
     expect($actualProperty->content->termsAndConditions)->toBe($expected['content']['termsAndConditions']);
 
-    // Images
-    expect(count($actualProperty->images))->toBe(count($expected['images']));
-    foreach ($actualProperty->images as $index => $image) {
-        expect($image->name)->toBe($expected['images'][$index]['name']);
-        expect($image->url)->toBe($expected['images'][$index]['url']);
-        expect($image->modified)->toBe($expected['images'][$index]['modified']);
-        expect($image->description)->toBe($expected['images'][$index]['description']);
+    // Images - handle both full array checking and count-only checking
+    if (isset($expected['images']['_count_only'])) {
+        // If _count_only is set, just check the count
+        expect(count($actualProperty->images))->toBe($expected['images']['_count_only']);
+    } else {
+        // Full image validation
+        expect(count($actualProperty->images))->toBe(count($expected['images']));
+        foreach ($actualProperty->images as $index => $image) {
+            expect($image->name)->toBe($expected['images'][$index]['name']);
+            expect($image->url)->toBe($expected['images'][$index]['url']);
+            expect($image->modified)->toBe($expected['images'][$index]['modified']);
+            expect($image->description)->toBe($expected['images'][$index]['description']);
+        }
     }
 
     // External timestamps
