@@ -206,9 +206,11 @@ class XMLParser
             $rootCode = $rootAttributes['code'] ?? $rootAttributes['Code'] ?? null;
             if ($rootCode !== null && (string) $rootCode !== '0' && strtoupper((string) $rootCode) !== 'OK' && !empty($rootCode)) {
                 $code = (string) $rootCode;
-                $messageContent = $rootAttributes['message'] ?? $rootAttributes['Message'] ?? ($response['message'] ?? 'Error details not provided.');
+                // Check for message in various locations: attributes, #text content, or child elements
+                $messageContent = $rootAttributes['message'] ?? $rootAttributes['Message'] ??
+                                ($response['#text'] ?? ($response['message'] ?? 'Error details not provided.'));
                 $message = is_string($messageContent) ? trim($messageContent) : json_encode($messageContent);
-                $rawFragment = $rootAttributes;
+                $rawFragment = $response; // Use entire response as fragment for root-level errors
                 return new ErrorDetails($code, $message, $rawFragment);
             }
         }

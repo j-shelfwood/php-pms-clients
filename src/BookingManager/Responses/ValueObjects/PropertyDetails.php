@@ -148,6 +148,13 @@ class PropertyDetails
                     $value = $value['#text'];
                 }
 
+                if (is_array($value) && empty($value)) {
+                    return $default;
+                }
+                if (!is_scalar($value) && $value !== null) {
+                    return $default;
+                }
+
                 return is_numeric($value) ? (float) $value : $default;
             };
 

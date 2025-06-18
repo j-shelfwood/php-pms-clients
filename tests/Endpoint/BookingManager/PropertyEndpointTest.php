@@ -42,6 +42,7 @@ describe('PropertyEndpointTest', function () {
         'inactive property' => ['property-inactive.xml', TestData::getExpectedInactivePropertyData()],
         'minimal property' => ['property-minimal.xml', TestData::getExpectedMinimalPropertyData()],
         'standard property by id' => ['property-by-id.xml', TestData::getExpectedPropertyData()],
+        'single image property' => ['property-single-image.xml', TestData::getExpectedSingleImagePropertyData()],
     ]);
 
     test('BookingManagerAPI::property throws ApiException on API error', function () {

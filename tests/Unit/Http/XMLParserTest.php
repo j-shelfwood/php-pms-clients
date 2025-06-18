@@ -92,4 +92,15 @@ describe('XMLParserTest', function () {
             ->and($details->rawResponseFragment)->toBeArray();
     });
 
+    it('handles root-level error tags correctly', function () {
+        $xml = file_get_contents(Tests\Helpers\TestHelpers::getMockFilePath('error-root.xml'));
+        $arr = XmlParser::parse($xml);
+
+        expect(XmlParser::hasError($arr))->toBeTrue();
+
+        $details = XmlParser::extractErrorDetails($arr);
+        expect($details->code)->toBe('303');
+        expect($details->message)->toBe('Property is unavailable');
+    });
+
     });

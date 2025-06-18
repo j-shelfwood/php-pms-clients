@@ -464,6 +464,133 @@ yes',
     }
 
     /**
+     * Golden Master data for single image property mock (property-single-image.xml)
+     */
+    public static function getExpectedSingleImagePropertyData(): array
+    {
+        return [
+            'external_id' => 22098,
+            'name' => 'Single Image Test Property',
+            'identifier' => '#testSingle',
+            'status' => 'live',
+            'property_types' => ['leisure', 'business'],
+            'provider' => [
+                'id' => 93,
+                'code' => 'AMS',
+                'name' => 'Billy Blue Amsterdam'
+            ],
+            'location' => [
+                'latitude' => 52.3568,
+                'longitude' => 4.89784,
+                'address' => 'Test Street',
+                'zipcode' => '1073BR',
+                'city' => 'Amsterdam',
+                'country' => 'NL',
+                'cityLatitude' => 52.3731,
+                'cityLongitude' => 4.89235,
+                'area' => 'Test Area'
+            ],
+            'max_persons' => 2,
+            'minimal_nights' => 1,
+            'maximal_nights' => 0,
+            'available_start' => '2014-07-02',
+            'available_end' => '2025-05-05',
+            'floor' => 1,
+            'stairs' => false,
+            'size' => 30.0,
+            'bedrooms' => 1,
+            'single_bed' => 0,
+            'double_bed' => 1,
+            'single_sofa' => 0,
+            'double_sofa' => 0,
+            'single_bunk' => 0,
+            'bathrooms' => 1,
+            'toilets' => 1,
+            'elevator' => false,
+            'view' => 'street',
+            'internet' => 'wifi',
+            'internet_connection' => 'highspeed',
+            'parking' => 'none',
+            'airco' => false,
+            'fans' => false,
+            'balcony' => false,
+            'patio' => false,
+            'garden' => false,
+            'roof_terrace' => false,
+            'tv' => 'flatscreen',
+            'tv_connection' => 'cable',
+            'dvd' => 'none',
+            'computer' => false,
+            'printer' => false,
+            'iron' => false,
+            'dishwasher' => false,
+            'oven' => false,
+            'microwave' => true,
+            'grill' => false,
+            'hob' => true,
+            'fridge' => true,
+            'freezer' => false,
+            'washingmachine' => false,
+            'dryer' => false,
+            'toaster' => false,
+            'kettle' => true,
+            'coffeemachine' => false,
+            'bathtub' => 0,
+            'jacuzzi' => 0,
+            'shower_regular' => 1,
+            'shower_steam' => 0,
+            'swimmingpool' => 'none',
+            'sauna' => 'none',
+            'hairdryer' => true,
+            'entresol' => false,
+            'wheelchair_friendly' => false,
+            'smoking_allowed' => false,
+            'pets_allowed' => false,
+            'heating' => true,
+            'supplies' => [
+                'coffee' => false,
+                'tea' => true,
+                'milk' => false,
+                'sugar' => true,
+                'dishwasherTablets' => false
+            ],
+            'service' => [
+                'linen' => true,
+                'towels' => true,
+                'cleaning' => false
+            ],
+            'cleaning_costs' => 25.0,
+            'deposit_costs' => 50.0,
+            'check_in' => '15:00',
+            'check_out' => '11:00',
+            'tax' => [
+                'vat' => 9.0,
+                'other' => 6.0,
+                'otherType' => 'relative'
+            ],
+            'prepayment' => 30.0,
+            'fee' => 5.0,
+            'content' => [
+                'short' => 'A simple test property with exactly one image for testing XML parsing edge cases.',
+                'full' => '<p><strong>A simple test property with exactly one image for testing XML parsing edge cases.</strong></p>',
+                'area' => '<p>Test area description.</p>',
+                'arrival' => '<p>Test arrival instructions.</p>',
+                'termsAndConditions' => '<p>Test terms and conditions.</p>'
+            ],
+            'images' => [
+                [
+                    'name' => 'single_test.jpg',
+                    'url' => 'http://control.bookingmanager.com/data/property/real/test_single.jpg',
+                    'modified' => '2024-01-01 12:00:00',
+                    'description' => 'Single Image Test Property'
+                ]
+            ],
+            'external_created_at' => '2024-01-01T12:00:00.000000Z',
+            'external_updated_at' => '2024-01-01T12:00:00.000000Z'
+        ];
+    }
+
+    /**
      * Golden Master data for property-richest.xml mock
      */
     public static function getExpectedRichestPropertyData(): array

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties count="1">
+    <property id="22098" name="Single Image Test Property" identifier="#testSingle" status="live">
+        <provider id="93" code="AMS" name="Billy Blue Amsterdam" />
+        <location>
+            <gps>52.3568,4.89784</gps>
+            <address>Test Street</address>
+            <zipcode>1073BR</zipcode>
+            <city country="NL" gps="52.3731,4.89235">Amsterdam</city>
+            <area>Test Area</area>
+        </location>
+        <type>leisure,business</type>
+        <max_persons>2</max_persons>
+        <minimal_nights>1</minimal_nights>
+        <maximal_nights>0</maximal_nights>
+        <available_start>2014-07-02</available_start>
+        <available_end>2025-05-05</available_end>
+        <floor>1</floor>
+        <stairs>0</stairs>
+        <size>30</size>
+        <bedrooms>1</bedrooms>
+        <single_bed>0</single_bed>
+        <double_bed>1</double_bed>
+        <single_sofa>0</single_sofa>
+        <double_sofa>0</double_sofa>
+        <single_bunk>0</single_bunk>
+        <bathrooms>1</bathrooms>
+        <toilets>1</toilets>
+        <elevator>0</elevator>
+        <view>street</view>
+        <internet>wifi</internet>
+        <internet_connection>highspeed</internet_connection>
+        <parking>none</parking>
+        <airco>0</airco>
+        <fans>0</fans>
+        <balcony>0</balcony>
+        <patio>0</patio>
+        <garden>0</garden>
+        <roof_terrace>0</roof_terrace>
+        <tv>flatscreen</tv>
+        <tv_connection>cable</tv_connection>
+        <dvd>none</dvd>
+        <computer>0</computer>
+        <printer>0</printer>
+        <iron>0</iron>
+        <dishwasher>0</dishwasher>
+        <oven>0</oven>
+        <microwave>1</microwave>
+        <grill>0</grill>
+        <hob>1</hob>
+        <fridge>1</fridge>
+        <freezer>0</freezer>
+        <washingmachine>0</washingmachine>
+        <dryer>0</dryer>
+        <toaster>0</toaster>
+        <kettle>1</kettle>
+        <coffeemachine>0</coffeemachine>
+        <bathtub>0</bathtub>
+        <jacuzzi>0</jacuzzi>
+        <shower_regular>1</shower_regular>
+        <shower_steam>0</shower_steam>
+        <swimmingpool>none</swimmingpool>
+        <sauna>none</sauna>
+        <hairdryer>1</hairdryer>
+        <entresol>0</entresol>
+        <wheelchair_friendly>0</wheelchair_friendly>
+        <smoking_allowed>0</smoking_allowed>
+        <pets_allowed>0</pets_allowed>
+        <heating>1</heating>
+        <supplies>
+            <coffee>0</coffee>
+            <tea>1</tea>
+            <milk>0</milk>
+            <sugar>1</sugar>
+            <dishwasher_tablets>0</dishwasher_tablets>
+        </supplies>
+        <service>
+            <linen>1</linen>
+            <towels>1</towels>
+        </service>
+        <cleaning_costs>25.0</cleaning_costs>
+        <deposit_costs>50.0</deposit_costs>
+        <check_in>15:00</check_in>
+        <check_out>11:00</check_out>
+        <tax>
+            <vat>9</vat>
+            <other type="relative">6.0</other>
+        </tax>
+        <prepayment>30</prepayment>
+        <fee>5</fee>
+        <content>
+            <short><![CDATA[A simple test property with exactly one image for testing XML parsing edge cases.]]></short>
+            <full><![CDATA[<p><strong>A simple test property with exactly one image for testing XML parsing edge cases.</strong></p>]]></full>
+            <area><![CDATA[<p>Test area description.</p>]]></area>
+            <arrival><![CDATA[<p>Test arrival instructions.</p>]]></arrival>
+            <tac><![CDATA[<p>Test terms and conditions.</p>]]></tac>
+        </content>
+        <images>
+            <image name="single_test.jpg"
+                url="http://control.bookingmanager.com/data/property/real/test_single.jpg"
+                modified="2024-01-01 12:00:00"><![CDATA[Single Image Test Property]]></image>
+        </images>
+        <created>2024-01-01 12:00:00</created>
+        <modified>2024-01-01 12:00:00</modified>
+    </property>
+</properties>

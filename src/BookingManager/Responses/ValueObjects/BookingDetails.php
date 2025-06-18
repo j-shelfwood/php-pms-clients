@@ -94,6 +94,23 @@ class BookingDetails
             $propertyData = $bookingData['property'] ?? [];
             $propertyAttributes = $propertyData['@attributes'] ?? [];
 
+            // Helper function to extract text content from elements that might have attributes
+            $getTextContent = function($key, $default = '') use ($bookingData) {
+                $value = $bookingData[$key] ?? $default;
+
+                // Handle array structure with attributes and text content
+                if (is_array($value) && isset($value['#text'])) {
+                    return (string) $value['#text'];
+                }
+
+                // Handle simple string value
+                if (is_string($value)) {
+                    return $value;
+                }
+
+                return $default;
+            };
+
             return new self(
                 id: (int) ($attributes['id'] ?? 0),
                 identifier: $attributes['identifier'] ?? null,
@@ -113,10 +130,10 @@ class BookingDetails
                 amount_children: $getInt('amount_childs'), // Note: API uses 'childs'
                 time_arrival: $getString('time_arrival'),
                 flight: $getString('flight'),
-                notes: $getString('notes'),
+                notes: $getTextContent('notes'),
                 property_id: (int) ($propertyAttributes['id'] ?? 0),
                 property_identifier: $propertyAttributes['identifier'] ?? null,
-                property_name: $getString('property', ''),
+                property_name: $getTextContent('property'),
                 status: BookingStatus::tryFrom($getString('status', 'pending')) ?? BookingStatus::PENDING,
                 rate: BookingRate::fromXml($bookingData['rate'] ?? []),
                 created: $getDate('created') ?? Carbon::now(),
