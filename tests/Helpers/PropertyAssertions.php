@@ -23,6 +23,154 @@ use Shelfwood\PhpPms\BookingManager\Enums\TvConnectionType;
 use Shelfwood\PhpPms\BookingManager\Enums\DvdType;
 use Shelfwood\PhpPms\BookingManager\Enums\TaxType;
 
+/**
+ * Universal property details assertion that takes expected data array
+ */
+function assertPropertyDetails(PropertyDetails $actualProperty, array $expected): void
+{
+    // Basic property information
+    expect($actualProperty->external_id)->toBe($expected['external_id']);
+    expect($actualProperty->name)->toBe($expected['name']);
+    expect($actualProperty->identifier)->toBe($expected['identifier']);
+    expect($actualProperty->status?->value)->toBe($expected['status']);
+    expect($actualProperty->property_types)->toBe($expected['property_types']);
+
+    // Provider information
+    expect($actualProperty->provider->id)->toBe($expected['provider']['id']);
+    expect($actualProperty->provider->code)->toBe($expected['provider']['code']);
+    expect($actualProperty->provider->name)->toBe($expected['provider']['name']);
+
+    // Location information
+    expect($actualProperty->location->latitude)->toBe($expected['location']['latitude']);
+    expect($actualProperty->location->longitude)->toBe($expected['location']['longitude']);
+    expect($actualProperty->location->address)->toBe($expected['location']['address']);
+    expect($actualProperty->location->zipcode)->toBe($expected['location']['zipcode']);
+    expect($actualProperty->location->city)->toBe($expected['location']['city']);
+    expect($actualProperty->location->country)->toBe($expected['location']['country']);
+    expect($actualProperty->location->cityLatitude)->toBe($expected['location']['cityLatitude']);
+    expect($actualProperty->location->cityLongitude)->toBe($expected['location']['cityLongitude']);
+    expect($actualProperty->location->area)->toBe($expected['location']['area']);
+
+    // Property details
+    expect($actualProperty->max_persons)->toBe($expected['max_persons']);
+    expect($actualProperty->minimal_nights)->toBe($expected['minimal_nights']);
+    expect($actualProperty->maximal_nights)->toBe($expected['maximal_nights']);
+    expect($actualProperty->available_start?->toDateString())->toBe($expected['available_start']);
+    expect($actualProperty->available_end?->toDateString())->toBe($expected['available_end']);
+    expect($actualProperty->floor)->toBe($expected['floor']);
+    expect($actualProperty->stairs)->toBe($expected['stairs']);
+    expect($actualProperty->size)->toBe($expected['size']);
+
+    // Bedroom and bed information
+    expect($actualProperty->bedrooms)->toBe($expected['bedrooms']);
+    expect($actualProperty->single_bed)->toBe($expected['single_bed']);
+    expect($actualProperty->double_bed)->toBe($expected['double_bed']);
+    expect($actualProperty->single_sofa)->toBe($expected['single_sofa']);
+    expect($actualProperty->double_sofa)->toBe($expected['double_sofa']);
+    expect($actualProperty->single_bunk)->toBe($expected['single_bunk']);
+    expect($actualProperty->bathrooms)->toBe($expected['bathrooms']);
+    expect($actualProperty->toilets)->toBe($expected['toilets']);
+
+    // Accessibility and views
+    expect($actualProperty->elevator)->toBe($expected['elevator']);
+    expect($actualProperty->view?->value)->toBe($expected['view']);
+
+    // Technology and connectivity
+    expect($actualProperty->internet?->value)->toBe($expected['internet']);
+    expect($actualProperty->internet_connection?->value)->toBe($expected['internet_connection']);
+    expect($actualProperty->parking?->value)->toBe($expected['parking']);
+    expect($actualProperty->tv?->value)->toBe($expected['tv']);
+    expect($actualProperty->tv_connection?->value)->toBe($expected['tv_connection']);
+    expect($actualProperty->dvd?->value)->toBe($expected['dvd']);
+
+    // Climate and outdoor features
+    expect($actualProperty->airco)->toBe($expected['airco']);
+    expect($actualProperty->fans)->toBe($expected['fans']);
+    expect($actualProperty->balcony)->toBe($expected['balcony']);
+    expect($actualProperty->patio)->toBe($expected['patio']);
+    expect($actualProperty->garden)->toBe($expected['garden']);
+    expect($actualProperty->roof_terrace)->toBe($expected['roof_terrace']);
+
+    // Equipment and appliances
+    expect($actualProperty->computer)->toBe($expected['computer']);
+    expect($actualProperty->printer)->toBe($expected['printer']);
+    expect($actualProperty->iron)->toBe($expected['iron']);
+    expect($actualProperty->dishwasher)->toBe($expected['dishwasher']);
+    expect($actualProperty->oven)->toBe($expected['oven']);
+    expect($actualProperty->microwave)->toBe($expected['microwave']);
+    expect($actualProperty->grill)->toBe($expected['grill']);
+    expect($actualProperty->hob)->toBe($expected['hob']);
+    expect($actualProperty->fridge)->toBe($expected['fridge']);
+    expect($actualProperty->freezer)->toBe($expected['freezer']);
+    expect($actualProperty->washingmachine)->toBe($expected['washingmachine']);
+    expect($actualProperty->dryer)->toBe($expected['dryer']);
+    expect($actualProperty->toaster)->toBe($expected['toaster']);
+    expect($actualProperty->kettle)->toBe($expected['kettle']);
+    expect($actualProperty->coffeemachine)->toBe($expected['coffeemachine']);
+
+    // Bathroom and spa features
+    expect($actualProperty->bathtub)->toBe($expected['bathtub']);
+    expect($actualProperty->jacuzzi)->toBe($expected['jacuzzi']);
+    expect($actualProperty->shower_regular)->toBe($expected['shower_regular']);
+    expect($actualProperty->shower_steam)->toBe($expected['shower_steam']);
+    expect($actualProperty->swimmingpool?->value)->toBe($expected['swimmingpool']);
+    expect($actualProperty->sauna?->value)->toBe($expected['sauna']);
+    expect($actualProperty->hairdryer)->toBe($expected['hairdryer']);
+
+    // Property policies and features
+    expect($actualProperty->entresol)->toBe($expected['entresol']);
+    expect($actualProperty->wheelchair_friendly)->toBe($expected['wheelchair_friendly']);
+    expect($actualProperty->smoking_allowed)->toBe($expected['smoking_allowed']);
+    expect($actualProperty->pets_allowed)->toBe($expected['pets_allowed']);
+    expect($actualProperty->heating)->toBe($expected['heating']);
+
+    // Supplies
+    expect($actualProperty->supplies->coffee)->toBe($expected['supplies']['coffee']);
+    expect($actualProperty->supplies->tea)->toBe($expected['supplies']['tea']);
+    expect($actualProperty->supplies->milk)->toBe($expected['supplies']['milk']);
+    expect($actualProperty->supplies->sugar)->toBe($expected['supplies']['sugar']);
+    expect($actualProperty->supplies->dishwasherTablets)->toBe($expected['supplies']['dishwasherTablets']);
+
+    // Services
+    expect($actualProperty->service->linen)->toBe($expected['service']['linen']);
+    expect($actualProperty->service->towels)->toBe($expected['service']['towels']);
+    expect($actualProperty->service->cleaning)->toBe($expected['service']['cleaning']);
+
+    // Financial information
+    expect($actualProperty->cleaning_costs)->toBe($expected['cleaning_costs']);
+    expect($actualProperty->deposit_costs)->toBe($expected['deposit_costs']);
+    expect($actualProperty->check_in)->toBe($expected['check_in']);
+    expect($actualProperty->check_out)->toBe($expected['check_out']);
+
+    // Tax information
+    expect($actualProperty->tax->vat)->toBe($expected['tax']['vat']);
+    expect($actualProperty->tax->other)->toBe($expected['tax']['other']);
+    expect($actualProperty->tax->otherType?->value)->toBe($expected['tax']['otherType']);
+
+    expect($actualProperty->prepayment)->toBe($expected['prepayment']);
+    expect($actualProperty->fee)->toBe($expected['fee']);
+
+    // Content information
+    expect($actualProperty->content->short)->toBe($expected['content']['short']);
+    expect($actualProperty->content->full)->toBe($expected['content']['full']);
+    expect($actualProperty->content->area)->toBe($expected['content']['area']);
+    expect($actualProperty->content->arrival)->toBe($expected['content']['arrival']);
+    expect($actualProperty->content->termsAndConditions)->toBe($expected['content']['termsAndConditions']);
+
+    // Images
+    expect(count($actualProperty->images))->toBe(count($expected['images']));
+    foreach ($actualProperty->images as $index => $image) {
+        expect($image->name)->toBe($expected['images'][$index]['name']);
+        expect($image->url)->toBe($expected['images'][$index]['url']);
+        expect($image->modified)->toBe($expected['images'][$index]['modified']);
+        expect($image->description)->toBe($expected['images'][$index]['description']);
+    }
+
+    // External timestamps
+    expect($actualProperty->external_created_at?->toISOString())->toBe($expected['external_created_at']);
+    expect($actualProperty->external_updated_at?->toISOString())->toBe($expected['external_updated_at']);
+}
+
 function assertPropertyDetailsMatchesExpected(PropertyDetails $actualProperty): void
 {
     $expected = TestData::getExpectedPropertyData();

@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
+use Psr\Log\NullLogger;
 use Shelfwood\PhpPms\BookingManager\BookingManagerAPI;
 use Shelfwood\PhpPms\BookingManager\Responses\PropertyResponse;
 use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\PropertyDetails;
-use Psr\Log\NullLogger;
-use GuzzleHttp\ClientInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
+use Shelfwood\PhpPms\Exceptions\ApiException;
+use Tests\Helpers\TestData;
 use Tests\Helpers\TestHelpers;
 
 // Import the Golden Master assertion functions
 use function Tests\Helpers\assertPropertyDetailsMatchesExpected;
+use function Tests\Helpers\assertPropertyDetails;
 
 describe('PropertyEndpointTest', function () {
     beforeEach(function () {
@@ -125,14 +128,34 @@ describe('PropertyEndpointTest', function () {
         expect($response->property->fee)->toBe(10.0);
     });
 
-    test('BookingManagerAPI::property throws ApiException on API error', function () {
-        $mockResponsePath = Tests\Helpers\TestHelpers::getMockFilePath('generic-error.xml');
-        $xml = file_get_contents($mockResponsePath);
+    test('it correctly maps various property responses', function (string $mockFile, array $expectedData) {
+        $xml = file_get_contents(TestHelpers::getMockFilePath($mockFile));
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockStream = $this->createMock(StreamInterface::class);
         $mockStream->method('getContents')->willReturn($xml);
         $mockResponse->method('getBody')->willReturn($mockStream);
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
-        $this->api->property(123);
-    })->throws(\Shelfwood\PhpPms\Exceptions\ApiException::class);
+
+        $response = $this->api->property($expectedData['external_id']);
+
+        expect($response)->toBeInstanceOf(PropertyResponse::class);
+        assertPropertyDetails($response->property, $expectedData);
+    })->with([
+        'rich property' => ['property-richest.xml', TestData::getExpectedRichestPropertyData()],
+        'inactive property' => ['property-inactive.xml', TestData::getExpectedInactivePropertyData()],
+        'minimal property' => ['property-minimal.xml', TestData::getExpectedMinimalPropertyData()],
+        'standard property by id' => ['property-by-id.xml', TestData::getExpectedPropertyData()],
+    ]);
+
+    test('BookingManagerAPI::property throws ApiException on API error', function () {
+        $xml = file_get_contents(TestHelpers::getMockFilePath('generic-error.xml'));
+        $mockResponse = $this->createMock(ResponseInterface::class);
+        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream->method('getContents')->willReturn($xml);
+        $mockResponse->method('getBody')->willReturn($mockStream);
+        $this->mockHttpClient->method('request')->willReturn($mockResponse);
+
+        expect(fn() => $this->api->property(12345))
+            ->toThrow(ApiException::class, 'Sample error');
+    });
 });

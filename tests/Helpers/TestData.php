@@ -475,4 +475,383 @@ yes',
             ]
         ];
     }
+
+    /**
+     * Golden Master data for property-richest.xml mock
+     */
+    public static function getExpectedRichestPropertyData(): array
+    {
+        return [
+            'external_id' => 22097,
+            'name' => 'Albert Cuyp III B studio Amsterdam',
+            'identifier' => '#622',
+            'status' => 'live',
+            'property_types' => ['leisure', 'business'],
+            'provider' => [
+                'id' => 93,
+                'code' => 'AMS',
+                'name' => 'Billy Blue Amsterdam'
+            ],
+            'location' => [
+                'latitude' => 52.3568,
+                'longitude' => 4.89784,
+                'address' => 'Albert Cuypstraat',
+                'zipcode' => '1073BR',
+                'city' => 'Amsterdam',
+                'country' => 'NL',
+                'cityLatitude' => 52.3731,
+                'cityLongitude' => 4.89235,
+                'area' => 'De Pijp'
+            ],
+            'max_persons' => 2,
+            'minimal_nights' => 3,
+            'maximal_nights' => 0,
+            'available_start' => '2014-07-02',
+            'available_end' => '2025-05-05',
+            'floor' => 3,
+            'stairs' => false,
+            'size' => 45.0,
+            'bedrooms' => 0,
+            'single_bed' => 2,
+            'double_bed' => 0,
+            'single_sofa' => 0,
+            'double_sofa' => 0,
+            'single_bunk' => 0,
+            'bathrooms' => 1,
+            'toilets' => 1,
+            'elevator' => false,
+            'view' => 'street',
+            'internet' => 'wifi',
+            'internet_connection' => 'highspeed',
+            'parking' => 'public',
+            'airco' => false,
+            'fans' => true,
+            'balcony' => false,
+            'patio' => false,
+            'garden' => false,
+            'roof_terrace' => false,
+            'tv' => 'flatscreen',
+            'tv_connection' => 'cable',
+            'dvd' => 'none',
+            'computer' => false,
+            'printer' => false,
+            'iron' => false,
+            'dishwasher' => false,
+            'oven' => false,
+            'microwave' => false,
+            'grill' => false,
+            'hob' => false,
+            'fridge' => true,
+            'freezer' => false,
+            'washingmachine' => true,
+            'dryer' => false,
+            'toaster' => true,
+            'kettle' => true,
+            'coffeemachine' => true,
+            'bathtub' => 0,
+            'jacuzzi' => 0,
+            'shower_regular' => 1,
+            'shower_steam' => 0,
+            'swimmingpool' => 'none',
+            'sauna' => 'none',
+            'hairdryer' => true,
+            'entresol' => false,
+            'wheelchair_friendly' => false,
+            'smoking_allowed' => false,
+            'pets_allowed' => false,
+            'heating' => true,
+            'supplies' => [
+                'coffee' => true,
+                'tea' => true,
+                'milk' => true,
+                'sugar' => true,
+                'dishwasherTablets' => false
+            ],
+            'service' => [
+                'linen' => true,
+                'towels' => true,
+                'cleaning' => false
+            ],
+            'cleaning_costs' => 45.0,
+            'deposit_costs' => 100.0,
+            'check_in' => '14:00',
+            'check_out' => '11:00',
+            'tax' => [
+                'vat' => 9.0,
+                'other' => 12.5,
+                'otherType' => 'relative'
+            ],
+            'prepayment' => 12.1,
+            'fee' => 10.0,
+            'content' => [
+                'short' => 'An intimite and cosy studio in Amsterdam, for two people, just a short journey from the centre and the Heineken brewery.',
+                'full' => '<p><strong>An intimite and cosy studio in Amsterdam, for two people, just a short journey from the centre and the Heineken brewery. </strong></p>',
+                'area' => '<p>The location of this apartment is premium, with easy access to the Museumplein, with the van Gogh Museum and the Rijksmuseum.</p>',
+                'arrival' => '<p>Dear guest,<br />Thank you for booking your Amsterdam apartment with us!</p>',
+                'termsAndConditions' => '<p class="MsoNoSpacing"><strong><span style="text-decoration-line: underline;">Cancellation policy</span></strong></p>'
+            ],
+            'images' => [
+                [
+                    'name' => 'photos 00.jpg',
+                    'url' => 'http://control.bookingmanager.com/data/property/real/22097_photos%2000.jpg',
+                    'modified' => '2017-11-27 08:03:40',
+                    'description' => 'Sitting Area Albert Cuyp III B studio Amsterdam'
+                ],
+                [
+                    'name' => 'photos 01.jpg',
+                    'url' => 'http://control.bookingmanager.com/data/property/real/22097_photos%2001.jpg',
+                    'modified' => '2018-07-06 10:16:19',
+                    'description' => 'Dining Area and kitchen Albert Cuyp III B studio Amsterdam'
+                ],
+                [
+                    'name' => 'photos 002.jpg',
+                    'url' => 'http://control.bookingmanager.com/data/property/real/22097_photos%20002.jpg',
+                    'modified' => '2018-07-24 13:19:20',
+                    'description' => 'Coffee machine and kettle Albert Cuyp III B studio Amsterdam'
+                ]
+            ],
+            'external_created_at' => '2014-06-19T08:07:09.000000Z',
+            'external_updated_at' => '2024-08-29T14:23:21.000000Z'
+        ];
+    }
+
+    /**
+     * Golden Master data for property-inactive.xml mock
+     */
+    public static function getExpectedInactivePropertyData(): array
+    {
+        return [
+            'external_id' => 6861,
+            'name' => 'Plantage Park suite Amsterdam',
+            'identifier' => 'BBA0318',
+            'status' => 'inactive',
+            'property_types' => [],
+            'provider' => [
+                'id' => 0,
+                'code' => '',
+                'name' => ''
+            ],
+            'location' => [
+                'latitude' => null,
+                'longitude' => null,
+                'address' => '',
+                'zipcode' => '',
+                'city' => '',
+                'country' => '',
+                'cityLatitude' => null,
+                'cityLongitude' => null,
+                'area' => ''
+            ],
+            'max_persons' => 0,
+            'minimal_nights' => 0,
+            'maximal_nights' => 0,
+            'available_start' => null,
+            'available_end' => null,
+            'floor' => 0,
+            'stairs' => false,
+            'size' => null,
+            'bedrooms' => 0,
+            'single_bed' => 0,
+            'double_bed' => 0,
+            'single_sofa' => 0,
+            'double_sofa' => 0,
+            'single_bunk' => 0,
+            'bathrooms' => 0,
+            'toilets' => 0,
+            'elevator' => false,
+            'view' => null,
+            'internet' => null,
+            'internet_connection' => null,
+            'parking' => null,
+            'airco' => false,
+            'fans' => false,
+            'balcony' => false,
+            'patio' => false,
+            'garden' => false,
+            'roof_terrace' => false,
+            'tv' => null,
+            'tv_connection' => null,
+            'dvd' => null,
+            'computer' => false,
+            'printer' => false,
+            'iron' => false,
+            'dishwasher' => false,
+            'oven' => false,
+            'microwave' => false,
+            'grill' => false,
+            'hob' => false,
+            'fridge' => false,
+            'freezer' => false,
+            'washingmachine' => false,
+            'dryer' => false,
+            'toaster' => false,
+            'kettle' => false,
+            'coffeemachine' => false,
+            'bathtub' => 0,
+            'jacuzzi' => 0,
+            'shower_regular' => 0,
+            'shower_steam' => 0,
+            'swimmingpool' => null,
+            'sauna' => null,
+            'hairdryer' => false,
+            'entresol' => false,
+            'wheelchair_friendly' => false,
+            'smoking_allowed' => false,
+            'pets_allowed' => false,
+            'heating' => false,
+            'supplies' => [
+                'coffee' => false,
+                'tea' => false,
+                'milk' => false,
+                'sugar' => false,
+                'dishwasherTablets' => false
+            ],
+            'service' => [
+                'linen' => false,
+                'towels' => false,
+                'cleaning' => false
+            ],
+            'cleaning_costs' => 0.0,
+            'deposit_costs' => 0.0,
+            'check_in' => null,
+            'check_out' => null,
+            'tax' => [
+                'vat' => 0.0,
+                'other' => 0.0,
+                'otherType' => null
+            ],
+            'prepayment' => null,
+            'fee' => null,
+            'content' => [
+                'short' => '',
+                'full' => '',
+                'area' => '',
+                'arrival' => '',
+                'termsAndConditions' => ''
+            ],
+            'images' => [],
+            'external_created_at' => null,
+            'external_updated_at' => null
+        ];
+    }
+
+    /**
+     * Golden Master data for property-minimal.xml mock
+     */
+    public static function getExpectedMinimalPropertyData(): array
+    {
+        return [
+            'external_id' => 6743,
+            'name' => 'Historical Heart apartment Amsterdam',
+            'identifier' => 'BBA0052',
+            'status' => 'live',
+            'property_types' => [],
+            'provider' => [
+                'id' => 0,
+                'code' => '',
+                'name' => ''
+            ],
+            'location' => [
+                'latitude' => null,
+                'longitude' => null,
+                'address' => '',
+                'zipcode' => '',
+                'city' => '',
+                'country' => '',
+                'cityLatitude' => null,
+                'cityLongitude' => null,
+                'area' => ''
+            ],
+            'max_persons' => 0,
+            'minimal_nights' => 0,
+            'maximal_nights' => 0,
+            'available_start' => null,
+            'available_end' => null,
+            'floor' => 0,
+            'stairs' => false,
+            'size' => null,
+            'bedrooms' => 0,
+            'single_bed' => 0,
+            'double_bed' => 0,
+            'single_sofa' => 0,
+            'double_sofa' => 0,
+            'single_bunk' => 0,
+            'bathrooms' => 0,
+            'toilets' => 0,
+            'elevator' => false,
+            'view' => null,
+            'internet' => null,
+            'internet_connection' => null,
+            'parking' => null,
+            'airco' => false,
+            'fans' => false,
+            'balcony' => false,
+            'patio' => false,
+            'garden' => false,
+            'roof_terrace' => false,
+            'tv' => null,
+            'tv_connection' => null,
+            'dvd' => null,
+            'computer' => false,
+            'printer' => false,
+            'iron' => false,
+            'dishwasher' => false,
+            'oven' => false,
+            'microwave' => false,
+            'grill' => false,
+            'hob' => false,
+            'fridge' => false,
+            'freezer' => false,
+            'washingmachine' => false,
+            'dryer' => false,
+            'toaster' => false,
+            'kettle' => false,
+            'coffeemachine' => false,
+            'bathtub' => 0,
+            'jacuzzi' => 0,
+            'shower_regular' => 0,
+            'shower_steam' => 0,
+            'swimmingpool' => null,
+            'sauna' => null,
+            'hairdryer' => false,
+            'entresol' => false,
+            'wheelchair_friendly' => false,
+            'smoking_allowed' => false,
+            'pets_allowed' => false,
+            'heating' => false,
+            'supplies' => [
+                'coffee' => false,
+                'tea' => false,
+                'milk' => false,
+                'sugar' => false,
+                'dishwasherTablets' => false
+            ],
+            'service' => [
+                'linen' => false,
+                'towels' => false,
+                'cleaning' => false
+            ],
+            'cleaning_costs' => 0.0,
+            'deposit_costs' => 0.0,
+            'check_in' => null,
+            'check_out' => null,
+            'tax' => [
+                'vat' => 0.0,
+                'other' => 0.0,
+                'otherType' => null
+            ],
+            'prepayment' => null,
+            'fee' => null,
+            'content' => [
+                'short' => '',
+                'full' => '',
+                'area' => '',
+                'arrival' => '',
+                'termsAndConditions' => ''
+            ],
+            'images' => [],
+            'external_created_at' => null,
+            'external_updated_at' => null
+        ];
+    }
 }
