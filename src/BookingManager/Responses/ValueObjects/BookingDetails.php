@@ -54,6 +54,12 @@ class BookingDetails
             // Helper functions for safe data extraction
             $getString = function($key, $default = null) use ($bookingData) {
                 $value = $bookingData[$key] ?? $default;
+
+                // Handle new XML parser structure where elements with attributes become arrays
+                if (is_array($value) && isset($value['#text'])) {
+                    $value = $value['#text'];
+                }
+
                 if (is_array($value) && empty($value)) {
                     return $default;
                 }
@@ -110,7 +116,7 @@ class BookingDetails
                 notes: $getString('notes'),
                 property_id: (int) ($propertyAttributes['id'] ?? 0),
                 property_identifier: $propertyAttributes['identifier'] ?? null,
-                property_name: is_string($propertyData) ? $propertyData : (string) ($propertyData['name'] ?? $propertyData ?? ''),
+                property_name: $getString('property', ''),
                 status: BookingStatus::tryFrom($getString('status', 'pending')) ?? BookingStatus::PENDING,
                 rate: BookingRate::fromXml($bookingData['rate'] ?? []),
                 created: $getDate('created') ?? Carbon::now(),

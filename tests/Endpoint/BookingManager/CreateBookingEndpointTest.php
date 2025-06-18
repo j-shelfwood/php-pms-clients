@@ -11,6 +11,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Shelfwood\PhpPms\BookingManager\Enums\BookingStatus;
 
+// Import the Golden Master assertion function
+use function Tests\Helpers\assertBookingDetailsMatchesExpected;
+
 
 describe('CreateBookingEndpointTest', function () {
     beforeEach(function () {
@@ -23,7 +26,7 @@ describe('CreateBookingEndpointTest', function () {
         );
     });
 
-    test('BookingManagerAPI::createBooking returns CreateBookingResponse with correct id and departure', function () {
+    test('Golden Master: createBooking correctly maps all fields from rich response', function () {
         $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/create-booking.xml');
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockStream = $this->createMock(StreamInterface::class);
@@ -47,10 +50,9 @@ describe('CreateBookingEndpointTest', function () {
         $response = $this->api->createBooking($payload);
 
         expect($response)->toBeInstanceOf(CreateBookingResponse::class);
-        expect($response->booking->id)->toBe(171830);
-        expect($response->booking->status)->toBeInstanceOf(BookingStatus::class);
-        expect($response->booking->status->value)->toBe('open');
-        expect($response->booking->departure->format('Y-m-d'))->toBe('2024-02-12');
+
+        // Golden Master validation - validates ALL fields
+        assertBookingDetailsMatchesExpected($response->booking);
     });
 
     });

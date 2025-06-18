@@ -4,9 +4,11 @@ namespace Tests\Helpers;
 
 use Carbon\Carbon;
 use Shelfwood\PhpPms\BookingManager\Responses\CalendarResponse;
+use Shelfwood\PhpPms\BookingManager\Responses\CalendarChangesResponse;
 use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarDayInfo;
 use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarRate;
 use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarTax;
+use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarChange;
 use Shelfwood\PhpPms\BookingManager\Enums\SeasonType;
 
 function assertCalendarResponseMatchesExpected(CalendarResponse $actualCalendar): void
@@ -71,4 +73,22 @@ function assertCalendarTaxMatchesExpected(CalendarTax $actualTax, array $expecte
     expect($actualTax->vat)->toBe($expectedTax['vat']);
     expect($actualTax->vatValue)->toBe($expectedTax['vatValue']);
     expect($actualTax->final)->toBe($expectedTax['final']);
+}
+
+function assertCalendarChangesResponseMatchesExpected(CalendarChangesResponse $actualResponse): void
+{
+    $expected = TestData::getExpectedCalendarChangesData();
+
+    expect($actualResponse->amount)->toBe($expected['amount']);
+    expect($actualResponse->time)->toBeInstanceOf(Carbon::class);
+    expect($actualResponse->time->toISOString())->toBe($expected['time']);
+    expect($actualResponse->changes)->toBeArray();
+    expect($actualResponse->changes)->toHaveCount(count($expected['changes']));
+
+    foreach ($expected['changes'] as $index => $expectedChange) {
+        $actualChange = $actualResponse->changes[$index];
+        expect($actualChange)->toBeInstanceOf(CalendarChange::class);
+        expect($actualChange->propertyId)->toBe($expectedChange['propertyId']);
+        expect($actualChange->months)->toBe($expectedChange['months']);
+    }
 }

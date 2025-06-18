@@ -120,6 +120,12 @@ class PropertyDetails
 
             $getString = function($key, $default = null) use ($propertyData) {
                 $value = $propertyData[$key] ?? $default;
+
+                // Handle new XML parser structure where elements with attributes become arrays
+                if (is_array($value) && isset($value['#text'])) {
+                    $value = $value['#text'];
+                }
+
                 if (is_array($value) && empty($value)) {
                     return $default;
                 }
@@ -136,6 +142,12 @@ class PropertyDetails
 
             $getFloat = function($key, $default = 0.0) use ($propertyData) {
                 $value = $propertyData[$key] ?? $default;
+
+                // Handle new XML parser structure where elements with attributes become arrays
+                if (is_array($value) && isset($value['#text'])) {
+                    $value = $value['#text'];
+                }
+
                 return is_numeric($value) ? (float) $value : $default;
             };
 

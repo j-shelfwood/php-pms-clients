@@ -217,3 +217,41 @@ function assertPropertyImagesMatchExpected(array $images, array $expectedImages)
         expect($actualImage->description)->toBe($expectedImage['description']);
     }
 }
+
+function assertPropertiesResponseMatchesExpected(\Shelfwood\PhpPms\BookingManager\Responses\PropertiesResponse $actualResponse): void
+{
+    $expected = TestData::getExpectedPropertiesData();
+
+    expect($actualResponse->properties)->toBeArray();
+    expect($actualResponse->properties)->toHaveCount($expected['totalProperties']);
+
+    // Find the detailed property (6794) and validate it comprehensively
+    $detailedProperty = null;
+    foreach ($actualResponse->properties as $property) {
+        if ($property->external_id === $expected['detailedProperty']['external_id']) {
+            $detailedProperty = $property;
+            break;
+        }
+    }
+
+    expect($detailedProperty)->not()->toBeNull();
+
+    // Comprehensive validation of the detailed property
+    $expectedDetailed = $expected['detailedProperty'];
+    expect($detailedProperty->external_id)->toBe($expectedDetailed['external_id']);
+    expect($detailedProperty->name)->toBe($expectedDetailed['name']);
+    expect($detailedProperty->identifier)->toBe($expectedDetailed['identifier']);
+    expect($detailedProperty->status->value)->toBe($expectedDetailed['status']);
+    expect($detailedProperty->property_types)->toBe($expectedDetailed['property_types']);
+    expect($detailedProperty->max_persons)->toBe($expectedDetailed['max_persons']);
+    expect($detailedProperty->minimal_nights)->toBe($expectedDetailed['minimal_nights']);
+    expect($detailedProperty->view->value)->toBe($expectedDetailed['view']);
+    expect($detailedProperty->internet->value)->toBe($expectedDetailed['internet']);
+    expect($detailedProperty->internet_connection->value)->toBe($expectedDetailed['internet_connection']);
+    expect($detailedProperty->parking->value)->toBe($expectedDetailed['parking']);
+    expect($detailedProperty->swimmingpool->value)->toBe($expectedDetailed['swimmingpool']);
+    expect($detailedProperty->sauna->value)->toBe($expectedDetailed['sauna']);
+    expect($detailedProperty->tax->vat)->toBe($expectedDetailed['tax']['vat']);
+    expect($detailedProperty->tax->other)->toBe($expectedDetailed['tax']['other']);
+    expect($detailedProperty->tax->otherType->value)->toBe($expectedDetailed['tax']['otherType']);
+}

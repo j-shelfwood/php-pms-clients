@@ -21,14 +21,7 @@ class XMLParser
                 throw new XmlParsingException('Cannot parse empty XML string.');
             }
             $element = new SimpleXMLElement($xml, LIBXML_NOCDATA | LIBXML_NOERROR | LIBXML_NOWARNING);
-            $json = json_encode($element);
-            if ($json === false) {
-                throw new XmlParsingException('Failed to encode XML to JSON. Error: ' . json_last_error_msg());
-            }
-            $array = json_decode($json, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new XmlParsingException('Failed to decode JSON to array: ' . json_last_error_msg());
-            }
+            $array = self::xmlToArray($element);
             return $array;
         } catch (Exception $e) {
             if ($e instanceof XmlParsingException) {
@@ -36,6 +29,70 @@ class XMLParser
             }
             throw new XmlParsingException("Error parsing XML: " . $e->getMessage(), 0, $e);
         }
+    }
+
+    /**
+     * Converts SimpleXMLElement to array while preserving attributes even when elements have text content.
+     *
+     * @return array|string
+     */
+    private static function xmlToArray(SimpleXMLElement $element)
+    {
+        $result = [];
+
+        // Handle attributes
+        $attributes = [];
+        foreach ($element->attributes() as $key => $value) {
+            $attributes[$key] = (string) $value;
+        }
+
+        // Handle children
+        $children = [];
+        foreach ($element->children() as $key => $child) {
+            $childArray = self::xmlToArray($child);
+            if (isset($children[$key])) {
+                // Multiple children with same tag name - convert to indexed array
+                if (!is_array($children[$key]) || !isset($children[$key][0])) {
+                    $children[$key] = [$children[$key]];
+                }
+                $children[$key][] = $childArray;
+            } else {
+                $children[$key] = $childArray;
+            }
+        }
+
+        // Get text content
+        $text = trim((string) $element);
+
+        // Build result array
+        if (!empty($attributes)) {
+            $result['@attributes'] = $attributes;
+        }
+
+        if (!empty($children)) {
+            $result = array_merge($result, $children);
+        }
+
+        if (!empty($text) && empty($children)) {
+            // Element has only text content and possibly attributes
+            if (!empty($attributes)) {
+                $result['#text'] = $text;
+            } else {
+                // Element has only text content, return as string
+                return $text;
+            }
+        } elseif (!empty($text) && !empty($children)) {
+            // Element has both text and children - add text as #text
+            $result['#text'] = $text;
+        } elseif (empty($text) && empty($children) && !empty($attributes)) {
+            // Element has only attributes, no text or children
+            // Result already has @attributes set above
+        } elseif (empty($text) && empty($children) && empty($attributes)) {
+            // Empty element
+            return '';
+        }
+
+        return $result;
     }
 
     /**

@@ -8,6 +8,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Tests\Helpers\TestHelpers;
 
+// Import the Golden Master assertion function
+use function Tests\Helpers\assertPendingBookingsResponseMatchesExpected;
+
 describe('PendingBookingsTest', function () {
     beforeEach(function () {
         $this->mockHttpClient = $this->createMock(ClientInterface::class);
@@ -19,7 +22,7 @@ describe('PendingBookingsTest', function () {
         );
     });
 
-    test('returns pending bookings for a given booking id', function () {
+    test('Golden Master: pendingBookings correctly maps all fields from rich response', function () {
         $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/pending-bookings.xml');
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockStream = $this->createMock(StreamInterface::class);
@@ -28,8 +31,10 @@ describe('PendingBookingsTest', function () {
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
 
         $response = $this->api->pendingBookings(16);
+
         expect($response)->not()->toBeNull();
-        expect($response->pendingBookings)->toBeArray();
-        expect($response->pendingBookings[0]->bookingId)->toBe(16);
+
+        // Golden Master validation - validates ALL fields
+        assertPendingBookingsResponseMatchesExpected($response);
     });
 });

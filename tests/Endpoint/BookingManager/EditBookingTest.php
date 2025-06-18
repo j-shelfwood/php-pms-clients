@@ -1,6 +1,5 @@
 <?php
 
-
 use Shelfwood\PhpPms\BookingManager\Payloads\EditBookingPayload;
 use Shelfwood\PhpPms\BookingManager\BookingManagerAPI;
 use GuzzleHttp\ClientInterface;
@@ -8,6 +7,9 @@ use Psr\Log\NullLogger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Tests\Helpers\TestHelpers;
+
+// Import the Golden Master assertion function
+use function Tests\Helpers\assertEditBookingDetailsMatchesExpected;
 
 describe('EditBookingTest', function () {
     beforeEach(function () {
@@ -20,7 +22,7 @@ describe('EditBookingTest', function () {
         );
     });
 
-    test('edits a booking and returns updated booking data', function () {
+    test('Golden Master: editBooking correctly maps all fields from rich response', function () {
         $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/edit-booking.xml');
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockStream = $this->createMock(StreamInterface::class);
@@ -33,8 +35,10 @@ describe('EditBookingTest', function () {
             amount_childs: 1
         );
         $response = $this->api->editBooking($payload);
+
         expect($response)->not()->toBeNull();
-        expect($response->booking->id)->toBe(16);
-        expect($response->booking->amount_children)->toBe(1);
+
+        // Golden Master validation - validates ALL fields
+        assertEditBookingDetailsMatchesExpected($response->booking);
     });
 });

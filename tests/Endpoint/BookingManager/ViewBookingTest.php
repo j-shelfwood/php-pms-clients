@@ -7,6 +7,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Tests\Helpers\TestHelpers;
 
+// Import the Golden Master assertion function
+use function Tests\Helpers\assertViewBookingDetailsMatchesExpected;
+
 describe('ViewBookingTest', function () {
     beforeEach(function () {
         $this->mockHttpClient = $this->createMock(ClientInterface::class);
@@ -18,7 +21,7 @@ describe('ViewBookingTest', function () {
         );
     });
 
-    test('views a booking and returns booking data', function () {
+    test('Golden Master: viewBooking correctly maps all fields from rich response', function () {
         $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/view-booking.xml');
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockStream = $this->createMock(StreamInterface::class);
@@ -27,9 +30,10 @@ describe('ViewBookingTest', function () {
         $this->mockHttpClient->method('request')->willReturn($mockResponse);
 
         $response = $this->api->viewBooking(16);
+
         expect($response)->not()->toBeNull();
-        expect($response->booking->id)->toBe(16);
-        expect($response->booking->first_name)->toBeString();
-        expect($response->booking->last_name)->toBeString();
+
+        // Golden Master validation - validates ALL fields
+        assertViewBookingDetailsMatchesExpected($response->booking);
     });
 });

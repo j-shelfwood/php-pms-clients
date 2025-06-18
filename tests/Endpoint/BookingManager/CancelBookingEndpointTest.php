@@ -10,6 +10,9 @@ use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
+// Import the Golden Master assertion function
+use function Tests\Helpers\assertCancelBookingDetailsMatchesExpected;
+
 
 describe('CancelBookingEndpointTest', function () {
     beforeEach(function () {
@@ -22,7 +25,7 @@ describe('CancelBookingEndpointTest', function () {
         );
     });
 
-    test('BookingManagerAPI::cancelBooking returns CancelBookingResponse with correct status on failure from mock', function () {
+    test('Golden Master: cancelBooking correctly maps all fields from rich response', function () {
         $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/cancel-booking.xml');
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockStream = $this->createMock(StreamInterface::class);
@@ -33,8 +36,9 @@ describe('CancelBookingEndpointTest', function () {
         $response = $this->api->cancelBooking(171838, 'reason');
 
         expect($response)->toBeInstanceOf(CancelBookingResponse::class);
-        expect($response->booking->status)->toBe(BookingStatus::FAILED);
-        // Message would be available from the booking details or error response
+
+        // Golden Master validation - validates ALL fields
+        assertCancelBookingDetailsMatchesExpected($response->booking);
     });
 
     test('BookingManagerAPI::cancelBooking returns CancelBookingResponse with CANCELLED status on successful cancellation', function () {

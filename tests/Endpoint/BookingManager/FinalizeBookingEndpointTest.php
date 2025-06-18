@@ -10,6 +10,9 @@ use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
+// Import the Golden Master assertion function
+use function Tests\Helpers\assertBookingDetailsMatchesExpected;
+
 
 describe('FinalizeBookingEndpointTest', function () {
     beforeEach(function () {
@@ -22,7 +25,7 @@ describe('FinalizeBookingEndpointTest', function () {
         );
     });
 
-    test('finalizeBooking returns FinalizeBookingResponse with OPEN status for open booking mock', function () {
+    test('Golden Master: finalizeBooking correctly maps all fields from rich response', function () {
         $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/create-booking.xml');
         $mockResponse = $this->createMock(ResponseInterface::class);
         $mockStream = $this->createMock(StreamInterface::class);
@@ -33,9 +36,9 @@ describe('FinalizeBookingEndpointTest', function () {
         $response = $this->api->finalizeBooking(171830);
 
         expect($response)->toBeInstanceOf(FinalizeBookingResponse::class);
-        expect($response->booking->id)->toBe(171830);
-        expect($response->booking->identifier)->toBe('BILL-171830-148-AMS-21663-2024-02-08');
-        expect($response->booking->status)->toBe(BookingStatus::OPEN);
+
+        // Golden Master validation - validates ALL fields
+        assertBookingDetailsMatchesExpected($response->booking);
     });
 
     test('finalizeBooking returns FinalizeBookingResponse with SUCCESS status for implicit success mock with message', function () {

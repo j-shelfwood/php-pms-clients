@@ -13,6 +13,9 @@ use Psr\Http\Message\StreamInterface;
 use Carbon\Carbon;
 use Tests\Helpers\TestHelpers;
 
+// Import the Golden Master assertion function
+use function Tests\Helpers\assertCalendarResponseMatchesExpected;
+
 
 describe('CalendarEndpointTest', function () {
     beforeEach(function () {
@@ -25,7 +28,7 @@ describe('CalendarEndpointTest', function () {
         );
     });
 
-    test('BookingManagerAPI::calendar uses calendar.xml and correctly maps calendar data with rates', function () {
+    test('Golden Master: calendar correctly maps all fields from rich response', function () {
         // Use the calendar-date-range.xml mock which contains rate information
         $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/calendar-date-range.xml');
 
@@ -41,23 +44,10 @@ describe('CalendarEndpointTest', function () {
         // Call the calendar method
         $response = $this->api->calendar(22958, $startDate, $endDate);
 
-        // Assertions
         expect($response)->toBeInstanceOf(CalendarResponse::class);
-        expect($response->propertyId)->toBe(22958);
-        expect($response->days)->toBeArray();
-        expect($response->days)->not()->toBeEmpty();
 
-        // Check that we have calendar data with rate information
-        expect($response->days)->toHaveCount(7);
-
-        $firstDay = $response->days[0];
-        expect($firstDay)->toBeInstanceOf(CalendarDayInfo::class);
-        expect($firstDay->available)->toBe(0); // From mock data
-        expect($firstDay->day->toDateString())->toBe('2023-11-01');
-        expect($firstDay->rate->final)->toBe(179.92); // Rate data from calendar.xml
-        expect($firstDay->rate->currency)->toBe('EUR');
-        expect($firstDay->rate->total)->toBe(173.0);
-        expect($firstDay->season)->toBe(SeasonType::HIGH);
+        // Golden Master validation - validates ALL fields
+        assertCalendarResponseMatchesExpected($response);
     });
 
     test('BookingManagerAPI::availability uses availability.xml and correctly maps availability data', function () {
