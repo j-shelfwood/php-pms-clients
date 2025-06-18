@@ -77,28 +77,14 @@ class BookingManagerAPI extends XMLClient
         $url = $this->getEndpointUrl($endpoint);
         $formData = $apiParams; // No 'request' parameter needed for XML endpoints
 
-        echo "=== DEBUG: API Call ===" . PHP_EOL;
-        echo "URL: {$url}" . PHP_EOL;
-        echo "Form data: " . json_encode($formData, JSON_PRETTY_PRINT) . PHP_EOL;
-
         try {
             $xmlBody = $this->executePostRequest($url, $formData);
-
-            echo "Raw XML Response:" . PHP_EOL;
-            echo substr($xmlBody, 0, 1000) . (strlen($xmlBody) > 1000 ? '...[truncated]' : '') . PHP_EOL;
-
             $parsedData = XMLParser::parse($xmlBody);
 
             if (XMLParser::hasError($parsedData)) {
                 $errorDetails = XMLParser::extractErrorDetails($parsedData);
-                echo "API Error detected:" . PHP_EOL;
-                echo "- Message: " . $errorDetails->message . PHP_EOL;
-                echo "- Code: " . ($errorDetails->code ?? 'none') . PHP_EOL;
                 throw new ApiException($errorDetails->message, $errorDetails->code ?? 0, null, $errorDetails);
             }
-
-            echo "Parsed data keys: " . implode(', ', array_keys($parsedData)) . PHP_EOL;
-            echo "======================" . PHP_EOL;
 
             return $parsedData;
         } catch (NetworkException | XmlParsingException | ApiException $e) {
@@ -206,17 +192,6 @@ class BookingManagerAPI extends XMLClient
                     1 // Default to 1 adult for availability check
                 );
 
-                // DEBUG: Dump the raw rate response to see what properties are available
-                echo "=== DEBUG: Rate Response for {$current->toDateString()} ===" . PHP_EOL;
-                echo "Available: " . ($rateResponse->available ? 'true' : 'false') . PHP_EOL;
-                echo "Final before taxes: " . ($rateResponse->final_before_taxes ?? 'null') . PHP_EOL;
-                echo "Final after taxes: " . ($rateResponse->final_after_taxes ?? 'null') . PHP_EOL;
-                echo "Tax total: " . ($rateResponse->tax_total ?? 'null') . PHP_EOL;
-                echo "Minimal nights: " . ($rateResponse->minimalNights ?? 'null') . PHP_EOL;
-                echo "Max persons: " . ($rateResponse->maxPersons ?? 'null') . PHP_EOL;
-                echo "Raw response object: " . json_encode($rateResponse, JSON_PRETTY_PRINT) . PHP_EOL;
-                echo "========================================" . PHP_EOL;
-
                 $days[] = new \Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarDayInfo(
                     day: $current->copy(),
                     season: null, // info.xml does not provide season information
@@ -318,35 +293,13 @@ class BookingManagerAPI extends XMLClient
             'guests' => $numAdults + ($numChildren ?? 0) + ($numBabies ?? 0),
         ];
 
-        echo "=== DEBUG: rateForStay API Call ===" . PHP_EOL;
-        echo "Property ID: {$propertyId}" . PHP_EOL;
-        echo "Date: {$arrivalDate->format('Y-m-d')} to {$departureDate->format('Y-m-d')}" . PHP_EOL;
-        echo "Guests: " . ($numAdults + ($numChildren ?? 0) + ($numBabies ?? 0)) . PHP_EOL;
-
         $parsedData = $this->performApiCall('info', $apiParams);
 
-        echo "Raw parsed XML data:" . PHP_EOL;
-        echo json_encode($parsedData, JSON_PRETTY_PRINT) . PHP_EOL;
-
         if (!$parsedData || !isset($parsedData['rate'])) {
-            echo "ERROR: Missing rate key in response!" . PHP_EOL;
-            echo "Available keys: " . implode(', ', array_keys($parsedData ?? [])) . PHP_EOL;
             throw new MappingException('Invalid response structure for rate for stay: missing "rate" key.');
         }
 
-        echo "Rate data from XML:" . PHP_EOL;
-        echo json_encode($parsedData['rate'], JSON_PRETTY_PRINT) . PHP_EOL;
-
-        $rateResponse = RateResponse::map($parsedData['rate']);
-
-        echo "Mapped RateResponse object:" . PHP_EOL;
-        echo "- available: " . ($rateResponse->available ? 'true' : 'false') . PHP_EOL;
-        echo "- final_before_taxes: " . ($rateResponse->final_before_taxes ?? 'null') . PHP_EOL;
-        echo "- final_after_taxes: " . ($rateResponse->final_after_taxes ?? 'null') . PHP_EOL;
-        echo "- tax_total: " . ($rateResponse->tax_total ?? 'null') . PHP_EOL;
-        echo "=================================" . PHP_EOL;
-
-        return $rateResponse;
+        return RateResponse::map($parsedData['rate']);
     }
 
     public function createBooking(CreateBookingPayload $payload): CreateBookingResponse
