@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties count="1">
+    <property id="22097" name="Albert Cuyp III B studio Amsterdam" identifier="#622" status="live"
+        type="apartment">
+        <provider id="93" code="AMS" name="Billy Blue Amsterdam" />
+        <location>
+            <gps>52.3568,4.89784</gps>
+            <address>Albert Cuypstraat</address>
+            <zipcode>1073BR</zipcode>
+            <city country="NL" gps="52.3731,4.89235">Amsterdam</city>
+            <area>De Pijp</area>
+        </location>
+        <type>leisure,business</type>
+        <max_persons>2</max_persons>
+        <minimal_nights>3</minimal_nights>
+        <maximal_nights>0</maximal_nights>
+        <available_start>2014-07-02</available_start>
+        <available_end>2025-05-05</available_end>
+        <floor>3</floor>
+        <stairs>0</stairs>
+        <size>45</size>
+        <bedrooms>0</bedrooms>
+        <single_bed>2</single_bed>
+        <double_bed>0</double_bed>
+        <single_sofa>0</single_sofa>
+        <double_sofa>0</double_sofa>
+        <single_bunk>0</single_bunk>
+        <bathrooms>1</bathrooms>
+        <toilets>1</toilets>
+        <elevator>0</elevator>
+        <view>street</view>
+        <internet>wifi</internet>
+        <internet_connection>highspeed</internet_connection>
+        <parking>public</parking>
+        <airco>0</airco>
+        <fans>1</fans>
+        <balcony>0</balcony>
+        <patio>0</patio>
+        <garden>0</garden>
+        <roof_terrace>0</roof_terrace>
+        <tv>flatscreen</tv>
+        <tv_connection>cable</tv_connection>
+        <dvd>none</dvd>
+        <computer>0</computer>
+        <printer>0</printer>
+        <iron>0</iron>
+        <dishwasher>0</dishwasher>
+        <oven>0</oven>
+        <microwave>0</microwave>
+        <grill>0</grill>
+        <hob>0</hob>
+        <fridge>1</fridge>
+        <freezer>0</freezer>
+        <washingmachine>1</washingmachine>
+        <dryer>0</dryer>
+        <toaster>1</toaster>
+        <kettle>1</kettle>
+        <coffeemachine>1</coffeemachine>
+        <bathtub>0</bathtub>
+        <jacuzzi>0</jacuzzi>
+        <shower_regular>1</shower_regular>
+        <shower_steam>0</shower_steam>
+        <swimmingpool>none</swimmingpool>
+        <sauna>none</sauna>
+        <hairdryer>1</hairdryer>
+        <entresol>0</entresol>
+        <wheelchair_friendly>0</wheelchair_friendly>
+        <smoking_allowed>0</smoking_allowed>
+        <pets_allowed>0</pets_allowed>
+        <heating>1</heating>
+        <supplies>
+            <coffee>1</coffee>
+            <tea>1</tea>
+            <milk>1</milk>
+            <sugar>1</sugar>
+            <dishwasher_tablets>0</dishwasher_tablets>
+        </supplies>
+        <service>
+            <linen>1</linen>
+            <towels>1</towels>
+        </service>
+        <cleaning_costs>45</cleaning_costs>
+        <deposit_costs>100</deposit_costs>
+        <check_in>14:00</check_in>
+        <check_out>11:00</check_out>
+        <tax>
+            <vat>9</vat>
+            <other type="relative">12.5</other>
+        </tax>
+        <prepayment>12.1</prepayment>
+        <fee>10</fee>
+        <content>
+            <short locale="en_gb"><![CDATA[An intimite and cosy studio in Amsterdam, for two people, just a short journey from the centre and the Heineken brewery.]]></short>
+            <full locale="en_gb"><![CDATA[<p><strong>An intimite and cosy studio in Amsterdam, for two people, just a short journey from the centre and the Heineken brewery. </strong></p>]]></full>
+            <area locale="en_gb"><![CDATA[<p>The location of this apartment is premium, with easy access to the Museumplein, with the van Gogh Museum and the Rijksmuseum.</p>]]></area>
+            <arrival><![CDATA[<p>Dear guest,<br />Thank you for booking your Amsterdam apartment with us!</p>]]></arrival>
+            <tac><![CDATA[<p class="MsoNoSpacing"><strong><span style="text-decoration-line: underline;">Cancellation policy</span></strong></p>]]></tac>
+        </content>
+        <images>
+            <image name="photos 00.jpg"
+                url="http://control.bookingmanager.com/data/property/real/22097_photos%2000.jpg"
+                modified="2017-11-27 08:03:40"><![CDATA[Sitting Area Albert Cuyp III B studio Amsterdam]]></image>
+            <image name="photos 01.jpg"
+                url="http://control.bookingmanager.com/data/property/real/22097_photos%2001.jpg"
+                modified="2018-07-06 10:16:19"><![CDATA[Dining Area and kitchen Albert Cuyp III B studio Amsterdam]]></image>
+            <image name="photos 002.jpg"
+                url="http://control.bookingmanager.com/data/property/real/22097_photos%20002.jpg"
+                modified="2018-07-24 13:19:20"><![CDATA[Coffee machine and kettle Albert Cuyp III B studio Amsterdam]]></image>
+        </images>
+        <created>2014-06-19 08:07:09</created>
+        <modified>2024-08-29 14:23:21</modified>
+    </property>
+</properties>

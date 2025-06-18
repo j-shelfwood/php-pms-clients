@@ -49,4 +49,18 @@ describe('PropertiesEndpointTest', function () {
         assertPropertiesResponseMatchesExpected($response);
     });
 
+    test('it handles an empty properties response gracefully', function () {
+        $xml = file_get_contents(TestHelpers::getMockFilePath('empty-properties.xml'));
+
+        $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockStream = $this->createMock(\Psr\Http\Message\StreamInterface::class);
+        $mockStream->method('getContents')->willReturn($xml);
+        $mockResponse->method('getBody')->willReturn($mockStream);
+        $this->mockHttpClient->method('request')->willReturn($mockResponse);
+
+        $response = $this->api->properties();
+
+        expect($response)->toBeInstanceOf(PropertiesResponse::class);
+        expect($response->properties)->toBeArray()->toBeEmpty();
     });
+});

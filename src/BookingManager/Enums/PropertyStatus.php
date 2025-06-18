@@ -6,4 +6,5 @@ enum PropertyStatus: string
 {
     case READY = 'ready';
     case LIVE = 'live';
+    case INACTIVE = 'inactive';
 }

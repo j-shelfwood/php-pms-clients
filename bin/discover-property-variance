@@ -1,0 +1,99 @@
+#!/usr/bin/env php
+<?php
+// bin/discover-property-variance
+
+require __DIR__ . '/../vendor/autoload.php';
+
+echo "--- Analyzing property variance in all-properties.xml ---\n";
+
+$xmlPath = __DIR__ . '/../mocks/bookingmanager/all-properties.xml';
+$xml = file_get_contents($xmlPath);
+$data = Shelfwood\PhpPms\Http\XMLParser::parse($xml);
+
+$properties = $data['property'];
+$allKeys = [];
+$propertyStats = [];
+
+// First pass: collect all possible keys from all properties
+foreach ($properties as $property) {
+    $allKeys = array_merge($allKeys, array_keys($property));
+}
+$allKeys = array_unique($allKeys);
+
+// Second pass: analyze each property
+foreach ($properties as $property) {
+    $id = $property['@attributes']['id'];
+    $status = $property['@attributes']['status'] ?? 'unknown';
+    $keyCount = count($property);
+    $missingKeys = array_diff($allKeys, array_keys($property));
+
+    $propertyStats[$id] = [
+        'keyCount' => $keyCount,
+        'status' => $status,
+        'imageCount' => isset($property['images']['image']) ? count($property['images']['image']) : 0,
+        'missingKeys' => count($missingKeys),
+        'name' => $property['@attributes']['name'] ?? 'Unknown'
+    ];
+}
+
+// Sort by key count to find min/max
+uasort($propertyStats, fn($a, $b) => $a['keyCount'] <=> $b['keyCount']);
+
+$minProperty = array_slice($propertyStats, 0, 1, true);
+$maxProperty = array_slice($propertyStats, -1, 1, true);
+
+echo "Total Unique Root-Level Keys Found: " . count($allKeys) . "\n\n";
+
+$minId = key($minProperty);
+echo "==> Minimal Property Candidate:\n";
+echo "    ID: {$minId}, Name: {$minProperty[$minId]['name']}, Status: {$minProperty[$minId]['status']}, Keys: {$minProperty[$minId]['keyCount']}, Missing Keys: {$minProperty[$minId]['missingKeys']}\n";
+
+$maxId = key($maxProperty);
+echo "\n==> Richest Property Candidate (Golden Master):\n";
+echo "    ID: {$maxId}, Name: {$maxProperty[$maxId]['name']}, Status: {$maxProperty[$maxId]['status']}, Keys: {$maxProperty[$maxId]['keyCount']}, Missing Keys: {$maxProperty[$maxId]['missingKeys']}\n";
+
+// Find an inactive property
+foreach ($propertyStats as $id => $stats) {
+    if ($stats['status'] === 'inactive') {
+        echo "\n==> Inactive Property Candidate:\n";
+        echo "    ID: {$id}, Name: {$stats['name']}, Status: {$stats['status']}, Keys: {$stats['keyCount']}\n";
+        break;
+    }
+}
+
+// Find a property with one image
+foreach ($propertyStats as $id => $stats) {
+    if ($stats['imageCount'] === 1) {
+        echo "\n==> Single Image Property Candidate:\n";
+        echo "    ID: {$id}, Name: {$stats['name']}, Status: {$stats['status']}, Keys: {$stats['keyCount']}, Images: {$stats['imageCount']}\n";
+        break;
+    }
+}
+
+// Find properties with no images
+foreach ($propertyStats as $id => $stats) {
+    if ($stats['imageCount'] === 0) {
+        echo "\n==> No Images Property Candidate:\n";
+        echo "    ID: {$id}, Name: {$stats['name']}, Status: {$stats['status']}, Keys: {$stats['keyCount']}, Images: {$stats['imageCount']}\n";
+        break;
+    }
+}
+
+echo "\n--- Summary of All Properties ---\n";
+echo "Total Properties: " . count($propertyStats) . "\n";
+
+$statusCounts = [];
+foreach ($propertyStats as $stats) {
+    $statusCounts[$stats['status']] = ($statusCounts[$stats['status']] ?? 0) + 1;
+}
+
+echo "Status Distribution:\n";
+foreach ($statusCounts as $status => $count) {
+    echo "  {$status}: {$count}\n";
+}
+
+echo "\nKey Count Distribution:\n";
+$keyCounts = array_column($propertyStats, 'keyCount');
+echo "  Min Keys: " . min($keyCounts) . "\n";
+echo "  Max Keys: " . max($keyCounts) . "\n";
+echo "  Average Keys: " . round(array_sum($keyCounts) / count($keyCounts), 2) . "\n";

@@ -49,12 +49,32 @@ The script will output the parsed XML data and the final mapped PHP object for e
 
 ## Testing
 
-The test suite uses [Pest](https://pestphp.com/) and is organized by endpoint, with a single integration-style test file per endpoint. All redundant or duplicate tests have been removed for clarity and maintainability.
+The test suite uses [Pest](https://pestphp.com/) and employs a comprehensive **Golden Master** testing approach. For each API endpoint, we validate the entire response object against a canonical "golden" version, ensuring 100% of fields are mapped correctly for both rich and edge-case responses.
 
-To run the tests:
+The testing strategy includes:
+
+- **Golden Master Validation**: Each endpoint test validates every field in the response against expected data
+- **Edge Case Coverage**: Tests for minimal properties, inactive properties, empty responses, and comprehensive data
+- **485+ Assertions**: Comprehensive validation covering all response object properties
+- **Curated Mock Data**: Real-world XML responses extracted from production data for accurate testing
+
+**Test Structure:**
+
+- `tests/Endpoint/BookingManager/` — Endpoint-level integration tests for BookingManager API
+- `tests/Helpers/` — Reusable assertion helpers and test data
+- `mocks/bookingmanager/` — Comprehensive mock XML responses including edge cases
+
+**Running Tests:**
 
 ```bash
+# Run all tests
 vendor/bin/pest
+
+# Run tests for a specific endpoint
+vendor/bin/pest --filter="PropertyEndpointTest"
+
+# Discover property variance in mock data
+./bin/discover-property-variance
 ```
 
 ## Project Structure
