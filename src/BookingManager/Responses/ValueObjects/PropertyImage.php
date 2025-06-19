@@ -25,8 +25,6 @@ class PropertyImage
         $description = null;
         if (isset($data['#text']) && is_string($data['#text'])) {
             $description = trim($data['#text']);
-        } elseif (isset($data[0]) && is_string($data[0])) {
-            $description = trim($data[0]);
         }
 
         return new self(

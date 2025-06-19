@@ -157,20 +157,8 @@ function assertPropertyDetails(PropertyDetails $actualProperty, array $expected)
     expect($actualProperty->content->arrival)->toBe($expected['content']['arrival']);
     expect($actualProperty->content->termsAndConditions)->toBe($expected['content']['termsAndConditions']);
 
-    // Images - handle both full array checking and count-only checking
-    if (isset($expected['images']['_count_only'])) {
-        // If _count_only is set, just check the count
-        expect(count($actualProperty->images))->toBe($expected['images']['_count_only']);
-    } else {
-        // Full image validation
-        expect(count($actualProperty->images))->toBe(count($expected['images']));
-        foreach ($actualProperty->images as $index => $image) {
-            expect($image->name)->toBe($expected['images'][$index]['name']);
-            expect($image->url)->toBe($expected['images'][$index]['url']);
-            expect($image->modified)->toBe($expected['images'][$index]['modified']);
-            expect($image->description)->toBe($expected['images'][$index]['description']);
-        }
-    }
+    // Images - use dedicated assertion function for comprehensive validation
+    assertPropertyImagesMatchExpected($actualProperty->images, $expected['images']);
 
     // External timestamps
     expect($actualProperty->external_created_at?->toISOString())->toBe($expected['external_created_at']);
@@ -358,11 +346,11 @@ function assertPropertyContentMatchesExpected(PropertyContent $content, array $e
 
 function assertPropertyImagesMatchExpected(array $images, array $expectedImages): void
 {
-    // Validate total count (all 25 images from mock)
-    expect($images)->toHaveCount(25);
+    // Step 1: Validate the total count dynamically.
+    expect($images)->toHaveCount(count($expectedImages));
 
-    // Validate structure of first few images
-    foreach (array_slice($expectedImages, 0, 2) as $index => $expectedImage) {
+    // Step 2: Validate every single expected image.
+    foreach ($expectedImages as $index => $expectedImage) {
         $actualImage = $images[$index];
         expect($actualImage)->toBeInstanceOf(PropertyImage::class);
         expect($actualImage->name)->toBe($expectedImage['name']);

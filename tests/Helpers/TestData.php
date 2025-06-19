@@ -121,8 +121,33 @@ class TestData
                 'arrival' => '',
                 'termsAndConditions' => ''
             ],
+            // All 25 images from property-by-id.xml for comprehensive validation
             'images' => [
-                '_count_only' => 25  // property-by-id.xml has 25 images
+                ['name' => '1.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_1.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Double bed Runstraat suite Amsterdam'],
+                ['name' => '2.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_2.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Double bed other angle Runstraat suite Amsterdam'],
+                ['name' => '3.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_3.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Bed with the view of Sofa Runstraat suite Amsterdam'],
+                ['name' => '4.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_4.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Sofa Runstraat suite Amsterdam'],
+                ['name' => '5.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_5.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Sofa other angle Runstraat suite Amsterdam'],
+                ['name' => '6.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_6.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Double bed other angle Runstraat suite Amsterdam'],
+                ['name' => '7.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_7.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Window Runstraat suite Amsterdam'],
+                ['name' => '8.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_8.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Bed Runstraat suite Amsterdam'],
+                ['name' => '9.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_9.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Decorative details with the view of bathroom Runstraat suite Amsterdam'],
+                ['name' => '10.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_10.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Bed other angle Runstraat suite Amsterdam'],
+                ['name' => '11.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_11.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Television Runstraat suite Amsterdam'],
+                ['name' => '12.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_12.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Shower Runstraat suite Amsterdam'],
+                ['name' => '13.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_13.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Bathroom Runstraat suite Amsterdam'],
+                ['name' => '14.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_14.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Bathroom other angle Runstraat suite Amsterdam'],
+                ['name' => '15.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_15.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Entree Runstraat suite Amsterdam'],
+                ['name' => '16.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_16.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Neighborhood Runstraat suite Amsterdam'],
+                ['name' => '17.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_17.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Apartment building Runstraat suite Amsterdam'],
+                ['name' => '18.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_18.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Apartment building other angle Runstraat suite Amsterdam'],
+                ['name' => '19.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_19.jpg', 'modified' => '2022-04-28 11:08:20', 'description' => 'Door lock Runstraat suite Amsterdam'],
+                ['name' => '20.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_20.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Neighborhood Runstraat suite Amsterdam'],
+                ['name' => '21.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_21.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Water View Runstraat suite Amsterdam'],
+                ['name' => '22.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_22.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Neighborhood other angle Runstraat suite Amsterdam'],
+                ['name' => '23.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_23.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Others Runstraat suite Amsterdam'],
+                ['name' => '24.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_24.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Neighborhood Runstraat suite Amsterdam'],
+                ['name' => '25.jpg', 'url' => 'http://control.bookingmanager.com/data/property/real/21663_25.jpg', 'modified' => '2022-04-28 11:08:17', 'description' => 'Neighborhood Runstraat suite Amsterdam']
             ],
             'external_created_at' => '2014-01-15T15:14:54.000000Z',
             'external_updated_at' => '2023-11-10T08:55:55.000000Z'
@@ -966,6 +991,126 @@ yes',
             'images' => [],
             'external_created_at' => null,
             'external_updated_at' => null
+        ];
+    }
+
+    /**
+     * Golden Master data for property-no-images.xml mock
+     */
+    public static function getExpectedNoImagesPropertyData(): array
+    {
+        return [
+            'external_id' => 99999,
+            'name' => 'No Image Test Property',
+            'identifier' => '#noimage',
+            'status' => 'live',
+            'property_types' => ['leisure', 'business'],
+            'provider' => [
+                'id' => 93,
+                'code' => 'AMS',
+                'name' => 'Billy Blue Amsterdam'
+            ],
+            'location' => [
+                'latitude' => 52.3568,
+                'longitude' => 4.89784,
+                'address' => 'Test Street',
+                'zipcode' => '1073BR',
+                'city' => 'Amsterdam',
+                'country' => 'NL',
+                'cityLatitude' => 52.3731,
+                'cityLongitude' => 4.89235,
+                'area' => 'Test Area'
+            ],
+            'max_persons' => 2,
+            'minimal_nights' => 1,
+            'maximal_nights' => 0,
+            'available_start' => '2014-07-02',
+            'available_end' => '2025-05-05',
+            'floor' => 1,
+            'stairs' => false,
+            'size' => 30.0,
+            'bedrooms' => 1,
+            'single_bed' => 0,
+            'double_bed' => 1,
+            'single_sofa' => 0,
+            'double_sofa' => 0,
+            'single_bunk' => 0,
+            'bathrooms' => 1,
+            'toilets' => 1,
+            'elevator' => false,
+            'view' => 'street',
+            'internet' => 'wifi',
+            'internet_connection' => 'highspeed',
+            'parking' => 'none',
+            'airco' => false,
+            'fans' => false,
+            'balcony' => false,
+            'patio' => false,
+            'garden' => false,
+            'roof_terrace' => false,
+            'tv' => 'flatscreen',
+            'tv_connection' => 'cable',
+            'dvd' => 'none',
+            'computer' => false,
+            'printer' => false,
+            'iron' => false,
+            'dishwasher' => false,
+            'oven' => false,
+            'microwave' => true,
+            'grill' => false,
+            'hob' => true,
+            'fridge' => true,
+            'freezer' => false,
+            'washingmachine' => false,
+            'dryer' => false,
+            'toaster' => false,
+            'kettle' => true,
+            'coffeemachine' => false,
+            'bathtub' => 0,
+            'jacuzzi' => 0,
+            'shower_regular' => 1,
+            'shower_steam' => 0,
+            'swimmingpool' => 'none',
+            'sauna' => 'none',
+            'hairdryer' => false,
+            'entresol' => false,
+            'wheelchair_friendly' => false,
+            'smoking_allowed' => false,
+            'pets_allowed' => false,
+            'heating' => true,
+            'supplies' => [
+                'coffee' => false,
+                'tea' => false,
+                'milk' => false,
+                'sugar' => false,
+                'dishwasherTablets' => false
+            ],
+            'service' => [
+                'linen' => false,
+                'towels' => false,
+                'cleaning' => false
+            ],
+            'cleaning_costs' => 0.0,
+            'deposit_costs' => 0.0,
+            'check_in' => '15:00',
+            'check_out' => '11:00',
+            'tax' => [
+                'vat' => 21.0,
+                'other' => 5.0,
+                'otherType' => 'relative'
+            ],
+            'prepayment' => 50.0,
+            'fee' => 25.0,
+            'content' => [
+                'short' => 'Basic property with no images',
+                'full' => 'A simple property for testing purposes with no images',
+                'area' => 'Test area description',
+                'arrival' => 'Standard arrival instructions',
+                'termsAndConditions' => 'Standard terms and conditions'
+            ],
+            'images' => [], // The key assertion - empty array
+            'external_created_at' => '2024-01-01T10:00:00.000000Z',
+            'external_updated_at' => '2024-01-01T10:00:00.000000Z'
         ];
     }
 }
