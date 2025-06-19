@@ -115,7 +115,7 @@ class TestData
             'prepayment' => 30.0,
             'fee' => 10.0, // fee type="percentage" with value 10
             'content' => [
-                'short' => '',
+                'short' => 'Spacious suite in the heart of Amsterdam\\\'s nine streets area.',
                 'full' => '',
                 'area' => '',
                 'arrival' => '',
@@ -1113,4 +1113,6 @@ yes',
             'external_updated_at' => '2024-01-01T10:00:00.000000Z'
         ];
     }
+
+
 }

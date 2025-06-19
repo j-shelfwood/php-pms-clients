@@ -178,8 +178,8 @@ class PropertyDetails
                 }
             };
 
-            $typesString = $getString('type', '');
-            $propertyTypes = !empty($typesString) ? explode(',', $typesString) : [];
+            $typesString = $getString('type'); // Get string or null
+            $propertyTypes = $typesString ? explode(',', $typesString) : [];
 
             $imagesData = $propertyData['images']['image'] ?? [];
             if (!is_array($imagesData)) {
@@ -264,7 +264,7 @@ class PropertyDetails
                 check_out: $getString('check_out'),
                 tax: PropertyTax::fromXml($propertyData['tax'] ?? []),
                 prepayment: $getFloat('prepayment') ?: null,
-                fee: $getFloat('fee') ?: null,
+                fee: isset($propertyData['fee']) ? $getFloat('fee') : null,
                 content: PropertyContent::fromXml($propertyData['content'] ?? []),
                 images: array_map(fn($img) => PropertyImage::fromXml($img), $imagesData),
                 external_created_at: $getDate('created'),

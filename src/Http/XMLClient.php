@@ -27,7 +27,7 @@ abstract class XMLClient
         ?ClientInterface $httpClient = null,
         ?LoggerInterface $logger = null
     ) {
-        $this->baseUrl = $baseUrl;
+        $this->baseUrl = rtrim($baseUrl, '/'); // Remove trailing slash to prevent double slashes
         $this->apiKey = $apiKey;
         $this->httpClient = $httpClient ?? new Client();
         $this->logger = $logger ?? new NullLogger();

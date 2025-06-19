@@ -100,13 +100,3 @@ function assertEditBookingDetailsMatchesExpected(BookingDetails $actualBooking):
 {
     assertBookingDetails($actualBooking, TestData::getExpectedEditBookingData());
 }
-
-function assertBookingRateMatchesExpected(BookingRate $actualRate, array $expected): void
-{
-    assertBookingRate($actualRate, $expected);
-}
-
-function assertBookingTaxMatchesExpected(BookingTax $actualTax, array $expected): void
-{
-    assertBookingTax($actualTax, $expected);
-}

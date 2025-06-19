@@ -92,7 +92,7 @@ class CalendarResponse
 
         $propertyId = 0;
 
-        // Extract unavailable date ranges
+        // Extract unavailable date ranges with their modification timestamps
         foreach ($unavailableData as $unavailable) {
             if (!isset($unavailable['start']) || !isset($unavailable['end'])) {
                 continue;
@@ -106,9 +106,20 @@ class CalendarResponse
             $rangeStart = Carbon::createFromFormat('Y-m-d', $unavailable['start'])->startOfDay();
             $rangeEnd = Carbon::createFromFormat('Y-m-d', $unavailable['end'])->endOfDay();
 
+            // Parse modified timestamp from availability data
+            $modified = Carbon::now(); // Default fallback
+            if (isset($unavailable['modified'])) {
+                try {
+                    $modified = Carbon::parse($unavailable['modified']);
+                } catch (\Exception $e) {
+                    // Keep default if parsing fails
+                }
+            }
+
             $unavailableRanges[] = [
                 'start' => $rangeStart,
-                'end' => $rangeEnd
+                'end' => $rangeEnd,
+                'modified' => $modified
             ];
         }
 
@@ -118,11 +129,13 @@ class CalendarResponse
 
         while ($current->lte($endDate)) {
             $isAvailable = true;
+            $dayModified = Carbon::now(); // Default for available days
 
             // Check if current date falls within any unavailable range
             foreach ($unavailableRanges as $range) {
                 if ($current->between($range['start'], $range['end'])) {
                     $isAvailable = false;
+                    $dayModified = $range['modified']; // Use the actual modified timestamp
                     break;
                 }
             }
@@ -130,7 +143,7 @@ class CalendarResponse
             $dayInfo = new CalendarDayInfo(
                 day: $current->copy(),
                 season: null,
-                modified: Carbon::now(),
+                modified: $dayModified,
                 available: $isAvailable ? 1 : 0,
                 stayMinimum: 1, // Default minimum stay
                 rate: CalendarRate::fromXml([]), // Rate information not available from availability.xml
