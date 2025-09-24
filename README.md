@@ -13,6 +13,62 @@ This repository contains PHP clients for Property Management Systems (PMS).
 composer require shelfwood/php-pms-clients
 ```
 
+## Laravel Integration
+
+### Automatic Service Provider Registration
+
+The package will automatically register its service provider in Laravel applications using auto-discovery.
+
+### Configuration Publishing
+
+Publish the configuration file to customize HTTP client behavior:
+
+```bash
+php artisan vendor:publish --tag=php-pms-config
+```
+
+This creates `config/php-pms.php` with the following options:
+
+```php
+return [
+    'http' => [
+        'timeout' => env('PHP_PMS_HTTP_TIMEOUT', 30),
+        'verify_ssl' => env('PHP_PMS_VERIFY_SSL', true),
+        'debug' => env('PHP_PMS_HTTP_DEBUG', false), // Only works in local environment
+    ],
+    // ... other configuration options
+];
+```
+
+### Environment Variables
+
+Add these to your `.env` file:
+
+```bash
+# HTTP Client Configuration
+PHP_PMS_HTTP_TIMEOUT=30
+PHP_PMS_VERIFY_SSL=true
+PHP_PMS_HTTP_DEBUG=false
+
+# BookingManager Configuration
+BOOKING_MANAGER_BASE_URL=https://xml.billypds.com
+BOOKING_MANAGER_API_KEY=your-api-key-here
+
+# Logging
+PHP_PMS_LOGGING=false
+PHP_PMS_LOG_CHANNEL=default
+```
+
+### Controlling Debug Output
+
+The verbose HTTP debug output (cURL verbose mode) can be controlled via environment:
+
+- **Production/Staging**: Debug output is always disabled for security
+- **Local Environment**: Set `PHP_PMS_HTTP_DEBUG=true` to enable debug output
+- **Default**: Debug output is disabled by default
+
+This prevents the verbose cURL output that appears in `art queue:listen` when `APP_DEBUG=true`.
+
 ## Debugging
 
 A CLI tool is included to help debug the BookingManager API integration using a production key. It runs a sequence of non-destructive read calls to verify data is being returned and mapped correctly.
