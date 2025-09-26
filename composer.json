@@ -39,11 +39,7 @@
       "pestphp/pest-plugin": true
     }
   },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "Shelfwood\\PhpPms\\Laravel\\PhpPmsServiceProvider"
-      ]
-    }
+  "scripts": {
+    "test": "pest"
   }
 }
