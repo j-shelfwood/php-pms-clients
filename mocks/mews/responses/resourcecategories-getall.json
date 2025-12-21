@@ -1,0 +1,90 @@
+{
+    "ResourceCategories": [
+        {
+            "Id": "44bd8ad0-e70b-4bd9-8445-ad7200d7c349",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "ServiceId": "ec9d261c-1ef1-4a6e-8565-ad7200d77411",
+            "IsActive": true,
+            "Type": "Room",
+            "Classification": "Other",
+            "Names": {
+                "en-GB": "First Room",
+                "en-US": "k"
+            },
+            "ShortNames": {
+                "en-GB": "First Room"
+            },
+            "Descriptions": {
+                "en-GB": "First Room"
+            },
+            "Ordering": 0,
+            "Capacity": 80,
+            "ExtraCapacity": 0,
+            "ExternalIdentifier": null,
+            "AccountingCategoryId": "e62b2b95-b5f9-4678-979c-9b178a34c570"
+        },
+        {
+            "Id": "be7f282a-bdda-426f-8abe-ae5100402f7b",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "ServiceId": "ec9d261c-1ef1-4a6e-8565-ad7200d77411",
+            "IsActive": true,
+            "Type": "Room",
+            "Classification": "SharedOrDorm",
+            "Names": {
+                "en-US": "Parking Area A"
+            },
+            "ShortNames": {
+                "en-US": "Parking Area A"
+            },
+            "Descriptions": {
+                "en-US": "Parking Area A"
+            },
+            "Ordering": 0,
+            "Capacity": 80,
+            "ExtraCapacity": 2,
+            "ExternalIdentifier": null,
+            "AccountingCategoryId": null
+        },
+        {
+            "Id": "77621038-5a0f-4269-9648-b12600d1091b",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "ServiceId": "ec9d261c-1ef1-4a6e-8565-ad7200d77411",
+            "IsActive": true,
+            "Type": "Room",
+            "Classification": null,
+            "Names": {
+                "en-US": "Jeep Chimney"
+            },
+            "ShortNames": [],
+            "Descriptions": [],
+            "Ordering": 0,
+            "Capacity": 5,
+            "ExtraCapacity": 0,
+            "ExternalIdentifier": null,
+            "AccountingCategoryId": null
+        },
+        {
+            "Id": "895d7917-ce46-4984-957f-b203008b442c",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "ServiceId": "ec9d261c-1ef1-4a6e-8565-ad7200d77411",
+            "IsActive": true,
+            "Type": "Room",
+            "Classification": null,
+            "Names": {
+                "en-US": "TAC_CAR_PARK"
+            },
+            "ShortNames": {
+                "en-US": "TCP"
+            },
+            "Descriptions": {
+                "en-US": "Do parken die w\u00fcdn hund"
+            },
+            "Ordering": 0,
+            "Capacity": 100,
+            "ExtraCapacity": 0,
+            "ExternalIdentifier": null,
+            "AccountingCategoryId": null
+        }
+    ],
+    "Cursor": null
+}

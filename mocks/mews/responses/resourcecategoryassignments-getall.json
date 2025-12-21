@@ -1,0 +1,13 @@
+{
+    "ResourceCategoryAssignments": [
+        {
+            "Id": "e1a2b3c4-5d6e-7f8a-9b0c-1d2e3f4a5b6c",
+            "ResourceId": "095a6d7f-4893-4a3b-9c35-ff595d4bfa0c",
+            "CategoryId": "44bd8ad0-e70b-4bd9-8445-ad7200d7c349",
+            "IsActive": true,
+            "CreatedUtc": "2024-01-01T00:00:00Z",
+            "UpdatedUtc": "2024-01-01T00:00:00Z"
+        }
+    ],
+    "Cursor": null
+}

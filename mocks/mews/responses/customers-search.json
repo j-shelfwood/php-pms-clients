@@ -1,0 +1,31 @@
+{
+  "Customers": [
+    {
+      "Id": "35d4b117-4e60-44a3-9580-c1deae0557c1",
+      "ChainId": "3edbe1b4-6739-40b7-81b3-82bca5a2d610",
+      "Number": "1234",
+      "FirstName": "John",
+      "LastName": "Doe",
+      "SecondLastName": null,
+      "Title": "Mr",
+      "Sex": "Male",
+      "NationalityCode": "US",
+      "LanguageCode": "en-US",
+      "BirthDate": "1985-03-15",
+      "BirthPlace": "New York",
+      "Email": "john.doe@example.com",
+      "Phone": "+1234567890",
+      "LoyaltyCode": "GOLD123",
+      "AccountingCode": "CUST_1234",
+      "Classifications": ["Returning", "VeryImportant"],
+      "Options": {},
+      "Notes": "Prefers late check-in",
+      "CarRegistrationNumber": "ABC123",
+      "TaxIdentificationNumber": null,
+      "CompanyId": null,
+      "IsActive": true,
+      "CreatedUtc": "2024-01-01T10:00:00Z",
+      "UpdatedUtc": "2024-12-15T14:30:00Z"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "Reservations": [
+    {
+      "Identifier": "req_001",
+      "Reservation": {
+        "Id": "bfee2c44-1f84-4326-a862-5289598a6cea",
+        "ServiceId": "bd26d8db-86a4-4f18-9e94-1b2362a1073c",
+        "AccountId": "35d4b117-4e60-44a3-9580-c1deae0557c1",
+        "GroupId": null,
+        "Number": "52",
+        "State": "Confirmed",
+        "Origin": "Connector",
+        "ChannelNumber": "WEB_001",
+        "ChannelManagerNumber": null,
+        "ChannelManagerGroupNumber": null,
+        "ChannelManager": null,
+        "AdultCount": 2,
+        "ChildCount": 0,
+        "PersonCounts": [
+          {
+            "AgeCategoryId": "1f67644f-052d-4863-acdf-ae1600c60ca0",
+            "Count": 2
+          }
+        ],
+        "ScheduledStartUtc": "2025-01-15T00:00:00Z",
+        "ScheduledEndUtc": "2025-01-18T00:00:00Z",
+        "ActualStartUtc": null,
+        "ActualEndUtc": null,
+        "ReleaseUtc": null,
+        "RequestedCategoryId": "773d5e42-de1e-43a0-9ce6-c3e7511c1e0a",
+        "AssignedResourceId": "5ee074b1-6c86-48e8-915f-c73a9bfc11e0",
+        "AssignedResourceLocked": false,
+        "BusinessSegmentId": null,
+        "CompanyId": null,
+        "TravelAgencyId": null,
+        "RateId": "ed4b660b-19d0-434b-9360-a4de2101ed08",
+        "VoucherCode": null,
+        "CreditCardId": null,
+        "BookerId": null,
+        "Options": {},
+        "Notes": "Late check-in requested",
+        "Purpose": null,
+        "CancellationReason": null,
+        "CreatedUtc": "2025-01-10T12:34:56Z",
+        "UpdatedUtc": "2025-01-10T12:34:56Z"
+      }
+    }
+  ]
+}

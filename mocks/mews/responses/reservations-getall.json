@@ -1,0 +1,51 @@
+{
+  "Reservations": [
+    {
+      "Id": "bfee2c44-1f84-4326-a862-5289598a6cea",
+      "ServiceId": "bd26d8db-86a4-4f18-9e94-1b2362a1073c",
+      "AccountId": "35d4b117-4e60-44a3-9580-c1deae0557c1",
+      "Number": "52",
+      "State": "Confirmed",
+      "PersonCounts": [
+        {
+          "AgeCategoryId": "1f67644f-052d-4863-acdf-ae1600c60ca0",
+          "Count": 2
+        }
+      ],
+      "ScheduledStartUtc": "2025-01-15T00:00:00Z",
+      "ScheduledEndUtc": "2025-01-18T00:00:00Z",
+      "AssignedResourceId": "5ee074b1-6c86-48e8-915f-c73a9bfc11e0",
+      "RateId": "ed4b660b-19d0-434b-9360-a4de2101ed08",
+      "Notes": "Late check-in requested",
+      "CreatedUtc": "2025-01-10T12:34:56Z",
+      "UpdatedUtc": "2025-01-10T12:34:56Z"
+    },
+    {
+      "Id": "c2ff3d55-2f95-5437-b973-6390709b7deb",
+      "ServiceId": "bd26d8db-86a4-4f18-9e94-1b2362a1073c",
+      "AccountId": "8a3c8f42-1e95-4e3b-a7c9-82bca5a2d610",
+      "Number": "53",
+      "State": "Started",
+      "PersonCounts": [
+        {
+          "AgeCategoryId": "1f67644f-052d-4863-acdf-ae1600c60ca0",
+          "Count": 1
+        },
+        {
+          "AgeCategoryId": "55a76d26-0df3-4efb-b0cc-ade3011a53a5",
+          "Count": 1
+        }
+      ],
+      "ScheduledStartUtc": "2025-01-10T00:00:00Z",
+      "ScheduledEndUtc": "2025-01-12T00:00:00Z",
+      "ActualStartUtc": "2025-01-10T14:30:00Z",
+      "ActualEndUtc": null,
+      "AssignedResourceId": "7fa185c2-7d97-59e9-c046-d84f820f2e91",
+      "RateId": "ed4b660b-19d0-434b-9360-a4de2101ed08",
+      "Notes": null,
+      "CreatedUtc": "2025-01-05T09:15:00Z",
+      "UpdatedUtc": "2025-01-10T14:30:00Z"
+    }
+  ],
+  "Cursor": null
+}

@@ -1,0 +1,51 @@
+{
+  "Restrictions": [
+    {
+      "Id": "d4e5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a",
+      "ServiceId": "bd26d8db-86a4-4f18-9e94-1b2362a1073c",
+      "ResourceCategoryId": "773d5e42-de1e-43a0-9ce6-c3e7511c1e0a",
+      "StartUtc": "2025-12-20T00:00:00Z",
+      "EndUtc": "2026-01-05T00:00:00Z",
+      "MinimumStay": 3,
+      "MaximumStay": null,
+      "MinAdvance": null,
+      "MaxAdvance": null,
+      "Type": "Stay",
+      "Conditions": {
+        "Type": "Stay",
+        "ResourceCategoryId": "773d5e42-de1e-43a0-9ce6-c3e7511c1e0a",
+        "RateId": null,
+        "RateGroupId": null,
+        "Days": ["Friday", "Saturday"]
+      },
+      "Exceptions": [],
+      "Origin": "User",
+      "CreatedUtc": "2024-10-01T09:00:00Z",
+      "UpdatedUtc": "2024-10-01T09:00:00Z"
+    },
+    {
+      "Id": "e5f6a7b8-9c0d-1e2f-3a4b-5c6d7e8f9a0b",
+      "ServiceId": "bd26d8db-86a4-4f18-9e94-1b2362a1073c",
+      "ResourceCategoryId": "a9f42c86-1e95-4e3b-a7c9-82bca5a2d610",
+      "StartUtc": "2025-07-01T00:00:00Z",
+      "EndUtc": "2025-08-31T00:00:00Z",
+      "MinimumStay": 7,
+      "MaximumStay": 14,
+      "MinAdvance": null,
+      "MaxAdvance": null,
+      "Type": "Stay",
+      "Conditions": {
+        "Type": "Stay",
+        "ResourceCategoryId": "a9f42c86-1e95-4e3b-a7c9-82bca5a2d610",
+        "RateId": null,
+        "RateGroupId": null,
+        "Days": []
+      },
+      "Exceptions": [],
+      "Origin": "User",
+      "CreatedUtc": "2024-05-15T12:00:00Z",
+      "UpdatedUtc": "2024-05-15T12:00:00Z"
+    }
+  ],
+  "Cursor": null
+}

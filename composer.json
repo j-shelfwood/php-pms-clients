@@ -40,6 +40,7 @@
     }
   },
   "scripts": {
-    "test": "pest"
+    "test": "pest",
+    "test:mews": "pest tests/Mews --colors=always --no-coverage"
   }
 }

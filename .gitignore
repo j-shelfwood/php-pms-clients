@@ -1,2 +1,28 @@
 .git
 vendor/
+.phpunit.cache
+.phpunit.result.cache
+composer.lock
+
+# IDE
+.idea/
+.vscode/
+.fleet/
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# Testing artifacts
+coverage/
+.phpunit.result.cache
+*.cache
+
+# Agent orchestration
+.agent/
+
+# Temporary files
+*.tmp
+*.log

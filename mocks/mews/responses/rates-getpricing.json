@@ -1,0 +1,102 @@
+{
+  "Currency": "EUR",
+  "TimeUnitStartsUtc": [
+    "2025-01-15T00:00:00Z",
+    "2025-01-16T00:00:00Z",
+    "2025-01-17T00:00:00Z"
+  ],
+  "BaseAmountPrices": [
+    {
+      "Index": 0,
+      "Amount": {
+        "GrossValue": 150.00,
+        "NetValue": 137.61,
+        "TaxValues": [
+          {
+            "Code": "VAT",
+            "Value": 12.39
+          }
+        ],
+        "Currency": "EUR"
+      }
+    },
+    {
+      "Index": 1,
+      "Amount": {
+        "GrossValue": 150.00,
+        "NetValue": 137.61,
+        "TaxValues": [
+          {
+            "Code": "VAT",
+            "Value": 12.39
+          }
+        ],
+        "Currency": "EUR"
+      }
+    },
+    {
+      "Index": 2,
+      "Amount": {
+        "GrossValue": 180.00,
+        "NetValue": 165.14,
+        "TaxValues": [
+          {
+            "Code": "VAT",
+            "Value": 14.86
+          }
+        ],
+        "Currency": "EUR"
+      }
+    }
+  ],
+  "CategoryPrices": [
+    {
+      "ResourceCategoryId": "44bd8ad0-e70b-4bd9-8445-ad7200d7c349",
+      "AmountPrices": [
+        {
+          "Index": 0,
+          "Amount": {
+            "GrossValue": 150.00,
+            "NetValue": 137.61,
+            "TaxValues": [
+              {
+                "Code": "VAT",
+                "Value": 12.39
+              }
+            ],
+            "Currency": "EUR"
+          }
+        },
+        {
+          "Index": 1,
+          "Amount": {
+            "GrossValue": 150.00,
+            "NetValue": 137.61,
+            "TaxValues": [
+              {
+                "Code": "VAT",
+                "Value": 12.39
+              }
+            ],
+            "Currency": "EUR"
+          }
+        },
+        {
+          "Index": 2,
+          "Amount": {
+            "GrossValue": 180.00,
+            "NetValue": 165.14,
+            "TaxValues": [
+              {
+                "Code": "VAT",
+                "Value": 14.86
+              }
+            ],
+            "Currency": "EUR"
+          }
+        }
+      ]
+    }
+  ],
+  "AgeCategoryAdjustments": []
+}

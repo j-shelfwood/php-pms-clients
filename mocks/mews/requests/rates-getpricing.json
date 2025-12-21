@@ -1,0 +1,16 @@
+{
+  "ClientToken": "E0D7BAAA5F704DA6B78CD1BE50000E3E-DA39A3EE5E6B4B0D3255BFEF95601890",
+  "AccessToken": "C66EF7B239D24632943D115EDE9E3DCC-EA00F8FD8294692C976C01A74C5A4AE",
+  "Client": "MoreApartments/1.0",
+  "RateId": "ed4b660b-19d0-434b-9360-a4de2101ed08",
+  "FirstTimeUnitStartUtc": "2025-01-15T00:00:00Z",
+  "LastTimeUnitStartUtc": "2025-01-17T00:00:00Z",
+  "OccupancyConfiguration": {
+    "PersonCounts": [
+      {
+        "AgeCategoryId": "1f67644f-052d-4863-acdf-ae1600c60ca0",
+        "Count": 2
+      }
+    ]
+  }
+}

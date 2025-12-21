@@ -1,0 +1,10 @@
+{
+  "ClientToken": "E0D7BAAA5F704DA6B78CD1BE50000E3E-DA39A3EE5E6B4B0D3255BFEF95601890",
+  "AccessToken": "C66EF7B239D24632943D115EDE9E3DCC-EA00F8FD8294692C976C01A74C5A4AE",
+  "Client": "MoreApartments/1.0",
+  "ServiceIds": ["bd26d8db-86a4-4f18-9e94-1b2362a1073c"],
+  "Limitation": {
+    "Count": 100,
+    "Cursor": null
+  }
+}

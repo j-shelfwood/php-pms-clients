@@ -1,0 +1,70 @@
+{
+    "Rates": [
+        {
+            "Id": "11672368-e0d7-4a6d-bd85-ad7200d77428",
+            "GroupId": "eb918ef2-710a-4734-b441-ad7200d77421",
+            "ServiceId": "ec9d261c-1ef1-4a6e-8565-ad7200d77411",
+            "BaseRateId": null,
+            "IsBaseRate": true,
+            "BusinessSegmentId": null,
+            "IsActive": true,
+            "IsEnabled": true,
+            "IsPublic": true,
+            "IsDefault": true,
+            "Type": "Public",
+            "Name": "Fully Flexible",
+            "Names": {
+                "en-GB": "Fully Flexible"
+            },
+            "ShortName": "FF",
+            "UpdatedUtc": "2025-09-17T11:22:18Z",
+            "ExternalNames": [],
+            "Description": [],
+            "ExternalIdentifier": null,
+            "Options": {
+                "HidePriceFromGuest": false,
+                "IsBonusPointsEligible": false
+            },
+            "Pricing": {
+                "Discriminator": "BaseRatePricing",
+                "BaseRatePricing": {
+                    "Amount": {
+                        "Currency": "GBP",
+                        "NetValue": 8333.33,
+                        "GrossValue": 10000,
+                        "TaxValues": [
+                            {
+                                "Code": "UK-2022-20%",
+                                "Value": 1666.67
+                            }
+                        ],
+                        "Breakdown": {
+                            "Items": [
+                                {
+                                    "TaxRateCode": "UK-2022-20%",
+                                    "NetValue": 8333.33,
+                                    "TaxValue": 1666.67
+                                }
+                            ]
+                        }
+                    }
+                },
+                "DependentRatePricing": null
+            },
+            "TaxExemptionReason": null,
+            "TaxExemptionLegalReference": null
+        }
+    ],
+    "RateGroups": [
+        {
+            "Id": "eb918ef2-710a-4734-b441-ad7200d77421",
+            "ServiceId": "ec9d261c-1ef1-4a6e-8565-ad7200d77411",
+            "IsActive": true,
+            "Name": "Default",
+            "ExternalIdentifier": null
+        }
+    ],
+    "RateRestrictions": null,
+    "AvailabilityBlockAssignments": null,
+    "Cursor": null
+}

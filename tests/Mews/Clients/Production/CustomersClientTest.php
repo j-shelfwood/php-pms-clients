@@ -1,0 +1,213 @@
+<?php
+
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
+use Shelfwood\PhpPms\Mews\Config\MewsConfig;
+use Shelfwood\PhpPms\Mews\Http\MewsHttpClient;
+use Shelfwood\PhpPms\Mews\Clients\Production\CustomersClient;
+use Shelfwood\PhpPms\Mews\Payloads\SearchCustomersPayload;
+use Shelfwood\PhpPms\Mews\Payloads\CreateCustomerPayload;
+use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Customer;
+use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
+
+beforeEach(function () {
+    $this->config = new MewsConfig(
+        clientToken: 'test_client_token',
+        accessToken: 'test_access_token',
+        baseUrl: 'https://api.mews-demo.com',
+        clientName: 'TestClient/1.0'
+    );
+
+    // Load mock response data
+    $this->searchMockData = json_decode(
+        file_get_contents(__DIR__ . '/../../../../mocks/mews/responses/customers-search.json'),
+        true
+    );
+
+    $this->addMockData = json_decode(
+        file_get_contents(__DIR__ . '/../../../../mocks/mews/responses/customers-add.json'),
+        true
+    );
+});
+
+it('searches for customers by email', function () {
+    $mockResponse = new Response(200, [], json_encode($this->searchMockData));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/api/connector/v1/customers/search#'),
+            Mockery::on(function ($options) {
+                $body = json_decode($options['body'], true);
+                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'Emails'])
+                    ->and($body['Emails'])->toBeArray();
+                return true;
+            })
+        )
+        ->andReturn($mockResponse);
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $customersClient = new CustomersClient($mewsClient);
+
+    $payload = new SearchCustomersPayload(emails: ['john.doe@example.com']);
+    $response = $customersClient->search($payload);
+
+    expect($response->customers)->toHaveCount(1)
+        ->and($response->customers[0])->toBeInstanceOf(Customer::class)
+        ->and($response->customers[0]->email)->toBe('john.doe@example.com')
+        ->and($response->customers[0]->firstName)->toBe('John')
+        ->and($response->customers[0]->lastName)->toBe('Doe');
+});
+
+it('returns empty results when no customers match search', function () {
+    $mockResponse = new Response(200, [], json_encode(['Customers' => []]));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->andReturn($mockResponse);
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $customersClient = new CustomersClient($mewsClient);
+
+    $payload = new SearchCustomersPayload(emails: ['nonexistent@example.com']);
+    $response = $customersClient->search($payload);
+
+    expect($response->customers)->toBeEmpty();
+});
+
+it('gets customer by ID successfully', function () {
+    $mockResponse = new Response(200, [], json_encode($this->searchMockData));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/api/connector/v1/customers/getAll#'),
+            Mockery::on(function ($options) {
+                $body = json_decode($options['body'], true);
+                expect($body)->toHaveKey('CustomerIds')
+                    ->and($body['CustomerIds'])->toBeArray()
+                    ->and($body['CustomerIds'])->toHaveCount(1);
+                return true;
+            })
+        )
+        ->andReturn($mockResponse);
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $customersClient = new CustomersClient($mewsClient);
+
+    $customer = $customersClient->getById('35d4b117-4e60-44a3-9580-c1deae0557c1');
+
+    expect($customer)->toBeInstanceOf(Customer::class)
+        ->and($customer->id)->toBe('35d4b117-4e60-44a3-9580-c1deae0557c1')
+        ->and($customer->firstName)->toBe('John')
+        ->and($customer->lastName)->toBe('Doe');
+});
+
+it('throws exception when customer not found by ID', function () {
+    $mockResponse = new Response(200, [], json_encode(['Customers' => []]));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->andReturn($mockResponse);
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $customersClient = new CustomersClient($mewsClient);
+
+    $customersClient->getById('non-existent-id');
+})->throws(MewsApiException::class, 'Customer not found');
+
+it('finds existing customer without creating new one', function () {
+    $mockSearchResponse = new Response(200, [], json_encode($this->searchMockData));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(Mockery::pattern('#/customers/search#'), Mockery::any())
+        ->andReturn($mockSearchResponse);
+
+    // Should NOT call customers/add since customer exists
+    $httpClient->shouldNotReceive('post')
+        ->with(Mockery::pattern('#/customers/add#'), Mockery::any());
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $customersClient = new CustomersClient($mewsClient);
+
+    $payload = new CreateCustomerPayload(
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john.doe@example.com'
+    );
+
+    $customerId = $customersClient->findOrCreate($payload);
+
+    expect($customerId)->toBe('35d4b117-4e60-44a3-9580-c1deae0557c1');
+});
+
+it('creates new customer when not found', function () {
+    $mockSearchResponse = new Response(200, [], json_encode(['Customers' => []]));
+    $mockAddResponse = new Response(200, [], json_encode($this->addMockData));
+
+    $httpClient = Mockery::mock(Client::class);
+
+    // First call: search returns empty
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(Mockery::pattern('#/customers/search#'), Mockery::any())
+        ->andReturn($mockSearchResponse);
+
+    // Second call: add creates new customer
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/customers/add#'),
+            Mockery::on(function ($options) {
+                $body = json_decode($options['body'], true);
+                expect($body)->toHaveKey('Customers')
+                    ->and($body['Customers'])->toBeArray()
+                    ->and($body['Customers'][0])->toHaveKeys(['FirstName', 'LastName', 'Email']);
+                return true;
+            })
+        )
+        ->andReturn($mockAddResponse);
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $customersClient = new CustomersClient($mewsClient);
+
+    $payload = new CreateCustomerPayload(
+        firstName: 'Jane',
+        lastName: 'Smith',
+        email: 'jane.smith@example.com'
+    );
+
+    $customerId = $customersClient->findOrCreate($payload);
+
+    expect($customerId)->toBe('8a3c8f42-1e95-4e3b-a7c9-82bca5a2d610');
+});
+
+it('throws exception when customer creation fails', function () {
+    $mockSearchResponse = new Response(200, [], json_encode(['Customers' => []]));
+    $mockAddResponse = new Response(200, [], json_encode(['Customers' => []]));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->with(Mockery::pattern('#/customers/search#'), Mockery::any())
+        ->andReturn($mockSearchResponse);
+
+    $httpClient->shouldReceive('post')
+        ->with(Mockery::pattern('#/customers/add#'), Mockery::any())
+        ->andReturn($mockAddResponse);
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $customersClient = new CustomersClient($mewsClient);
+
+    $payload = new CreateCustomerPayload(
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'test@example.com'
+    );
+
+    $customersClient->findOrCreate($payload);
+})->throws(MewsApiException::class, 'Failed to create customer');

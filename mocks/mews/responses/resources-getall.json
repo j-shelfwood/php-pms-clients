@@ -1,0 +1,215 @@
+{
+    "Resources": [
+        {
+            "Id": "095a6d7f-4893-4a3b-9c35-ff595d4bfa0c",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "IsActive": true,
+            "ParentResourceId": null,
+            "Name": "Updated Updated Updated Updated Updated",
+            "State": "Clean",
+            "Descriptions": {
+                "es-ES": "Prueba de descripcion a ver que sale en espa\u00f1ol",
+                "en-US": "Prueba de descripcion a ver que sale"
+            },
+            "CreatedUtc": "2018-06-11T14:55:45Z",
+            "UpdatedUtc": "2025-12-12T10:33:13Z",
+            "Data": {
+                "Discriminator": "Space",
+                "Value": {
+                    "FloorNumber": "2",
+                    "LocationNotes": "1"
+                }
+            },
+            "ExternalNames": [],
+            "Directions": []
+        },
+        {
+            "Id": "0943f364-491f-4590-a207-fc92dc9ab92e",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "IsActive": true,
+            "ParentResourceId": null,
+            "Name": "107",
+            "State": "Dirty",
+            "Descriptions": [],
+            "CreatedUtc": "2015-07-07T13:33:22Z",
+            "UpdatedUtc": "2025-12-03T03:08:07Z",
+            "Data": {
+                "Discriminator": "Space",
+                "Value": {
+                    "FloorNumber": "1",
+                    "LocationNotes": null
+                }
+            },
+            "ExternalNames": [],
+            "Directions": []
+        },
+        {
+            "Id": "eeb095d1-e8ed-40e9-9b4f-f5a91bf85bc4",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "IsActive": true,
+            "ParentResourceId": null,
+            "Name": "103",
+            "State": "Dirty",
+            "Descriptions": [],
+            "CreatedUtc": "2018-09-24T07:55:26Z",
+            "UpdatedUtc": "2025-12-03T03:08:07Z",
+            "Data": {
+                "Discriminator": "Space",
+                "Value": {
+                    "FloorNumber": "8",
+                    "LocationNotes": null
+                }
+            },
+            "ExternalNames": [],
+            "Directions": []
+        },
+        {
+            "Id": "731aaefd-1f84-47cb-858a-ef701f6a375a",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "IsActive": true,
+            "ParentResourceId": null,
+            "Name": "108",
+            "State": "Dirty",
+            "Descriptions": [],
+            "CreatedUtc": "2018-04-25T11:49:09Z",
+            "UpdatedUtc": "2025-12-08T17:02:06Z",
+            "Data": {
+                "Discriminator": "Space",
+                "Value": {
+                    "FloorNumber": "1",
+                    "LocationNotes": ""
+                }
+            },
+            "ExternalNames": [],
+            "Directions": []
+        },
+        {
+            "Id": "ec06ad34-be1a-40f9-b934-dc7b561d2f12",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "IsActive": true,
+            "ParentResourceId": null,
+            "Name": "309",
+            "State": "Dirty",
+            "Descriptions": [],
+            "CreatedUtc": "2015-11-26T00:16:44Z",
+            "UpdatedUtc": "2025-12-03T03:08:07Z",
+            "Data": {
+                "Discriminator": "Space",
+                "Value": {
+                    "FloorNumber": "3",
+                    "LocationNotes": null
+                }
+            },
+            "ExternalNames": [],
+            "Directions": []
+        },
+        {
+            "Id": "359fecf8-2bd3-4bdb-ada7-d2a2e6ae661c",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "IsActive": true,
+            "ParentResourceId": null,
+            "Name": "802",
+            "State": "Dirty",
+            "Descriptions": [],
+            "CreatedUtc": "2018-01-28T17:37:41Z",
+            "UpdatedUtc": "2025-12-03T03:08:07Z",
+            "Data": {
+                "Discriminator": "Space",
+                "Value": {
+                    "FloorNumber": "999",
+                    "LocationNotes": "2"
+                }
+            },
+            "ExternalNames": [],
+            "Directions": []
+        },
+        {
+            "Id": "6f8bdb5b-86ad-47c2-8378-d14350a38eaa",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "IsActive": true,
+            "ParentResourceId": null,
+            "Name": "407",
+            "State": "Dirty",
+            "Descriptions": {
+                "en-US": "Test room"
+            },
+            "CreatedUtc": "2018-12-12T11:42:26Z",
+            "UpdatedUtc": "2025-12-03T03:08:07Z",
+            "Data": {
+                "Discriminator": "Space",
+                "Value": {
+                    "FloorNumber": "4",
+                    "LocationNotes": "0506"
+                }
+            },
+            "ExternalNames": [],
+            "Directions": []
+        },
+        {
+            "Id": "baade5a4-9dd9-43b2-90d8-c936c115bc99",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "IsActive": true,
+            "ParentResourceId": null,
+            "Name": "116",
+            "State": "Dirty",
+            "Descriptions": [],
+            "CreatedUtc": "2018-05-22T13:09:16Z",
+            "UpdatedUtc": "2025-12-03T03:08:07Z",
+            "Data": {
+                "Discriminator": "Space",
+                "Value": {
+                    "FloorNumber": "8",
+                    "LocationNotes": null
+                }
+            },
+            "ExternalNames": [],
+            "Directions": []
+        },
+        {
+            "Id": "5ee074b1-6c86-48e8-915f-c7aa4702086f",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "IsActive": true,
+            "ParentResourceId": null,
+            "Name": "0101",
+            "State": "Dirty",
+            "Descriptions": [],
+            "CreatedUtc": "2015-07-07T13:33:22Z",
+            "UpdatedUtc": "2025-12-03T03:08:07Z",
+            "Data": {
+                "Discriminator": "Space",
+                "Value": {
+                    "FloorNumber": "1",
+                    "LocationNotes": "A1"
+                }
+            },
+            "ExternalNames": [],
+            "Directions": []
+        },
+        {
+            "Id": "9868b6d9-1e6d-4e85-a64a-b731628a0da2",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "IsActive": true,
+            "ParentResourceId": null,
+            "Name": "101",
+            "State": "Dirty",
+            "Descriptions": [],
+            "CreatedUtc": "2015-07-07T13:33:22Z",
+            "UpdatedUtc": "2025-12-19T01:27:16Z",
+            "Data": {
+                "Discriminator": "Space",
+                "Value": {
+                    "FloorNumber": "2",
+                    "LocationNotes": null
+                }
+            },
+            "ExternalNames": [],
+            "Directions": []
+        }
+    ],
+    "ResourceCategories": null,
+    "ResourceCategoryAssignments": null,
+    "ResourceCategoryImageAssignments": null,
+    "ResourceFeatures": null,
+    "ResourceFeatureAssignments": null,
+    "Cursor": "9868b6d9-1e6d-4e85-a64a-b731628a0da2"
+}

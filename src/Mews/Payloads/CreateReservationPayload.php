@@ -7,6 +7,7 @@ use Carbon\Carbon;
 class CreateReservationPayload
 {
     public function __construct(
+        public readonly string $serviceId,
         public readonly string $customerId,
         public readonly string $rateId,
         public readonly Carbon $startUtc,
