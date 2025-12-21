@@ -161,10 +161,10 @@ it('gets all reservations for service and date range', function () {
         endDate: Carbon::parse('2025-01-31')
     );
 
-    expect($response->reservations)->toHaveCount(2)
-        ->and($response->reservations[0])->toBeInstanceOf(Reservation::class)
-        ->and($response->reservations[0]->state)->toBe('Confirmed')
-        ->and($response->reservations[1]->state)->toBe('Started');
+    expect($response->items)->toHaveCount(2)
+        ->and($response->items[0])->toBeInstanceOf(Reservation::class)
+        ->and($response->items[0]->state)->toBe('Confirmed')
+        ->and($response->items[1]->state)->toBe('Started');
 });
 
 it('filters reservations by states', function () {
@@ -197,8 +197,8 @@ it('filters reservations by states', function () {
         states: ['Confirmed', 'Started']
     );
 
-    expect($response->reservations)->toHaveCount(1)
-        ->and($response->reservations[0]->state)->toBe('Confirmed');
+    expect($response->items)->toHaveCount(1)
+        ->and($response->items[0]->state)->toBe('Confirmed');
 });
 
 it('updates reservation successfully', function () {

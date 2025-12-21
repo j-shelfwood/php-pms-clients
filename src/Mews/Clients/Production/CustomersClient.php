@@ -28,8 +28,8 @@ class CustomersClient
         $searchPayload = new SearchCustomersPayload(emails: [$createPayload->email]);
         $existing = $this->search($searchPayload);
 
-        if (count($existing->customers) > 0) {
-            return $existing->customers[0]->id;
+        if (count($existing->items) > 0) {
+            return $existing->items[0]->id;
         }
 
         // Create new customer if not found
@@ -41,11 +41,11 @@ class CustomersClient
 
         $customersResponse = CustomersResponse::map($response);
 
-        if (count($customersResponse->customers) === 0) {
+        if (count($customersResponse->items) === 0) {
             throw new MewsApiException('Failed to create customer', 500);
         }
 
-        return $customersResponse->customers[0]->id;
+        return $customersResponse->items[0]->id;
     }
 
     /**
@@ -81,10 +81,10 @@ class CustomersClient
 
         $customersResponse = CustomersResponse::map($response);
 
-        if (count($customersResponse->customers) === 0) {
+        if (count($customersResponse->items) === 0) {
             throw new MewsApiException("Customer not found: {$customerId}", 404);
         }
 
-        return $customersResponse->customers[0];
+        return $customersResponse->items[0];
     }
 }

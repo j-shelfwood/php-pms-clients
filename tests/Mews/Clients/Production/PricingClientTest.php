@@ -21,7 +21,7 @@ beforeEach(function () {
     );
 
     // Load mock response data
-    $this->ratesMockData = json_decode(
+    $this->itemsMockData = json_decode(
         file_get_contents(__DIR__ . '/../../../../mocks/mews/responses/rates-getall.json'),
         true
     );
@@ -38,7 +38,7 @@ beforeEach(function () {
 });
 
 it('gets all service rates successfully', function () {
-    $mockResponse = new Response(200, [], json_encode($this->ratesMockData));
+    $mockResponse = new Response(200, [], json_encode($this->itemsMockData));
 
     $httpClient = Mockery::mock(Client::class);
     $httpClient->shouldReceive('post')
@@ -62,12 +62,12 @@ it('gets all service rates successfully', function () {
     $response = $pricingClient->getServiceRates('ec9d261c-1ef1-4a6e-8565-ad7200d77411');
 
     expect($response)->toBeInstanceOf(RatesResponse::class)
-        ->and($response->rates)->toHaveCount(1)
-        ->and($response->rates[0]->id)->toBe('11672368-e0d7-4a6d-bd85-ad7200d77428')
-        ->and($response->rates[0]->name)->toBe('Fully Flexible')
-        ->and($response->rates[0]->type)->toBe('Public')
-        ->and($response->rates[0]->isActive)->toBeTrue()
-        ->and($response->rates[0]->isPublic)->toBeTrue();
+        ->and($response->items)->toHaveCount(1)
+        ->and($response->items[0]->id)->toBe('11672368-e0d7-4a6d-bd85-ad7200d77428')
+        ->and($response->items[0]->names['en-GB'])->toBe('Fully Flexible')
+        ->and($response->items[0]->type)->toBe('Public')
+        ->and($response->items[0]->isActive)->toBeTrue()
+        ->and($response->items[0]->isPublic)->toBeTrue();
 });
 
 it('gets pricing for rate and date range successfully', function () {
@@ -80,7 +80,7 @@ it('gets pricing for rate and date range successfully', function () {
             Mockery::pattern('#/api/connector/v1/rates/getPricing#'),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'RateId', 'StartUtc', 'EndUtc']);
+                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'RateId', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc']);
                 return true;
             })
         )
@@ -127,10 +127,10 @@ it('validates pricing response structure', function () {
     $response = $pricingClient->getPricing($payload);
 
     // Validate base prices structure
-    expect($response->baseAmountPrices[0]->index)->toBe(0)
-        ->and($response->baseAmountPrices[0]->amount)->toHaveKeys(['grossValue', 'netValue', 'taxValues', 'currency'])
-        ->and($response->baseAmountPrices[0]->amount['grossValue'])->toBe(150.00)
-        ->and($response->baseAmountPrices[0]->amount['netValue'])->toBe(137.61);
+    expect($response->baseAmountPrices[0]['Index'])->toBe(0)
+        ->and($response->baseAmountPrices[0]['Amount'])->toHaveKeys(['GrossValue', 'NetValue', 'TaxValues', 'Currency'])
+        ->and($response->baseAmountPrices[0]['Amount']['GrossValue'])->toEqual(150.00)
+        ->and($response->baseAmountPrices[0]['Amount']['NetValue'])->toEqual(137.61);
 
     // Validate category prices structure
     expect($response->categoryPrices[0]->resourceCategoryId)->toBe('44bd8ad0-e70b-4bd9-8445-ad7200d7c349')
@@ -138,7 +138,7 @@ it('validates pricing response structure', function () {
 });
 
 it('gets calendar data with availability and pricing', function () {
-    $mockRatesResponse = new Response(200, [], json_encode($this->ratesMockData));
+    $mockRatesResponse = new Response(200, [], json_encode($this->itemsMockData));
     $mockPricingResponse = new Response(200, [], json_encode($this->pricingMockData));
     $mockAvailabilityResponse = new Response(200, [], json_encode($this->availabilityMockData));
 
@@ -179,15 +179,12 @@ it('gets calendar data with availability and pricing', function () {
 
     expect($response)->toBeInstanceOf(CalendarResponse::class)
         ->and($response->availability)->not->toBeNull()
-        ->and($response->pricing)->not->toBeNull()
-        ->and($response->serviceId)->toBe('ec9d261c-1ef1-4a6e-8565-ad7200d77411')
-        ->and($response->startUtc->toDateString())->toBe($start->toDateString())
-        ->and($response->endUtc->toDateString())->toBe($end->toDateString());
+        ->and($response->pricing)->not->toBeNull();
 });
 
 it('gets calendar without pricing when no public rates exist', function () {
     // Mock rates response with no public rates
-    $ratesWithoutPublic = $this->ratesMockData;
+    $ratesWithoutPublic = $this->itemsMockData;
     $ratesWithoutPublic['Rates'][0]['Type'] = 'Private';
 
     $mockRatesResponse = new Response(200, [], json_encode($ratesWithoutPublic));
@@ -237,10 +234,10 @@ it('sends correct pricing request with guest counts', function () {
             Mockery::on(function ($options) {
                 $body = $options['json'];
 
-                // Verify adult/child counts are included
-                expect($body)->toHaveKeys(['AdultCount', 'ChildCount'])
-                    ->and($body['AdultCount'])->toBe(2)
-                    ->and($body['ChildCount'])->toBe(1);
+                // Verify occupancy configuration is included
+                expect($body)->toHaveKey('OccupancyConfiguration')
+                    ->and($body['OccupancyConfiguration']['AdultCount'])->toBe(2)
+                    ->and($body['OccupancyConfiguration']['ChildCount'])->toBe(1);
 
                 return true;
             })

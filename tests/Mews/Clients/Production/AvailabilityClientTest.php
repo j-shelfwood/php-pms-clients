@@ -34,7 +34,7 @@ it('gets availability successfully', function () {
             Mockery::pattern('#/api/connector/v1/services/getAvailability#'),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceId', 'ResourceCategoryId', 'StartUtc', 'EndUtc']);
+                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceId', 'ResourceCategoryIds', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc']);
                 return true;
             })
         )
@@ -99,9 +99,8 @@ it('sends correct request structure', function () {
 
                 // Verify request structure
                 expect($body['ServiceId'])->toBeString()
-                    ->and($body['ResourceCategoryId'])->toBeString()
-                    ->and($body['StartUtc'])->toMatch('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/')
-                    ->and($body['EndUtc'])->toMatch('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/');
+                    ->and($body['FirstTimeUnitStartUtc'])->toMatch('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/')
+                    ->and($body['LastTimeUnitStartUtc'])->toMatch('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/');
 
                 return true;
             })

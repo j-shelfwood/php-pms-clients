@@ -44,11 +44,11 @@ class ReservationsClient
 
         $reservationsResponse = ReservationsResponse::map($response);
 
-        if (count($reservationsResponse->reservations) === 0) {
+        if (count($reservationsResponse->items) === 0) {
             throw new MewsApiException('Failed to create reservation', 500);
         }
 
-        return $reservationsResponse->reservations[0];
+        return $reservationsResponse->items[0];
     }
 
     /**
@@ -68,11 +68,11 @@ class ReservationsClient
 
         $reservationsResponse = ReservationsResponse::map($response);
 
-        if (count($reservationsResponse->reservations) === 0) {
+        if (count($reservationsResponse->items) === 0) {
             throw new MewsApiException("Reservation not found: {$reservationId}", 404);
         }
 
-        return $reservationsResponse->reservations[0];
+        return $reservationsResponse->items[0];
     }
 
     /**
@@ -120,11 +120,11 @@ class ReservationsClient
 
         $reservationsResponse = ReservationsResponse::map($response);
 
-        if (count($reservationsResponse->reservations) === 0) {
+        if (count($reservationsResponse->items) === 0) {
             throw new MewsApiException('Failed to update reservation', 500);
         }
 
-        return $reservationsResponse->reservations[0];
+        return $reservationsResponse->items[0];
     }
 
     /**

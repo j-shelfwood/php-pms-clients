@@ -53,11 +53,11 @@ it('searches for customers by email', function () {
     $payload = new SearchCustomersPayload(emails: ['john.doe@example.com']);
     $response = $customersClient->search($payload);
 
-    expect($response->customers)->toHaveCount(1)
-        ->and($response->customers[0])->toBeInstanceOf(Customer::class)
-        ->and($response->customers[0]->email)->toBe('john.doe@example.com')
-        ->and($response->customers[0]->firstName)->toBe('John')
-        ->and($response->customers[0]->lastName)->toBe('Doe');
+    expect($response->items)->toHaveCount(1)
+        ->and($response->items[0])->toBeInstanceOf(Customer::class)
+        ->and($response->items[0]->email)->toBe('john.doe@example.com')
+        ->and($response->items[0]->firstName)->toBe('John')
+        ->and($response->items[0]->lastName)->toBe('Doe');
 });
 
 it('returns empty results when no customers match search', function () {
@@ -74,7 +74,7 @@ it('returns empty results when no customers match search', function () {
     $payload = new SearchCustomersPayload(emails: ['nonexistent@example.com']);
     $response = $customersClient->search($payload);
 
-    expect($response->customers)->toBeEmpty();
+    expect($response->items)->toBeEmpty();
 });
 
 it('gets customer by ID successfully', function () {

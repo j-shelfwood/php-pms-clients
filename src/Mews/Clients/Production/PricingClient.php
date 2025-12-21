@@ -99,7 +99,7 @@ class PricingClient
         $rates = $this->getServiceRates($serviceId);
 
         // Find best public rate
-        $publicRates = array_filter($rates->rates, function ($rate) {
+        $publicRates = array_filter($rates->items, function ($rate) {
             return $rate->isActive &&
                    $rate->type === 'Public' &&
                    $rate->baseRateId === null;
@@ -110,20 +110,19 @@ class PricingClient
             $bestRate = array_values($publicRates)[0];
             $pricingPayload = new GetPricingPayload(
                 rateId: $bestRate->id,
-                start: $start,
-                end: $end,
-                adults: $adults,
-                children: $children
+                firstTimeUnitStartUtc: $start,
+                lastTimeUnitStartUtc: $end,
+                occupancyConfiguration: [
+                    'AdultCount' => $adults,
+                    'ChildCount' => $children
+                ]
             );
             $pricing = $this->getPricing($pricingPayload);
         }
 
         return new CalendarResponse(
             availability: $availability,
-            pricing: $pricing,
-            serviceId: $serviceId,
-            startUtc: $start,
-            endUtc: $end
+            pricing: $pricing
         );
     }
 }
