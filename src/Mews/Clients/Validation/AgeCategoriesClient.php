@@ -1,0 +1,55 @@
+<?php
+
+namespace Shelfwood\PhpPms\Mews\Clients\Validation;
+
+use Shelfwood\PhpPms\Mews\Http\MewsHttpClient;
+use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
+use Shelfwood\PhpPms\Mews\Responses\AgeCategoriesResponse;
+use Shelfwood\PhpPms\Mews\Responses\ValueObjects\AgeCategory;
+
+class AgeCategoriesClient
+{
+    public function __construct(
+        private MewsHttpClient $httpClient
+    ) {}
+
+    public function getAll(string $serviceId): AgeCategoriesResponse
+    {
+        $body = $this->httpClient->buildRequestBody([
+            'ServiceIds' => [$serviceId],
+            'Limitation' => [
+                'Count' => 100,
+            ],
+        ]);
+
+        $response = $this->httpClient->post('/api/connector/v1/ageCategories/getAll', $body);
+
+        return AgeCategoriesResponse::map($response);
+    }
+
+    public function getAdultCategory(string $serviceId): ?AgeCategory
+    {
+        $categoriesResponse = $this->getAll($serviceId);
+
+        foreach ($categoriesResponse->items as $category) {
+            if ($category->classification === 'Adult' && $category->isActive) {
+                return $category;
+            }
+        }
+
+        return null;
+    }
+
+    public function getChildCategory(string $serviceId): ?AgeCategory
+    {
+        $categoriesResponse = $this->getAll($serviceId);
+
+        foreach ($categoriesResponse->items as $category) {
+            if ($category->classification === 'Child' && $category->isActive) {
+                return $category;
+            }
+        }
+
+        return null;
+    }
+}

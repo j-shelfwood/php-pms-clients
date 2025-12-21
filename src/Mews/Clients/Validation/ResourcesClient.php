@@ -1,0 +1,62 @@
+<?php
+
+namespace Shelfwood\PhpPms\Mews\Clients\Validation;
+
+use Shelfwood\PhpPms\Mews\Http\MewsHttpClient;
+use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
+use Shelfwood\PhpPms\Mews\Responses\ResourcesResponse;
+use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Resource;
+
+class ResourcesClient
+{
+    public function __construct(
+        private MewsHttpClient $httpClient
+    ) {}
+
+    public function getAll(
+        ?array $serviceIds = null,
+        ?array $resourceCategoryIds = null,
+        ?array $resourceIds = null
+    ): ResourcesResponse {
+        $params = [];
+        
+        if ($serviceIds !== null) {
+            $params['ServiceIds'] = $serviceIds;
+        }
+        
+        if ($resourceCategoryIds !== null) {
+            $params['ResourceCategoryIds'] = $resourceCategoryIds;
+        }
+
+        if ($resourceIds !== null) {
+            $params['ResourceIds'] = $resourceIds;
+        }
+
+        $body = $this->httpClient->buildRequestBody($params);
+
+        $response = $this->httpClient->post('/api/connector/v1/resources/getAll', $body);
+
+        return ResourcesResponse::map($response);
+    }
+
+    public function getForService(string $serviceId): ResourcesResponse
+    {
+        return $this->getAll(serviceIds: [$serviceId]);
+    }
+
+    public function getForCategory(string $categoryId): ResourcesResponse
+    {
+        return $this->getAll(resourceCategoryIds: [$categoryId]);
+    }
+
+    public function getById(string $resourceId): Resource
+    {
+        $resourcesResponse = $this->getAll(resourceIds: [$resourceId]);
+
+        if (empty($resourcesResponse->items)) {
+            throw new MewsApiException("Resource not found: {$resourceId}", 404);
+        }
+
+        return $resourcesResponse->items[0];
+    }
+}
