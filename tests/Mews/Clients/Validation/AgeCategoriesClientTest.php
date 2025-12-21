@@ -31,7 +31,7 @@ it('gets all age categories for service', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/ageCategories/getAll#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceIds', 'Limitation'])
                     ->and($body['ServiceIds'])->toBeArray()
                     ->and($body['Limitation']['Count'])->toBe(100);

@@ -32,7 +32,7 @@ it('gets all services', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/services/getAll#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKeys(['ClientToken', 'AccessToken']);
                 return true;
             })
@@ -57,7 +57,7 @@ it('gets services by IDs', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body['ServiceIds'])->toBe(['service-1', 'service-2']);
                 return true;
             })
@@ -79,7 +79,7 @@ it('gets service by ID successfully', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body['ServiceIds'])->toBe(['test-service-id']);
                 return true;
             })

@@ -31,7 +31,7 @@ it('gets all resource category assignments', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/resourceCategoryAssignments/getAll#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'Limitation'])
                     ->and($body['Limitation']['Count'])->toBe(1000);
                 return true;
@@ -57,7 +57,7 @@ it('filters assignments by resource category IDs', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKey('ResourceCategoryIds')
                     ->and($body['ResourceCategoryIds'])->toBe(['category-1', 'category-2']);
                 return true;
@@ -80,7 +80,7 @@ it('filters assignments by resource IDs', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKey('ResourceIds')
                     ->and($body['ResourceIds'])->toBe(['resource-1']);
                 return true;
@@ -103,7 +103,7 @@ it('filters assignments by activity states', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKey('ActivityStates')
                     ->and($body['ActivityStates'])->toBe(['Active']);
                 return true;

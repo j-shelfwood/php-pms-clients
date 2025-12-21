@@ -33,7 +33,7 @@ it('gets availability successfully', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/services/getAvailability#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceId', 'ResourceCategoryId', 'StartUtc', 'EndUtc']);
                 return true;
             })
@@ -45,9 +45,9 @@ it('gets availability successfully', function () {
 
     $payload = new GetAvailabilityPayload(
         serviceId: 'bd26d8db-86a4-4f18-9e94-1b2362a1073c',
-        resourceCategoryId: '44bd8ad0-e70b-4bd9-8445-ad7200d7c349',
-        startDate: Carbon::parse('2025-12-19'),
-        endDate: Carbon::parse('2025-12-23')
+        firstTimeUnitStartUtc: Carbon::parse('2025-12-19'),
+        lastTimeUnitStartUtc: Carbon::parse('2025-12-23'),
+        resourceCategoryIds: ['44bd8ad0-e70b-4bd9-8445-ad7200d7c349']
     );
 
     $response = $availabilityClient->get($payload);
@@ -76,9 +76,8 @@ it('handles empty availability response', function () {
 
     $payload = new GetAvailabilityPayload(
         serviceId: 'test-service',
-        resourceCategoryId: 'test-category',
-        startDate: Carbon::parse('2025-01-01'),
-        endDate: Carbon::parse('2025-01-05')
+        firstTimeUnitStartUtc: Carbon::parse('2025-01-01'),
+        lastTimeUnitStartUtc: Carbon::parse('2025-01-05')
     );
 
     $response = $availabilityClient->get($payload);
@@ -96,7 +95,7 @@ it('sends correct request structure', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/services/getAvailability#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
 
                 // Verify request structure
                 expect($body['ServiceId'])->toBeString()
@@ -114,9 +113,8 @@ it('sends correct request structure', function () {
 
     $payload = new GetAvailabilityPayload(
         serviceId: 'test-service-id',
-        resourceCategoryId: 'test-category-id',
-        startDate: Carbon::parse('2025-01-01'),
-        endDate: Carbon::parse('2025-01-31')
+        firstTimeUnitStartUtc: Carbon::parse('2025-01-01'),
+        lastTimeUnitStartUtc: Carbon::parse('2025-01-31')
     );
 
     $availabilityClient->get($payload);

@@ -46,7 +46,7 @@ it('gets all service rates successfully', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/rates/getAll#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceIds'])
                     ->and($body['ServiceIds'])->toBeArray()
                     ->and($body['ServiceIds'])->toHaveCount(1);
@@ -79,7 +79,7 @@ it('gets pricing for rate and date range successfully', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/rates/getPricing#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'RateId', 'StartUtc', 'EndUtc']);
                 return true;
             })
@@ -92,9 +92,9 @@ it('gets pricing for rate and date range successfully', function () {
 
     $payload = new GetPricingPayload(
         rateId: '11672368-e0d7-4a6d-bd85-ad7200d77428',
-        start: Carbon::parse('2025-01-15'),
-        end: Carbon::parse('2025-01-17'),
-        adults: 2
+        firstTimeUnitStartUtc: Carbon::parse('2025-01-15'),
+        lastTimeUnitStartUtc: Carbon::parse('2025-01-17'),
+        occupancyConfiguration: ['AdultCount' => 2]
     );
 
     $response = $pricingClient->getPricing($payload);
@@ -120,8 +120,8 @@ it('validates pricing response structure', function () {
 
     $payload = new GetPricingPayload(
         rateId: 'test-rate',
-        start: Carbon::parse('2025-01-15'),
-        end: Carbon::parse('2025-01-17')
+        firstTimeUnitStartUtc: Carbon::parse('2025-01-15'),
+        lastTimeUnitStartUtc: Carbon::parse('2025-01-17')
     );
 
     $response = $pricingClient->getPricing($payload);
@@ -235,7 +235,7 @@ it('sends correct pricing request with guest counts', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
 
                 // Verify adult/child counts are included
                 expect($body)->toHaveKeys(['AdultCount', 'ChildCount'])
@@ -253,10 +253,9 @@ it('sends correct pricing request with guest counts', function () {
 
     $payload = new GetPricingPayload(
         rateId: 'test-rate',
-        start: Carbon::parse('2025-01-15'),
-        end: Carbon::parse('2025-01-17'),
-        adults: 2,
-        children: 1
+        firstTimeUnitStartUtc: Carbon::parse('2025-01-15'),
+        lastTimeUnitStartUtc: Carbon::parse('2025-01-17'),
+        occupancyConfiguration: ['AdultCount' => 2, 'ChildCount' => 1]
     );
 
     $pricingClient->getPricing($payload);

@@ -90,8 +90,8 @@ class PricingClient
         // Get availability for the date range
         $availabilityPayload = new GetAvailabilityPayload(
             serviceId: $serviceId,
-            start: $start,
-            end: $end
+            firstTimeUnitStartUtc: $start,
+            lastTimeUnitStartUtc: $end
         );
         $availability = $this->availabilityClient->get($availabilityPayload);
 

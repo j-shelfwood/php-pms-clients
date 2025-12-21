@@ -37,7 +37,7 @@ it('creates a new reservation successfully', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/reservations/add#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceId', 'Reservations', 'SendConfirmationEmail']);
                 return true;
             })
@@ -101,7 +101,7 @@ it('gets reservation by ID successfully', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/reservations/getAll#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKey('ReservationIds')
                     ->and($body['ReservationIds'])->toBeArray()
                     ->and($body['ReservationIds'])->toHaveCount(1);
@@ -142,7 +142,7 @@ it('gets all reservations for service and date range', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/reservations/getAll#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKeys(['ServiceIds', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc'])
                     ->and($body['ServiceIds'])->toBeArray()
                     ->and($body['FirstTimeUnitStartUtc'])->toBeString()
@@ -179,7 +179,7 @@ it('filters reservations by states', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKey('ReservationStates')
                     ->and($body['ReservationStates'])->toBe(['Confirmed', 'Started']);
                 return true;
@@ -212,7 +212,7 @@ it('updates reservation successfully', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/reservations/update#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKey('ReservationUpdates')
                     ->and($body['ReservationUpdates'])->toBeArray();
                 return true;

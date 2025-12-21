@@ -45,11 +45,11 @@ class RestrictionsClient
             $response = $this->httpClient->post('/api/connector/v1/restrictions/getAll', $body);
 
             $pageResponse = RestrictionsResponse::map($response);
-            $allRestrictions = array_merge($allRestrictions, $pageResponse->restrictions);
+            $allRestrictions = array_merge($allRestrictions, $pageResponse->items);
             $cursor = $pageResponse->cursor;
         } while ($cursor !== null);
 
-        return new RestrictionsResponse(restrictions: $allRestrictions);
+        return new RestrictionsResponse(items: $allRestrictions);
     }
 
     /**

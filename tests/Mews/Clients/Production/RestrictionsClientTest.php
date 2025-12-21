@@ -33,7 +33,7 @@ it('gets all restrictions for service and date range', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/restrictions/getAll#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceId', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc'])
                     ->and($body['ServiceId'])->toBeString()
                     ->and($body['FirstTimeUnitStartUtc'])->toMatch('/^\d{4}-\d{2}-\d{2}T/')
@@ -53,10 +53,10 @@ it('gets all restrictions for service and date range', function () {
     );
 
     expect($response)->toBeInstanceOf(RestrictionsResponse::class)
-        ->and($response->restrictions)->toHaveCount(2)
-        ->and($response->restrictions[0])->toBeInstanceOf(Restriction::class)
-        ->and($response->restrictions[0]->minimumStay)->toBe(3)
-        ->and($response->restrictions[1]->minimumStay)->toBe(7);
+        ->and($response->items)->toHaveCount(2)
+        ->and($response->items[0])->toBeInstanceOf(Restriction::class)
+        ->and($response->items[0]->minimumStay)->toBe(3)
+        ->and($response->items[1]->minimumStay)->toBe(7);
 });
 
 it('handles paginated responses with cursor', function () {
@@ -83,7 +83,7 @@ it('handles paginated responses with cursor', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body['Cursor'])->toBeNull();
                 return true;
             })
@@ -96,7 +96,7 @@ it('handles paginated responses with cursor', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body['Cursor'])->toBe('next-page-token');
                 return true;
             })
@@ -113,7 +113,7 @@ it('handles paginated responses with cursor', function () {
     );
 
     // Should aggregate both pages
-    expect($response->restrictions)->toHaveCount(2);
+    expect($response->items)->toHaveCount(2);
 });
 
 it('filters by resource category IDs', function () {
@@ -125,7 +125,7 @@ it('filters by resource category IDs', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKey('ResourceCategoryIds')
                     ->and($body['ResourceCategoryIds'])->toBe(['category-1', 'category-2']);
                 return true;
@@ -146,7 +146,7 @@ it('filters by resource category IDs', function () {
 
 it('finds minimum stay for date and category', function () {
     $restrictions = [
-        new Restriction([
+        Restriction::map([
             'Id' => 'restriction-1',
             'ServiceId' => 'service-1',
             'ResourceCategoryId' => 'category-1',
@@ -155,7 +155,7 @@ it('finds minimum stay for date and category', function () {
             'MinimumStay' => 3,
             'Type' => 'Stay',
         ]),
-        new Restriction([
+        Restriction::map([
             'Id' => 'restriction-2',
             'ServiceId' => 'service-1',
             'ResourceCategoryId' => 'category-1',
@@ -182,7 +182,7 @@ it('finds minimum stay for date and category', function () {
 
 it('finds minimum stay when only one restriction applies', function () {
     $restrictions = [
-        new Restriction([
+        Restriction::map([
             'Id' => 'restriction-1',
             'ServiceId' => 'service-1',
             'ResourceCategoryId' => 'category-1',
@@ -208,7 +208,7 @@ it('finds minimum stay when only one restriction applies', function () {
 
 it('returns null when no restrictions apply for date', function () {
     $restrictions = [
-        new Restriction([
+        Restriction::map([
             'Id' => 'restriction-1',
             'ServiceId' => 'service-1',
             'ResourceCategoryId' => 'category-1',
@@ -235,7 +235,7 @@ it('returns null when no restrictions apply for date', function () {
 
 it('returns null when no restrictions apply for category', function () {
     $restrictions = [
-        new Restriction([
+        Restriction::map([
             'Id' => 'restriction-1',
             'ServiceId' => 'service-1',
             'ResourceCategoryId' => 'category-1',
@@ -262,7 +262,7 @@ it('returns null when no restrictions apply for category', function () {
 
 it('handles restrictions without minimum stay set', function () {
     $restrictions = [
-        new Restriction([
+        Restriction::map([
             'Id' => 'restriction-1',
             'ServiceId' => 'service-1',
             'ResourceCategoryId' => 'category-1',

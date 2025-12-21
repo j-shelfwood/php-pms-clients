@@ -32,7 +32,7 @@ it('gets all resources with service filter', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/resources/getAll#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceIds'])
                     ->and($body['ServiceIds'])->toBeArray();
                 return true;
@@ -59,7 +59,7 @@ it('gets all resources with category filter', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKey('ResourceCategoryIds')
                     ->and($body['ResourceCategoryIds'])->toBe(['category-123']);
                 return true;
@@ -82,7 +82,7 @@ it('gets all resources with resource IDs filter', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKey('ResourceIds')
                     ->and($body['ResourceIds'])->toBe(['resource-1', 'resource-2']);
                 return true;
@@ -105,7 +105,7 @@ it('gets resources for service using helper method', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body['ServiceIds'])->toBe(['service-123']);
                 return true;
             })
@@ -129,7 +129,7 @@ it('gets resources for category using helper method', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body['ResourceCategoryIds'])->toBe(['category-456']);
                 return true;
             })
@@ -158,7 +158,7 @@ it('gets resource by ID successfully', function () {
         ->with(
             Mockery::any(),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body['ResourceIds'])->toBe(['095a6d7f-4893-4a3b-9c35-ff595d4bfa0c']);
                 return true;
             })

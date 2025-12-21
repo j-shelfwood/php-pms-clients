@@ -39,7 +39,7 @@ it('searches for customers by email', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/customers/search#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'Emails'])
                     ->and($body['Emails'])->toBeArray();
                 return true;
@@ -86,7 +86,7 @@ it('gets customer by ID successfully', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/customers/getAll#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKey('CustomerIds')
                     ->and($body['CustomerIds'])->toBeArray()
                     ->and($body['CustomerIds'])->toHaveCount(1);
@@ -164,7 +164,7 @@ it('creates new customer when not found', function () {
         ->with(
             Mockery::pattern('#/customers/add#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKey('Customers')
                     ->and($body['Customers'])->toBeArray()
                     ->and($body['Customers'][0])->toHaveKeys(['FirstName', 'LastName', 'Email']);

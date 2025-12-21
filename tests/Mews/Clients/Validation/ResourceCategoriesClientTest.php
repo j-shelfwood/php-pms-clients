@@ -31,7 +31,7 @@ it('gets resource categories for service', function () {
         ->with(
             Mockery::pattern('#/api/connector/v1/resourceCategories/getAll#'),
             Mockery::on(function ($options) {
-                $body = json_decode($options['body'], true);
+                $body = $options['json'];
                 expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceIds'])
                     ->and($body['ServiceIds'])->toBeArray()
                     ->and($body['ServiceIds'])->toContain('test-service-id');
