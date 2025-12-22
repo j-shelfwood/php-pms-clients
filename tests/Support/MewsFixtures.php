@@ -70,8 +70,7 @@ class MewsFixtures
     /**
      * Generate HMAC-SHA256 webhook signature
      *
-     * Mews webhooks use HMAC-SHA256 for signature verification.
-     * The signature is computed over the JSON-encoded payload.
+     * Delegates to production WebhookSignatureService for consistent behavior.
      *
      * @param array $payload Webhook payload to sign
      * @param string $secret Webhook secret from Mews configuration
@@ -79,11 +78,13 @@ class MewsFixtures
      */
     public static function generateSignature(array $payload, string $secret): string
     {
-        return hash_hmac('sha256', json_encode($payload), $secret);
+        return \Shelfwood\PhpPms\Mews\Services\WebhookSignatureService::generate($payload, $secret);
     }
 
     /**
      * Verify webhook signature
+     *
+     * Delegates to production WebhookSignatureService for consistent behavior.
      *
      * @param array $payload Webhook payload
      * @param string $signature Signature from X-Mews-Signature header
@@ -92,8 +93,7 @@ class MewsFixtures
      */
     public static function verifySignature(array $payload, string $signature, string $secret): bool
     {
-        $expected = self::generateSignature($payload, $secret);
-        return hash_equals($expected, $signature);
+        return \Shelfwood\PhpPms\Mews\Services\WebhookSignatureService::verify($payload, $signature, $secret);
     }
 
     // ========================================================================
