@@ -33,9 +33,7 @@ class CustomersClient
         }
 
         // Create new customer if not found
-        $body = $this->httpClient->buildRequestBody([
-            'Customers' => [$createPayload->toArray()],
-        ]);
+        $body = $this->httpClient->buildRequestBody($createPayload->toArray());
 
         $response = $this->httpClient->post('/api/connector/v1/customers/add', $body);
 

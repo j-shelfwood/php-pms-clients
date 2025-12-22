@@ -6,6 +6,7 @@ class CreateCustomerPayload
 {
     public function __construct(
         public readonly string $lastName,
+        public readonly bool $overwriteExisting = false,
         public readonly ?string $email = null,
         public readonly ?string $firstName = null,
         public readonly ?string $phone = null,
@@ -30,15 +31,34 @@ class CreateCustomerPayload
 
     public function toArray(): array
     {
-        return array_filter([
-            'Email' => $this->email,
-            'FirstName' => $this->firstName,
+        $data = [
             'LastName' => $this->lastName,
-            'Phone' => $this->phone,
-            'NationalityCode' => $this->nationalityCode,
-            'PreferredLanguageCode' => $this->preferredLanguageCode,
-            'BirthDate' => $this->birthDate,
-            'Address' => $this->address,
-        ], fn($value) => $value !== null);
+            'OverwriteExisting' => $this->overwriteExisting,
+        ];
+
+        // Add optional fields if not null
+        if ($this->email !== null) {
+            $data['Email'] = $this->email;
+        }
+        if ($this->firstName !== null) {
+            $data['FirstName'] = $this->firstName;
+        }
+        if ($this->phone !== null) {
+            $data['Phone'] = $this->phone;
+        }
+        if ($this->nationalityCode !== null) {
+            $data['NationalityCode'] = $this->nationalityCode;
+        }
+        if ($this->preferredLanguageCode !== null) {
+            $data['PreferredLanguageCode'] = $this->preferredLanguageCode;
+        }
+        if ($this->birthDate !== null) {
+            $data['BirthDate'] = $this->birthDate;
+        }
+        if ($this->address !== null) {
+            $data['Address'] = $this->address;
+        }
+
+        return $data;
     }
 }

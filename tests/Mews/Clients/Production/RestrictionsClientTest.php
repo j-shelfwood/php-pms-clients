@@ -34,10 +34,11 @@ it('gets all restrictions for service and date range', function () {
             Mockery::pattern('#/api/connector/v1/restrictions/getAll#'),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceId', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc'])
-                    ->and($body['ServiceId'])->toBeString()
-                    ->and($body['FirstTimeUnitStartUtc'])->toMatch('/^\d{4}-\d{2}-\d{2}T/')
-                    ->and($body['LastTimeUnitStartUtc'])->toMatch('/^\d{4}-\d{2}-\d{2}T/');
+                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceIds', 'CollidingUtc', 'Limitation'])
+                    ->and($body['ServiceIds'])->toBeArray()
+                    ->and($body['ServiceIds'])->toHaveCount(1)
+                    ->and($body['CollidingUtc'])->toHaveKeys(['StartUtc', 'EndUtc'])
+                    ->and($body['Limitation'])->toHaveKey('Count');
                 return true;
             })
         )
@@ -84,7 +85,7 @@ it('handles paginated responses with cursor', function () {
             Mockery::any(),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body['Cursor'])->toBeNull();
+                expect($body)->not->toHaveKey('Cursor');
                 return true;
             })
         )

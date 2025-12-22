@@ -165,9 +165,8 @@ it('creates new customer when not found', function () {
             Mockery::pattern('#/customers/add#'),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body)->toHaveKey('Customers')
-                    ->and($body['Customers'])->toBeArray()
-                    ->and($body['Customers'][0])->toHaveKeys(['FirstName', 'LastName', 'Email']);
+                expect($body)->toHaveKeys(['FirstName', 'LastName', 'Email', 'OverwriteExisting'])
+                    ->and($body['OverwriteExisting'])->toBeBool();
                 return true;
             })
         )

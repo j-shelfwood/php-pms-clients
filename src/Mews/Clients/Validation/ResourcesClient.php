@@ -14,16 +14,11 @@ class ResourcesClient
     ) {}
 
     public function getAll(
-        ?array $serviceIds = null,
         ?array $resourceCategoryIds = null,
         ?array $resourceIds = null
     ): ResourcesResponse {
         $params = [];
-        
-        if ($serviceIds !== null) {
-            $params['ServiceIds'] = $serviceIds;
-        }
-        
+
         if ($resourceCategoryIds !== null) {
             $params['ResourceCategoryIds'] = $resourceCategoryIds;
         }
@@ -37,11 +32,6 @@ class ResourcesClient
         $response = $this->httpClient->post('/api/connector/v1/resources/getAll', $body);
 
         return ResourcesResponse::map($response);
-    }
-
-    public function getForService(string $serviceId): ResourcesResponse
-    {
-        return $this->getAll(serviceIds: [$serviceId]);
     }
 
     public function getForCategory(string $categoryId): ResourcesResponse

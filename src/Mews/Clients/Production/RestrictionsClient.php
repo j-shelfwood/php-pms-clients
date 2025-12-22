@@ -35,10 +35,13 @@ class RestrictionsClient
 
         do {
             $body = $this->httpClient->buildRequestBody([
-                'ServiceId' => $serviceId,
-                'FirstTimeUnitStartUtc' => $start->toIso8601String(),
-                'LastTimeUnitStartUtc' => $end->toIso8601String(),
+                'ServiceIds' => [$serviceId],
+                'CollidingUtc' => [
+                    'StartUtc' => $start->toIso8601String(),
+                    'EndUtc' => $end->toIso8601String(),
+                ],
                 'ResourceCategoryIds' => $resourceCategoryIds,
+                'Limitation' => ['Count' => 1000],
                 'Cursor' => $cursor,
             ]);
 

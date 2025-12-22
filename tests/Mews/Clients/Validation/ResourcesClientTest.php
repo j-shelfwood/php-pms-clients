@@ -23,33 +23,6 @@ beforeEach(function () {
     );
 });
 
-it('gets all resources with service filter', function () {
-    $mockResponse = new Response(200, [], json_encode($this->mockData));
-
-    $httpClient = Mockery::mock(Client::class);
-    $httpClient->shouldReceive('post')
-        ->once()
-        ->with(
-            Mockery::pattern('#/api/connector/v1/resources/getAll#'),
-            Mockery::on(function ($options) {
-                $body = $options['json'];
-                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceIds'])
-                    ->and($body['ServiceIds'])->toBeArray();
-                return true;
-            })
-        )
-        ->andReturn($mockResponse);
-
-    $mewsClient = new MewsHttpClient($this->config, $httpClient);
-    $resourcesClient = new ResourcesClient($mewsClient);
-
-    $response = $resourcesClient->getAll(serviceIds: ['test-service-id']);
-
-    expect($response->items)->toHaveCount(10)
-        ->and($response->items[0])->toBeInstanceOf(Resource::class)
-        ->and($response->items[0]->name)->toBeString();
-});
-
 it('gets all resources with category filter', function () {
     $mockResponse = new Response(200, [], json_encode($this->mockData));
 
@@ -94,30 +67,6 @@ it('gets all resources with resource IDs filter', function () {
     $resourcesClient = new ResourcesClient($mewsClient);
 
     $resourcesClient->getAll(resourceIds: ['resource-1', 'resource-2']);
-});
-
-it('gets resources for service using helper method', function () {
-    $mockResponse = new Response(200, [], json_encode($this->mockData));
-
-    $httpClient = Mockery::mock(Client::class);
-    $httpClient->shouldReceive('post')
-        ->once()
-        ->with(
-            Mockery::any(),
-            Mockery::on(function ($options) {
-                $body = $options['json'];
-                expect($body['ServiceIds'])->toBe(['service-123']);
-                return true;
-            })
-        )
-        ->andReturn($mockResponse);
-
-    $mewsClient = new MewsHttpClient($this->config, $httpClient);
-    $resourcesClient = new ResourcesClient($mewsClient);
-
-    $response = $resourcesClient->getForService('service-123');
-
-    expect($response->items)->toHaveCount(10);
 });
 
 it('gets resources for category using helper method', function () {
