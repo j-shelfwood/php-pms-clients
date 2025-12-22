@@ -3,10 +3,9 @@
 use Shelfwood\PhpPms\Mews\Enums\AgeClassification;
 
 it('has all age classifications', function () {
-    expect(AgeClassification::cases())->toHaveCount(3)
+    expect(AgeClassification::cases())->toHaveCount(2)
         ->and(AgeClassification::Adult->value)->toBe('Adult')
-        ->and(AgeClassification::Child->value)->toBe('Child')
-        ->and(AgeClassification::Infant->value)->toBe('Infant');
+        ->and(AgeClassification::Child->value)->toBe('Child');
 });
 
 it('can be created from string', function () {

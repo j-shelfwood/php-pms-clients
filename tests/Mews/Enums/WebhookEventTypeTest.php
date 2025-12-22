@@ -3,10 +3,14 @@
 use Shelfwood\PhpPms\Mews\Enums\WebhookEventType;
 
 it('has all webhook event types', function () {
-    expect(WebhookEventType::cases())->toHaveCount(3)
+    expect(WebhookEventType::cases())->toHaveCount(7)
         ->and(WebhookEventType::ServiceOrderUpdated->value)->toBe('ServiceOrderUpdated')
         ->and(WebhookEventType::ResourceUpdated->value)->toBe('ResourceUpdated')
-        ->and(WebhookEventType::ResourceBlockUpdated->value)->toBe('ResourceBlockUpdated');
+        ->and(WebhookEventType::MessageAdded->value)->toBe('MessageAdded')
+        ->and(WebhookEventType::ResourceBlockUpdated->value)->toBe('ResourceBlockUpdated')
+        ->and(WebhookEventType::CustomerAdded->value)->toBe('CustomerAdded')
+        ->and(WebhookEventType::CustomerUpdated->value)->toBe('CustomerUpdated')
+        ->and(WebhookEventType::PaymentUpdated->value)->toBe('PaymentUpdated');
 });
 
 it('can be created from string', function () {
