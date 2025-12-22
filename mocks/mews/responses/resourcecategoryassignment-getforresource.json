@@ -1,0 +1,8 @@
+{
+  "Id": "abc12345-6789-0def-1234-567890abcdef",
+  "ResourceId": "095a6d7f-4893-4a3b-9c35-ff595d4bfa0c",
+  "CategoryId": "773d5e42-de1e-43a0-9ce6-c3e7511c1e0a",
+  "IsActive": true,
+  "CreatedUtc": "2018-06-11T15:00:00Z",
+  "UpdatedUtc": "2025-01-01T00:00:00Z"
+}

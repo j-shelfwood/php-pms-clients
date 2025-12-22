@@ -1,0 +1,33 @@
+{
+  "Id": "bd26d8db-86a4-4f18-9e94-1b2362a1073c",
+  "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+  "IsActive": true,
+  "Name": "Accommodation",
+  "Names": {
+    "en-US": "Accommodation",
+    "es-ES": "Alojamiento",
+    "nl-NL": "Accommodatie"
+  },
+  "Type": "Accommod",
+  "StartTime": "PT14H",
+  "EndTime": "PT11H",
+  "Promotions": {
+    "BeforeCheckIn": [],
+    "AfterCheckIn": [],
+    "DuringStay": [],
+    "BeforeCheckOut": [],
+    "AfterCheckOut": []
+  },
+  "Options": {
+    "BillAsPackage": false
+  },
+  "ExternalIdentifier": "ACCOM-SERVICE-001",
+  "CreatedUtc": "2018-01-01T00:00:00Z",
+  "UpdatedUtc": "2025-01-01T00:00:00Z",
+  "Data": {
+    "Discriminator": "Bookable",
+    "Value": {
+      "TimeUnitPeriod": "Day"
+    }
+  }
+}

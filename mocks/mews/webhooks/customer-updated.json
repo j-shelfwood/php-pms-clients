@@ -1,0 +1,12 @@
+{
+  "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+  "IntegrationId": "c8bee838-7fb1-4f4e-8fac-ac87008b2f90",
+  "Events": [
+    {
+      "Discriminator": "CustomerUpdated",
+      "Value": {
+        "Id": "c2f1d888-232e-49eb-87ac-5f75363af13b"
+      }
+    }
+  ]
+}

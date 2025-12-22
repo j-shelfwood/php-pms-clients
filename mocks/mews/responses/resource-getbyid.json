@@ -1,0 +1,24 @@
+{
+  "Id": "095a6d7f-4893-4a3b-9c35-ff595d4bfa0c",
+  "ServiceId": "bd26d8db-86a4-4f18-9e94-1b2362a1073c",
+  "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+  "IsActive": true,
+  "ParentResourceId": null,
+  "Name": "Superior Apartment",
+  "State": "Clean",
+  "Descriptions": {
+    "en-US": "Spacious apartment with city view and modern amenities",
+    "es-ES": "Apartamento espacioso con vistas a la ciudad y comodidades modernas"
+  },
+  "CreatedUtc": "2018-06-11T14:55:45Z",
+  "UpdatedUtc": "2025-12-12T10:33:13Z",
+  "Data": {
+    "Discriminator": "Space",
+    "Value": {
+      "FloorNumber": "2",
+      "LocationNotes": "Building A, near elevator"
+    }
+  },
+  "ExternalNames": [],
+  "Directions": []
+}

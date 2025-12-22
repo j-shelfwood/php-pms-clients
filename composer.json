@@ -23,7 +23,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Shelfwood\\PhpPms\\": "src/"
+      "Shelfwood\\PhpPms\\": "src/",
+      "Shelfwood\\PhpPms\\Tests\\Support\\": "tests/Support/"
     }
   },
   "autoload-dev": {
