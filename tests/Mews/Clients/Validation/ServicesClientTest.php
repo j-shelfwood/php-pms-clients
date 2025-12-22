@@ -33,7 +33,8 @@ it('gets all services', function () {
             Mockery::pattern('#/api/connector/v1/services/getAll#'),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body)->toHaveKeys(['ClientToken', 'AccessToken']);
+                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'Limitation'])
+                    ->and($body['Limitation'])->toHaveKey('Count');
                 return true;
             })
         )

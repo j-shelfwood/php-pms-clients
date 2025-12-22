@@ -15,6 +15,7 @@ class ResourceCategoriesClient
     {
         $body = $this->httpClient->buildRequestBody([
             'ServiceIds' => [$serviceId],
+            'Limitation' => ['Count' => 1000],
         ]);
 
         $response = $this->httpClient->post('/api/connector/v1/resourceCategories/getAll', $body);

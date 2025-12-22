@@ -17,6 +17,7 @@ class ServicesClient
     {
         $body = $this->httpClient->buildRequestBody([
             'ServiceIds' => $serviceIds,
+            'Limitation' => ['Count' => 1000],
         ]);
 
         $response = $this->httpClient->post('/api/connector/v1/services/getAll', $body);
