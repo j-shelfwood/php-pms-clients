@@ -2,6 +2,7 @@
 
 namespace Shelfwood\PhpPms\Mews\Clients\Validation;
 
+use Shelfwood\PhpPms\Mews\Enums\AgeClassification;
 use Shelfwood\PhpPms\Mews\Http\MewsHttpClient;
 use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
 use Shelfwood\PhpPms\Mews\Responses\AgeCategoriesResponse;
@@ -32,7 +33,7 @@ class AgeCategoriesClient
         $categoriesResponse = $this->getAll($serviceId);
 
         foreach ($categoriesResponse->items as $category) {
-            if ($category->classification === 'Adult' && $category->isActive) {
+            if ($category->classification === AgeClassification::Adult && $category->isActive) {
                 return $category;
             }
         }
@@ -45,7 +46,7 @@ class AgeCategoriesClient
         $categoriesResponse = $this->getAll($serviceId);
 
         foreach ($categoriesResponse->items as $category) {
-            if ($category->classification === 'Child' && $category->isActive) {
+            if ($category->classification === AgeClassification::Child && $category->isActive) {
                 return $category;
             }
         }

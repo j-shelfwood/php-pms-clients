@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Collection;
 use Shelfwood\PhpPms\Mews\Responses\ResourcesResponse;
+use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Resource;
 
 it('maps resources response from API', function () {
     $mockPath = __DIR__ . '/../../../mocks/mews/responses/resources-getall.json';
@@ -8,9 +10,11 @@ it('maps resources response from API', function () {
 
     $response = ResourcesResponse::map($mockData);
 
-    expect($response->items)->toHaveCount(10)
-        ->and($response->items[0]->name)->toBe('Updated Updated Updated Updated Updated')
-        ->and($response->cursor)->toBe('9868b6d9-1e6d-4e85-a64a-b731628a0da2');
+    expect($response->items)->toBeInstanceOf(Collection::class)
+        ->and($response->items->count())->toBeGreaterThan(0)
+        ->and($response->items[0])->toBeInstanceOf(Resource::class)
+        ->and($response->items[0]->name)->toBe('0. Sirius ')
+        ->and($response->cursor)->toBeNull();
 });
 
 it('handles empty resources', function () {

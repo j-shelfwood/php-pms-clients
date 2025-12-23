@@ -158,7 +158,7 @@ class BookingManagerAPI extends XMLClient
             $this->logger->warning('No <property> elements found directly under the root parsed XML for getAllProperties.', [
                 'parsed_xml_keys' => is_array($parsedArray) ? implode(',', array_keys($parsedArray)) : 'null',
             ]);
-            return new PropertiesResponse(properties: []);
+            return new PropertiesResponse(properties: collect());
         }
         if (isset($parsedArray['property']) && isset($parsedArray['property']['@attributes'])) {
             $parsedArray['property'] = [$parsedArray['property']];

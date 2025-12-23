@@ -1,6 +1,7 @@
 <?php
 
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Rate;
+use Shelfwood\PhpPms\Mews\Enums\RateType;
 
 it('maps rate from API response', function () {
     $mockPath = __DIR__ . '/../../../../mocks/mews/responses/rates-getall.json';
@@ -11,7 +12,7 @@ it('maps rate from API response', function () {
 
     expect($rate->id)->toBe('11672368-e0d7-4a6d-bd85-ad7200d77428')
         ->and($rate->isActive)->toBeTrue()
-        ->and($rate->type)->toBe('Public')
+        ->and($rate->type)->toBe(RateType::Public)
         ->and($rate->names)->toHaveKey('en-GB');
 });
 

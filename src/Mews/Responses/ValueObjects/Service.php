@@ -3,9 +3,29 @@
 namespace Shelfwood\PhpPms\Mews\Responses\ValueObjects;
 
 use Shelfwood\PhpPms\Exceptions\MappingException;
+use Shelfwood\PhpPms\Mews\Enums\ServiceType;
 
 class Service
 {
+    /**
+     * @param string $id
+     * @param string $enterpriseId
+     * @param bool $isActive
+     * @param array<string, string> $names
+     * @param array<string, string>|null $shortNames
+     * @param array<string, string>|null $description
+     * @param array<string, mixed> $options
+     * @param array<string, mixed> $data
+     * @param string|null $externalIdentifier
+     * @param int $ordering
+     * @param string $createdUtc
+     * @param string $updatedUtc
+     * @param string|null $name
+     * @param ServiceType|null $type
+     * @param string|null $startTime
+     * @param string|null $endTime
+     * @param array<int, mixed>|null $promotions
+     */
     public function __construct(
         public readonly string $id,
         public readonly string $enterpriseId,
@@ -21,7 +41,7 @@ class Service
         public readonly string $updatedUtc,
         // Additional fields from API
         public readonly ?string $name,
-        public readonly ?string $type,
+        public readonly ?ServiceType $type,
         public readonly ?string $startTime,
         public readonly ?string $endTime,
         public readonly ?array $promotions,
@@ -45,7 +65,7 @@ class Service
                 updatedUtc: $data['UpdatedUtc'] ?? '',
                 // Additional fields from API
                 name: $data['Name'] ?? null,
-                type: $data['Type'] ?? null,
+                type: isset($data['Type']) ? ServiceType::from($data['Type']) : null,
                 startTime: $data['StartTime'] ?? null,
                 endTime: $data['EndTime'] ?? null,
                 promotions: $data['Promotions'] ?? null,

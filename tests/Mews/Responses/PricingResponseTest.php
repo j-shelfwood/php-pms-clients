@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Collection;
 use Shelfwood\PhpPms\Mews\Responses\PricingResponse;
 
 it('maps pricing response from API with adjustments', function () {
@@ -10,7 +11,7 @@ it('maps pricing response from API with adjustments', function () {
 
     expect($response->currency)->toBe('GBP')
         ->and($response->timeUnitStartsUtc)->toBeArray()
-        ->and($response->categoryPrices)->toBeArray()
+        ->and($response->categoryPrices)->toBeInstanceOf(Collection::class)
         ->and($response->categoryAdjustments)->toBeArray()
         ->and($response->ageCategoryAdjustments)->toBeArray()
         ->and($response->relativeAdjustment)->toBe(0.0)

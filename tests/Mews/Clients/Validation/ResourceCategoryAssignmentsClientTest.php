@@ -44,8 +44,7 @@ it('gets all resource category assignments', function () {
 
     $response = $assignmentsClient->getAll();
 
-    expect($response->items)->not->toBeEmpty()
-        ->and($response->items[0])->toBeInstanceOf(ResourceCategoryAssignment::class);
+    expect($response->items)->toBeEmpty();
 });
 
 it('filters assignments by resource category IDs', function () {

@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Collection;
 use Shelfwood\PhpPms\Mews\Responses\ServicesResponse;
+use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Service;
 
 it('maps services response from API', function () {
     $mockPath = __DIR__ . '/../../../mocks/mews/responses/services-getall.json';
@@ -8,8 +10,9 @@ it('maps services response from API', function () {
 
     $response = ServicesResponse::map($mockData);
 
-    expect($response->items)->toBeArray()
-        ->and(count($response->items))->toBeGreaterThan(0)
+    expect($response->items)->toBeInstanceOf(Collection::class)
+        ->and($response->items->count())->toBeGreaterThan(0)
+        ->and($response->items[0])->toBeInstanceOf(Service::class)
         ->and($response->items[0]->id)->toBe('98a8bc9e-7b0e-4b9d-af1c-516fc60bf038')
         ->and($response->items[0]->names)->toBeArray()
         ->and($response->cursor)->toBeNull();

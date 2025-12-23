@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Shelfwood\PhpPms\Mews\Payloads\CreateReservationPayload;
+use Shelfwood\PhpPms\Mews\Enums\ReservationState;
 
 it('creates payload with required fields', function () {
     $payload = new CreateReservationPayload(
@@ -19,7 +20,7 @@ it('creates payload with required fields', function () {
         ->and($payload->customerId)->toBe('customer-456')
         ->and($payload->rateId)->toBe('rate-789')
         ->and($payload->personCounts)->toBe([['AgeCategoryId' => 'adult-category', 'Count' => 2]])
-        ->and($payload->state)->toBe('Confirmed'); // Default value
+        ->and($payload->state)->toBe(ReservationState::Confirmed); // Default value
 });
 
 it('converts to array with all fields', function () {
@@ -34,7 +35,7 @@ it('converts to array with all fields', function () {
             ['AgeCategoryId' => 'child-category', 'Count' => 1]
         ],
         requestedCategoryId: 'category-123',
-        state: 'Confirmed',
+        state: ReservationState::Confirmed,
         notes: 'Late check-in requested'
     );
 
@@ -76,7 +77,7 @@ it('includes releaseUtc for optional reservations', function () {
         startUtc: Carbon::parse('2025-01-15'),
         endUtc: Carbon::parse('2025-01-18'),
         personCounts: [['AgeCategoryId' => 'adult', 'Count' => 2]],
-        state: 'Optional',
+        state: ReservationState::Optional,
         releaseUtc: Carbon::parse('2025-01-10 12:00:00')
     );
 
@@ -130,7 +131,7 @@ it('throws exception when optional state missing releaseUtc', function () {
         startUtc: Carbon::parse('2025-01-15'),
         endUtc: Carbon::parse('2025-01-18'),
         personCounts: [['AgeCategoryId' => 'adult', 'Count' => 2]],
-        state: 'Optional'
+        state: ReservationState::Optional
     );
 })->throws(\InvalidArgumentException::class, 'ReleaseUtc required for Optional reservations');
 
@@ -142,9 +143,9 @@ it('validates confirmed state does not require releaseUtc', function () {
         startUtc: Carbon::parse('2025-01-15'),
         endUtc: Carbon::parse('2025-01-18'),
         personCounts: [['AgeCategoryId' => 'adult', 'Count' => 2]],
-        state: 'Confirmed'
+        state: ReservationState::Confirmed
     );
 
-    expect($payload->state)->toBe('Confirmed')
+    expect($payload->state)->toBe(ReservationState::Confirmed)
         ->and($payload->releaseUtc)->toBeNull();
 });

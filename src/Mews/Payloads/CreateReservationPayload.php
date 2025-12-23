@@ -3,6 +3,7 @@
 namespace Shelfwood\PhpPms\Mews\Payloads;
 
 use Carbon\Carbon;
+use Shelfwood\PhpPms\Mews\Enums\ReservationState;
 
 class CreateReservationPayload
 {
@@ -14,7 +15,7 @@ class CreateReservationPayload
         public readonly Carbon $endUtc,
         public readonly array $personCounts,
         public readonly ?string $requestedCategoryId = null,
-        public readonly string $state = 'Confirmed',
+        public readonly ReservationState $state = ReservationState::Confirmed,
         public readonly ?string $notes = null,
         public readonly ?Carbon $releaseUtc = null,
     ) {
@@ -31,7 +32,7 @@ class CreateReservationPayload
             throw new \InvalidArgumentException('StartUtc must be before EndUtc');
         }
 
-        if ($this->state === 'Optional' && $this->releaseUtc === null) {
+        if ($this->state === ReservationState::Optional && $this->releaseUtc === null) {
             throw new \InvalidArgumentException('ReleaseUtc required for Optional reservations');
         }
     }
@@ -45,7 +46,7 @@ class CreateReservationPayload
             'EndUtc' => $this->endUtc->toIso8601String(),
             'PersonCounts' => $this->personCounts,
             'RequestedCategoryId' => $this->requestedCategoryId,
-            'State' => $this->state,
+            'State' => $this->state->value,
             'Notes' => $this->notes,
             'ReleaseUtc' => $this->releaseUtc?->toIso8601String(),
         ], fn($value) => $value !== null);

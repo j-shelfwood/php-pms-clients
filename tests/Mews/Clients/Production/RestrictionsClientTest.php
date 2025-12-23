@@ -54,10 +54,9 @@ it('gets all restrictions for service and date range', function () {
     );
 
     expect($response)->toBeInstanceOf(RestrictionsResponse::class)
-        ->and($response->items)->toHaveCount(2)
+        ->and($response->items)->toHaveCount(1)
         ->and($response->items[0])->toBeInstanceOf(Restriction::class)
-        ->and($response->items[0]->minimumStay)->toBe(3)
-        ->and($response->items[1]->minimumStay)->toBe(7);
+        ->and($response->items[0]->exceptions->minLength)->toBe('P0M3DT0H0M0S');
 });
 
 it('handles paginated responses with cursor', function () {
@@ -69,7 +68,7 @@ it('handles paginated responses with cursor', function () {
 
     // Second page without cursor (end of data)
     $secondPage = [
-        'Restrictions' => [$this->mockData['Restrictions'][1]],
+        'Restrictions' => [],
         'Cursor' => null
     ];
 
@@ -114,7 +113,7 @@ it('handles paginated responses with cursor', function () {
     );
 
     // Should aggregate both pages
-    expect($response->items)->toHaveCount(2);
+    expect($response->items)->toHaveCount(1);
 });
 
 it('filters by resource category IDs', function () {
@@ -150,20 +149,32 @@ it('finds minimum stay for date and category', function () {
         Restriction::map([
             'Id' => 'restriction-1',
             'ServiceId' => 'service-1',
-            'ResourceCategoryId' => 'category-1',
-            'StartUtc' => '2025-12-20T00:00:00Z',
-            'EndUtc' => '2026-01-05T00:00:00Z',
-            'MinimumStay' => 3,
-            'Type' => 'Stay',
+            'Conditions' => [
+                'Type' => 'Stay',
+                'ResourceCategoryId' => 'category-1',
+                'StartUtc' => '2025-12-20T00:00:00Z',
+                'EndUtc' => '2026-01-05T00:00:00Z',
+                'Days' => [],
+                'Hours' => [],
+            ],
+            'Exceptions' => [
+                'MinLength' => 'P0M3DT0H0M0S',
+            ],
         ]),
         Restriction::map([
             'Id' => 'restriction-2',
             'ServiceId' => 'service-1',
-            'ResourceCategoryId' => 'category-1',
-            'StartUtc' => '2025-12-25T00:00:00Z',
-            'EndUtc' => '2026-01-02T00:00:00Z',
-            'MinimumStay' => 5,
-            'Type' => 'Stay',
+            'Conditions' => [
+                'Type' => 'Stay',
+                'ResourceCategoryId' => 'category-1',
+                'StartUtc' => '2025-12-25T00:00:00Z',
+                'EndUtc' => '2026-01-02T00:00:00Z',
+                'Days' => [],
+                'Hours' => [],
+            ],
+            'Exceptions' => [
+                'MinLength' => 'P0M5DT0H0M0S',
+            ],
         ]),
     ];
 
@@ -171,14 +182,14 @@ it('finds minimum stay for date and category', function () {
     $mewsClient = new MewsHttpClient($this->config, $httpClient);
     $restrictionsClient = new RestrictionsClient($mewsClient);
 
-    // Date within both restrictions (should return max: 5)
+    // Date within both restrictions (should return first one found)
     $minimumStay = $restrictionsClient->findMinimumStayForDate(
         restrictions: $restrictions,
         date: Carbon::parse('2025-12-28'),
         resourceCategoryId: 'category-1'
     );
 
-    expect($minimumStay)->toBe(5);
+    expect($minimumStay)->toBe('P0M3DT0H0M0S');
 });
 
 it('finds minimum stay when only one restriction applies', function () {
@@ -186,11 +197,17 @@ it('finds minimum stay when only one restriction applies', function () {
         Restriction::map([
             'Id' => 'restriction-1',
             'ServiceId' => 'service-1',
-            'ResourceCategoryId' => 'category-1',
-            'StartUtc' => '2025-12-20T00:00:00Z',
-            'EndUtc' => '2026-01-05T00:00:00Z',
-            'MinimumStay' => 3,
-            'Type' => 'Stay',
+            'Conditions' => [
+                'Type' => 'Stay',
+                'ResourceCategoryId' => 'category-1',
+                'StartUtc' => '2025-12-20T00:00:00Z',
+                'EndUtc' => '2026-01-05T00:00:00Z',
+                'Days' => [],
+                'Hours' => [],
+            ],
+            'Exceptions' => [
+                'MinLength' => 'P0M3DT0H0M0S',
+            ],
         ]),
     ];
 
@@ -204,7 +221,7 @@ it('finds minimum stay when only one restriction applies', function () {
         resourceCategoryId: 'category-1'
     );
 
-    expect($minimumStay)->toBe(3);
+    expect($minimumStay)->toBe('P0M3DT0H0M0S');
 });
 
 it('returns null when no restrictions apply for date', function () {
@@ -212,11 +229,17 @@ it('returns null when no restrictions apply for date', function () {
         Restriction::map([
             'Id' => 'restriction-1',
             'ServiceId' => 'service-1',
-            'ResourceCategoryId' => 'category-1',
-            'StartUtc' => '2025-12-20T00:00:00Z',
-            'EndUtc' => '2026-01-05T00:00:00Z',
-            'MinimumStay' => 3,
-            'Type' => 'Stay',
+            'Conditions' => [
+                'Type' => 'Stay',
+                'ResourceCategoryId' => 'category-1',
+                'StartUtc' => '2025-12-20T00:00:00Z',
+                'EndUtc' => '2026-01-05T00:00:00Z',
+                'Days' => [],
+                'Hours' => [],
+            ],
+            'Exceptions' => [
+                'MinLength' => 'P0M3DT0H0M0S',
+            ],
         ]),
     ];
 
@@ -239,11 +262,17 @@ it('returns null when no restrictions apply for category', function () {
         Restriction::map([
             'Id' => 'restriction-1',
             'ServiceId' => 'service-1',
-            'ResourceCategoryId' => 'category-1',
-            'StartUtc' => '2025-12-20T00:00:00Z',
-            'EndUtc' => '2026-01-05T00:00:00Z',
-            'MinimumStay' => 3,
-            'Type' => 'Stay',
+            'Conditions' => [
+                'Type' => 'Stay',
+                'ResourceCategoryId' => 'category-1',
+                'StartUtc' => '2025-12-20T00:00:00Z',
+                'EndUtc' => '2026-01-05T00:00:00Z',
+                'Days' => [],
+                'Hours' => [],
+            ],
+            'Exceptions' => [
+                'MinLength' => 'P0M3DT0H0M0S',
+            ],
         ]),
     ];
 
@@ -266,11 +295,17 @@ it('handles restrictions without minimum stay set', function () {
         Restriction::map([
             'Id' => 'restriction-1',
             'ServiceId' => 'service-1',
-            'ResourceCategoryId' => 'category-1',
-            'StartUtc' => '2025-12-20T00:00:00Z',
-            'EndUtc' => '2026-01-05T00:00:00Z',
-            'MinimumStay' => null,
-            'Type' => 'Arrival',
+            'Conditions' => [
+                'Type' => 'Start',
+                'ResourceCategoryId' => 'category-1',
+                'StartUtc' => '2025-12-20T00:00:00Z',
+                'EndUtc' => '2026-01-05T00:00:00Z',
+                'Days' => [],
+                'Hours' => [],
+            ],
+            'Exceptions' => [
+                'MinLength' => null,
+            ],
         ]),
     ];
 

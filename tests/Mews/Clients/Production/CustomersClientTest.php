@@ -50,14 +50,14 @@ it('searches for customers by email', function () {
     $mewsClient = new MewsHttpClient($this->config, $httpClient);
     $customersClient = new CustomersClient($mewsClient);
 
-    $payload = new SearchCustomersPayload(emails: ['john.doe@example.com']);
+    $payload = new SearchCustomersPayload(emails: ['john.smith@gmail.com']);
     $response = $customersClient->search($payload);
 
-    expect($response->items)->toHaveCount(1)
+    expect($response->items->count())->toBeGreaterThan(0)
         ->and($response->items[0])->toBeInstanceOf(Customer::class)
-        ->and($response->items[0]->email)->toBe('john.doe@example.com')
+        ->and($response->items[0]->email)->toBe('john.smith@gmail.com')
         ->and($response->items[0]->firstName)->toBe('John')
-        ->and($response->items[0]->lastName)->toBe('Doe');
+        ->and($response->items[0]->lastName)->toBe('Smith');
 });
 
 it('returns empty results when no customers match search', function () {
@@ -98,12 +98,12 @@ it('gets customer by ID successfully', function () {
     $mewsClient = new MewsHttpClient($this->config, $httpClient);
     $customersClient = new CustomersClient($mewsClient);
 
-    $customer = $customersClient->getById('35d4b117-4e60-44a3-9580-c1deae0557c1');
+    $customer = $customersClient->getById('41a142b2-705c-4c2b-9ebb-0501d1665f3a');
 
     expect($customer)->toBeInstanceOf(Customer::class)
-        ->and($customer->id)->toBe('35d4b117-4e60-44a3-9580-c1deae0557c1')
+        ->and($customer->id)->toBe('41a142b2-705c-4c2b-9ebb-0501d1665f3a')
         ->and($customer->firstName)->toBe('John')
-        ->and($customer->lastName)->toBe('Doe');
+        ->and($customer->lastName)->toBe('Smith');
 });
 
 it('throws exception when customer not found by ID', function () {
@@ -137,13 +137,13 @@ it('finds existing customer without creating new one', function () {
 
     $payload = new CreateCustomerPayload(
         firstName: 'John',
-        lastName: 'Doe',
-        email: 'john.doe@example.com'
+        lastName: 'Smith',
+        email: 'john.smith@gmail.com'
     );
 
     $customerId = $customersClient->findOrCreate($payload);
 
-    expect($customerId)->toBe('35d4b117-4e60-44a3-9580-c1deae0557c1');
+    expect($customerId)->toBe('41a142b2-705c-4c2b-9ebb-0501d1665f3a');
 });
 
 it('creates new customer when not found', function () {

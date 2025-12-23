@@ -6,6 +6,35 @@ use Shelfwood\PhpPms\Exceptions\MappingException;
 
 class Customer
 {
+    /**
+     * @param string $id
+     * @param string $chainId
+     * @param string|null $number
+     * @param string|null $firstName
+     * @param string $lastName
+     * @param string|null $secondLastName
+     * @param string|null $title
+     * @param string|null $sex
+     * @param string|null $nationalityCode
+     * @param string|null $languageCode
+     * @param string|null $birthDate
+     * @param string|null $birthPlace
+     * @param string|null $email
+     * @param string|null $phone
+     * @param string|null $loyaltyCode
+     * @param string|null $accountingCode
+     * @param array<int, string> $classifications
+     * @param array<string, mixed> $options
+     * @param string|null $notes
+     * @param string|null $carRegistrationNumber
+     * @param string|null $taxIdentificationNumber
+     * @param string|null $companyId
+     * @param bool $isActive
+     * @param string $createdUtc
+     * @param string $updatedUtc
+     * @param string|null $addressId
+     * @param string|null $billingCode
+     */
     public function __construct(
         public readonly string $id,
         public readonly string $chainId,

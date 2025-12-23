@@ -6,6 +6,11 @@ use Shelfwood\PhpPms\Exceptions\MappingException;
 
 class AvailabilityBlock
 {
+    /**
+     * @param string $categoryId
+     * @param array<int, int> $availabilities
+     * @param array<int, int> $adjustments
+     */
     public function __construct(
         public readonly string $categoryId,
         public readonly array $availabilities,

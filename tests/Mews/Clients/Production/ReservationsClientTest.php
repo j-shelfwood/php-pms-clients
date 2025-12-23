@@ -10,6 +10,7 @@ use Shelfwood\PhpPms\Mews\Payloads\CreateReservationPayload;
 use Shelfwood\PhpPms\Mews\Payloads\UpdateReservationPayload;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Reservation;
 use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
+use Shelfwood\PhpPms\Mews\Enums\ReservationState;
 
 beforeEach(function () {
     $this->config = new MewsConfig(
@@ -64,7 +65,7 @@ it('creates a new reservation successfully', function () {
 
     expect($reservation)->toBeInstanceOf(Reservation::class)
         ->and($reservation->id)->toBe('bfee2c44-1f84-4326-a862-5289598a6cea')
-        ->and($reservation->state)->toBe('Confirmed')
+        ->and($reservation->state)->toBe(ReservationState::Confirmed)
         ->and($reservation->number)->toBe('52');
 });
 
@@ -117,7 +118,7 @@ it('gets reservation by ID successfully', function () {
 
     expect($reservation)->toBeInstanceOf(Reservation::class)
         ->and($reservation->id)->toBe('bfee2c44-1f84-4326-a862-5289598a6cea')
-        ->and($reservation->state)->toBe('Confirmed');
+        ->and($reservation->state)->toBe(ReservationState::Confirmed);
 });
 
 it('throws exception when reservation not found by ID', function () {
@@ -163,8 +164,8 @@ it('gets all reservations for service and date range', function () {
 
     expect($response->items)->toHaveCount(2)
         ->and($response->items[0])->toBeInstanceOf(Reservation::class)
-        ->and($response->items[0]->state)->toBe('Confirmed')
-        ->and($response->items[1]->state)->toBe('Started');
+        ->and($response->items[0]->state)->toBe(ReservationState::Confirmed)
+        ->and($response->items[1]->state)->toBe(ReservationState::Started);
 });
 
 it('filters reservations by states', function () {
@@ -198,7 +199,7 @@ it('filters reservations by states', function () {
     );
 
     expect($response->items)->toHaveCount(1)
-        ->and($response->items[0]->state)->toBe('Confirmed');
+        ->and($response->items[0]->state)->toBe(ReservationState::Confirmed);
 });
 
 it('updates reservation successfully', function () {
@@ -271,7 +272,7 @@ it('cancels reservation successfully', function () {
     );
 
     expect($reservation)->toBeInstanceOf(Reservation::class)
-        ->and($reservation->state)->toBe('Canceled');
+        ->and($reservation->state)->toBe(ReservationState::Canceled);
 });
 
 it('updates reservation state successfully', function () {
@@ -289,9 +290,9 @@ it('updates reservation state successfully', function () {
 
     $reservation = $reservationsClient->updateState(
         reservationId: 'bfee2c44-1f84-4326-a862-5289598a6cea',
-        newState: 'Confirmed'
+        newState: ReservationState::Confirmed
     );
 
     expect($reservation)->toBeInstanceOf(Reservation::class)
-        ->and($reservation->state)->toBe('Confirmed');
+        ->and($reservation->state)->toBe(ReservationState::Confirmed);
 });

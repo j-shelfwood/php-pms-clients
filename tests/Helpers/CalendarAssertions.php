@@ -82,11 +82,11 @@ function assertCalendarChangesResponseMatchesExpected(CalendarChangesResponse $a
     expect($actualResponse->amount)->toBe($expected['amount']);
     expect($actualResponse->time)->toBeInstanceOf(Carbon::class);
     expect($actualResponse->time->toISOString())->toBe($expected['time']);
-    expect($actualResponse->changes)->toBeArray();
+    expect($actualResponse->changes)->toBeInstanceOf(\Illuminate\Support\Collection::class);
     expect($actualResponse->changes)->toHaveCount(count($expected['changes']));
 
     foreach ($expected['changes'] as $index => $expectedChange) {
-        $actualChange = $actualResponse->changes[$index];
+        $actualChange = $actualResponse->changes->get($index);
         expect($actualChange)->toBeInstanceOf(CalendarChange::class);
         expect($actualChange->propertyId)->toBe($expectedChange['propertyId']);
         expect($actualChange->months)->toBe($expectedChange['months']);

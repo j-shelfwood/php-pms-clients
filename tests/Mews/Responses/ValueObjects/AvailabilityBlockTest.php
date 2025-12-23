@@ -10,8 +10,8 @@ it('maps availability block from API response', function () {
     $block = AvailabilityBlock::map($blockData);
 
     expect($block->categoryId)->toBe('44bd8ad0-e70b-4bd9-8445-ad7200d7c349')
-        ->and($block->availabilities)->toBe([5, 4, 3, 2, 1])
-        ->and($block->adjustments)->toBe([0, -1, -1, -1, -1]);
+        ->and($block->availabilities)->toBe([6, 6, 6, 6, 6, 6])
+        ->and($block->adjustments)->toBe([0, 0, 0, 0, 0, 0]);
 });
 
 it('throws exception on missing required field', function () {

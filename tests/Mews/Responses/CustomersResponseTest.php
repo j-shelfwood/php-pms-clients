@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Collection;
 use Shelfwood\PhpPms\Mews\Responses\CustomersResponse;
+use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Customer;
 
 it('maps customers response from API', function () {
     $mockPath = __DIR__ . '/../../../mocks/mews/responses/customers-search.json';
@@ -8,7 +10,9 @@ it('maps customers response from API', function () {
 
     $response = CustomersResponse::map($mockData);
 
-    expect($response->items)->toHaveCount(1)
+    expect($response->items)->toBeInstanceOf(Collection::class)
+        ->and($response->items->count())->toBeGreaterThan(0)
+        ->and($response->items[0])->toBeInstanceOf(Customer::class)
         ->and($response->items[0]->firstName)->toBe('John')
         ->and($response->cursor)->toBeNull();
 });

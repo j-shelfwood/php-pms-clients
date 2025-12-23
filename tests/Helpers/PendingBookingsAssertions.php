@@ -10,11 +10,11 @@ function assertPendingBookingsResponseMatchesExpected(PendingBookingResponse $ac
 {
     $expected = TestData::getExpectedPendingBookingsData();
 
-    expect($actualResponse->pendingBookings)->toBeArray();
+    expect($actualResponse->pendingBookings)->toBeInstanceOf(\Illuminate\Support\Collection::class);
     expect($actualResponse->pendingBookings)->toHaveCount(count($expected['pendingBookings']));
 
     foreach ($expected['pendingBookings'] as $index => $expectedBooking) {
-        $actualBooking = $actualResponse->pendingBookings[$index];
+        $actualBooking = $actualResponse->pendingBookings->get($index);
 
         expect($actualBooking)->toBeInstanceOf(PendingBooking::class);
         expect($actualBooking->bookingId)->toBe($expectedBooking['bookingId']);

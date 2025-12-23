@@ -6,6 +6,21 @@ use Shelfwood\PhpPms\Exceptions\MappingException;
 
 class ResourceCategory
 {
+    /**
+     * @param string $id
+     * @param string $serviceId
+     * @param bool $isActive
+     * @param string $type
+     * @param array<string, string> $names
+     * @param array<string, string>|null $shortNames
+     * @param array<string, string>|null $description
+     * @param int $ordering
+     * @param int $capacity
+     * @param int $extraCapacity
+     * @param array<int, string> $classifications
+     * @param string $createdUtc
+     * @param string $updatedUtc
+     */
     public function __construct(
         public readonly string $id,
         public readonly string $serviceId,

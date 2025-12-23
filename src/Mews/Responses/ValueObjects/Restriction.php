@@ -6,20 +6,23 @@ use Shelfwood\PhpPms\Exceptions\MappingException;
 
 class Restriction
 {
+    /**
+     * @param string $id
+     * @param string $serviceId
+     * @param string|null $externalIdentifier
+     * @param string $origin
+     * @param RestrictionConditions $conditions
+     * @param RestrictionExceptions $exceptions
+     * @param string $createdUtc
+     * @param string $updatedUtc
+     */
     public function __construct(
         public readonly string $id,
         public readonly string $serviceId,
-        public readonly string $resourceCategoryId,
-        public readonly string $startUtc,
-        public readonly string $endUtc,
-        public readonly ?int $minimumStay,
-        public readonly ?int $maximumStay,
-        public readonly ?string $minAdvance,
-        public readonly ?string $maxAdvance,
-        public readonly string $type,
-        public readonly array $conditions,
-        public readonly array $exceptions,
+        public readonly ?string $externalIdentifier,
         public readonly string $origin,
+        public readonly RestrictionConditions $conditions,
+        public readonly RestrictionExceptions $exceptions,
         public readonly string $createdUtc,
         public readonly string $updatedUtc,
     ) {}
@@ -30,17 +33,14 @@ class Restriction
             return new self(
                 id: $data['Id'] ?? throw new \InvalidArgumentException('Id is required'),
                 serviceId: $data['ServiceId'] ?? throw new \InvalidArgumentException('ServiceId required'),
-                resourceCategoryId: $data['ResourceCategoryId'] ?? throw new \InvalidArgumentException('ResourceCategoryId required'),
-                startUtc: $data['StartUtc'] ?? throw new \InvalidArgumentException('StartUtc required'),
-                endUtc: $data['EndUtc'] ?? throw new \InvalidArgumentException('EndUtc required'),
-                minimumStay: $data['MinimumStay'] ?? null,
-                maximumStay: $data['MaximumStay'] ?? null,
-                minAdvance: $data['MinAdvance'] ?? null,
-                maxAdvance: $data['MaxAdvance'] ?? null,
-                type: $data['Type'] ?? 'Stay',
-                conditions: $data['Conditions'] ?? [],
-                exceptions: $data['Exceptions'] ?? [],
+                externalIdentifier: $data['ExternalIdentifier'] ?? null,
                 origin: $data['Origin'] ?? 'User',
+                conditions: isset($data['Conditions'])
+                    ? RestrictionConditions::map($data['Conditions'])
+                    : throw new \InvalidArgumentException('Conditions is required'),
+                exceptions: isset($data['Exceptions'])
+                    ? RestrictionExceptions::map($data['Exceptions'])
+                    : throw new \InvalidArgumentException('Exceptions is required'),
                 createdUtc: $data['CreatedUtc'] ?? '',
                 updatedUtc: $data['UpdatedUtc'] ?? '',
             );

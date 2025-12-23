@@ -3,9 +3,12 @@
 use Shelfwood\PhpPms\Mews\Enums\ServiceType;
 
 it('has all service types', function () {
-    expect(ServiceType::cases())->toHaveCount(2)
+    expect(ServiceType::cases())->toHaveCount(5)
+        ->and(ServiceType::Accommod->value)->toBe('Accommod')
+        ->and(ServiceType::Additional->value)->toBe('Additional')
         ->and(ServiceType::Bookable->value)->toBe('Bookable')
-        ->and(ServiceType::Additional->value)->toBe('Additional');
+        ->and(ServiceType::Orderable->value)->toBe('Orderable')
+        ->and(ServiceType::Reservable->value)->toBe('Reservable');
 });
 
 it('can be created from string', function () {

@@ -11,6 +11,7 @@ use Shelfwood\PhpPms\Mews\Responses\ReservationsResponse;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Reservation;
 use Shelfwood\PhpPms\Mews\Responses\AgeCategoriesResponse;
 use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
+use Shelfwood\PhpPms\Mews\Enums\ReservationState;
 
 class ReservationsClient
 {
@@ -44,11 +45,11 @@ class ReservationsClient
 
         $reservationsResponse = ReservationsResponse::map($response);
 
-        if (count($reservationsResponse->items) === 0) {
+        if ($reservationsResponse->items->isEmpty()) {
             throw new MewsApiException('Failed to create reservation', 500);
         }
 
-        return $reservationsResponse->items[0];
+        return $reservationsResponse->items->first();
     }
 
     /**
@@ -68,11 +69,11 @@ class ReservationsClient
 
         $reservationsResponse = ReservationsResponse::map($response);
 
-        if (count($reservationsResponse->items) === 0) {
+        if ($reservationsResponse->items->isEmpty()) {
             throw new MewsApiException("Reservation not found: {$reservationId}", 404);
         }
 
-        return $reservationsResponse->items[0];
+        return $reservationsResponse->items->first();
     }
 
     /**
@@ -120,11 +121,11 @@ class ReservationsClient
 
         $reservationsResponse = ReservationsResponse::map($response);
 
-        if (count($reservationsResponse->items) === 0) {
+        if ($reservationsResponse->items->isEmpty()) {
             throw new MewsApiException('Failed to update reservation', 500);
         }
 
-        return $reservationsResponse->items[0];
+        return $reservationsResponse->items->first();
     }
 
     /**
@@ -139,7 +140,7 @@ class ReservationsClient
     {
         $payload = new UpdateReservationPayload(
             reservationId: $reservationId,
-            state: 'Canceled',
+            state: ReservationState::Canceled,
             notes: $reason
         );
 
@@ -150,11 +151,11 @@ class ReservationsClient
      * Update reservation state (e.g., Optional → Confirmed)
      *
      * @param string $reservationId Reservation UUID
-     * @param string $newState New state ('Optional', 'Confirmed', 'Canceled', etc.)
+     * @param ReservationState $newState New state (Optional, Confirmed, Canceled, etc.)
      * @return Reservation Updated reservation object
      * @throws MewsApiException
      */
-    public function updateState(string $reservationId, string $newState): Reservation
+    public function updateState(string $reservationId, ReservationState $newState): Reservation
     {
         $payload = new UpdateReservationPayload(
             reservationId: $reservationId,

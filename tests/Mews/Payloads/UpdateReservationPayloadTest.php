@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Shelfwood\PhpPms\Mews\Payloads\UpdateReservationPayload;
+use Shelfwood\PhpPms\Mews\Enums\ReservationState;
 
 it('creates minimal update payload with reservation ID only', function () {
     $payload = new UpdateReservationPayload(
@@ -42,7 +43,7 @@ it('updates reservation dates', function () {
 it('updates reservation state', function () {
     $payload = new UpdateReservationPayload(
         reservationId: 'reservation-123',
-        state: 'Canceled'
+        state: ReservationState::Canceled
     );
 
     expect($payload->toArray()['State'])->toBe('Canceled');
@@ -63,14 +64,14 @@ it('throws exception when start date is after end date', function () {
 it('throws exception when optional state missing releaseUtc', function () {
     new UpdateReservationPayload(
         reservationId: 'reservation-123',
-        state: 'Optional'
+        state: ReservationState::Optional
     );
 })->throws(\InvalidArgumentException::class, 'ReleaseUtc required for Optional state');
 
 it('allows optional state with releaseUtc', function () {
     $payload = new UpdateReservationPayload(
         reservationId: 'reservation-123',
-        state: 'Optional',
+        state: ReservationState::Optional,
         releaseUtc: Carbon::parse('2025-01-10')
     );
 

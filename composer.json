@@ -19,7 +19,8 @@
   },
   "require-dev": {
     "mockery/mockery": "^1.6",
-    "pestphp/pest": "^3.8"
+    "pestphp/pest": "^3.8",
+    "phpstan/phpstan": "^2.1"
   },
   "autoload": {
     "psr-4": {
@@ -42,6 +43,7 @@
   },
   "scripts": {
     "test": "pest",
-    "test:mews": "pest tests/Mews --colors=always --no-coverage"
+    "test:mews": "pest tests/Mews --colors=always --no-coverage",
+    "phpstan": "phpstan analyse --memory-limit=256M"
   }
 }

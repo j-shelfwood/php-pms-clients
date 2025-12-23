@@ -364,17 +364,11 @@ function assertPropertiesResponseMatchesExpected(\Shelfwood\PhpPms\BookingManage
 {
     $expected = TestData::getExpectedPropertiesData();
 
-    expect($actualResponse->properties)->toBeArray();
+    expect($actualResponse->properties)->toBeInstanceOf(\Illuminate\Support\Collection::class);
     expect($actualResponse->properties)->toHaveCount($expected['totalProperties']);
 
     // Find the detailed property (6794) and validate it comprehensively
-    $detailedProperty = null;
-    foreach ($actualResponse->properties as $property) {
-        if ($property->external_id === $expected['detailedProperty']['external_id']) {
-            $detailedProperty = $property;
-            break;
-        }
-    }
+    $detailedProperty = $actualResponse->properties->firstWhere('external_id', $expected['detailedProperty']['external_id']);
 
     expect($detailedProperty)->not()->toBeNull();
 

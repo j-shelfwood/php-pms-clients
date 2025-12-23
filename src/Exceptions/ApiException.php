@@ -6,7 +6,7 @@ use Shelfwood\PhpPms\Exceptions\PmsClientException;
 use Shelfwood\PhpPms\Exceptions\ErrorDetails;
 
 class ApiException extends PmsClientException {
-    public ErrorDetails $errorDetails;
+    public ?ErrorDetails $errorDetails;
     public readonly string|int $originalCode;
 
     public function __construct($message, string|int $code = 0, $previous = null, ?ErrorDetails $details = null) {

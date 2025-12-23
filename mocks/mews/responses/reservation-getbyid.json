@@ -18,8 +18,11 @@
       "Count": 2
     }
   ],
-  "StartUtc": "2025-01-15T14:00:00Z",
-  "EndUtc": "2025-01-18T10:00:00Z",
+  "ScheduledStartUtc": "2025-01-15T14:00:00Z",
+  "ScheduledEndUtc": "2025-01-18T10:00:00Z",
+  "ActualStartUtc": null,
+  "ActualEndUtc": null,
+  "ReleaseUtc": null,
   "RequestedCategoryId": "773d5e42-de1e-43a0-9ce6-c3e7511c1e0a",
   "AssignedResourceId": "095a6d7f-4893-4a3b-9c35-ff595d4bfa0c",
   "AssignedResourceLocked": false,

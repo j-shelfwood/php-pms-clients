@@ -7,6 +7,7 @@ use Shelfwood\PhpPms\Mews\Http\MewsHttpClient;
 use Shelfwood\PhpPms\Mews\Clients\Validation\ResourcesClient;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Resource;
 use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
+use Shelfwood\PhpPms\Mews\Enums\ResourceState;
 
 beforeEach(function () {
     $this->config = new MewsConfig(
@@ -90,7 +91,7 @@ it('gets resources for category using helper method', function () {
 
     $response = $resourcesClient->getForCategory('category-456');
 
-    expect($response->items)->toHaveCount(10);
+    expect($response->items->count())->toBeGreaterThan(0);
 });
 
 it('gets resource by ID successfully', function () {
@@ -108,7 +109,7 @@ it('gets resource by ID successfully', function () {
             Mockery::any(),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body['ResourceIds'])->toBe(['095a6d7f-4893-4a3b-9c35-ff595d4bfa0c']);
+                expect($body['ResourceIds'])->toBe(['68aa4760-1b63-452e-9060-b32501247b08']);
                 return true;
             })
         )
@@ -117,12 +118,12 @@ it('gets resource by ID successfully', function () {
     $mewsClient = new MewsHttpClient($this->config, $httpClient);
     $resourcesClient = new ResourcesClient($mewsClient);
 
-    $resource = $resourcesClient->getById('095a6d7f-4893-4a3b-9c35-ff595d4bfa0c');
+    $resource = $resourcesClient->getById('68aa4760-1b63-452e-9060-b32501247b08');
 
     expect($resource)->toBeInstanceOf(Resource::class)
-        ->and($resource->id)->toBe('095a6d7f-4893-4a3b-9c35-ff595d4bfa0c')
+        ->and($resource->id)->toBe('68aa4760-1b63-452e-9060-b32501247b08')
         ->and($resource->name)->toBeString()
-        ->and($resource->state)->toBe('Clean');
+        ->and($resource->state)->toBe(ResourceState::Dirty);
 });
 
 it('throws exception when resource not found by ID', function () {

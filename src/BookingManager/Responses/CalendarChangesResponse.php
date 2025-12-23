@@ -2,14 +2,20 @@
 
 namespace Shelfwood\PhpPms\BookingManager\Responses;
 
+use Illuminate\Support\Collection;
 use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\CalendarChange;
 use Exception;
 use Carbon\Carbon;
 
 class CalendarChangesResponse
 {
+    /**
+     * @param Collection<int, CalendarChange> $changes
+     * @param int|null $amount
+     * @param Carbon|null $time
+     */
     public function __construct(
-        public readonly array $changes,
+        public readonly Collection $changes,
         public readonly ?int $amount = null,
         public readonly ?Carbon $time = null
     ) {}
@@ -22,7 +28,6 @@ class CalendarChangesResponse
     public static function map(array $data): self
     {
         try {
-            $changes = [];
             $amount = null;
             $time = null;
 
@@ -32,6 +37,8 @@ class CalendarChangesResponse
                 $time = isset($data['@attributes']['time']) ? Carbon::parse($data['@attributes']['time']) : null;
             }
 
+            $changes = collect();
+
             // Handle change elements
             if (isset($data['change'])) {
                 $changeData = $data['change'];
@@ -39,18 +46,17 @@ class CalendarChangesResponse
                 // Handle single change vs multiple changes
                 if (isset($changeData['@attributes'])) {
                     // Single change
-                    $changes[] = CalendarChange::fromXml($changeData);
+                    $changes->push(CalendarChange::fromXml($changeData));
                 } else {
                     // Multiple changes
-                    foreach ($changeData as $change) {
-                        $changes[] = CalendarChange::fromXml($change);
-                    }
+                    $changes = collect($changeData)
+                        ->map(fn($change) => CalendarChange::fromXml($change));
                 }
             }
 
             return new self(
                 changes: $changes,
-                amount: $amount ?? count($changes),
+                amount: $amount ?? $changes->count(),
                 time: $time
             );
         } catch (\Throwable $e) {

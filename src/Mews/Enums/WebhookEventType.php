@@ -10,8 +10,34 @@ namespace Shelfwood\PhpPms\Mews\Enums;
  * Discriminator values sent in webhook payload Events array to identify event type.
  * Webhooks contain an Events array where each event has a Discriminator field.
  *
+ * IMPLEMENTATION STATUS: Enum defined, signature verification available, but payload
+ * parsing/routing not yet implemented.
+ *
+ * USAGE PATTERN (when implementing webhook handling):
+ * ```php
+ * // 1. Verify signature using WebhookSignatureService
+ * $payload = json_decode($request->getContent(), true);
+ * $signature = $request->header('X-Mews-Signature');
+ * if (!WebhookSignatureService::verify($payload, $signature, $secret)) {
+ *     throw new SecurityException('Invalid webhook signature');
+ * }
+ *
+ * // 2. Parse events and route by discriminator
+ * foreach ($payload['Events'] as $event) {
+ *     $eventType = WebhookEventType::from($event['Discriminator']);
+ *     match($eventType) {
+ *         WebhookEventType::ServiceOrderUpdated => $this->handleReservationUpdate($event),
+ *         WebhookEventType::ResourceUpdated => $this->handleResourceUpdate($event),
+ *         WebhookEventType::CustomerAdded => $this->handleCustomerAdded($event),
+ *         // ... handle other event types
+ *         default => Log::warning("Unhandled webhook event: {$eventType->value}"),
+ *     };
+ * }
+ * ```
+ *
  * @see https://mews-systems.gitbook.io/connector-api/webhooks
  * @see https://mews-systems.gitbook.io/connector-api/events/wh-general
+ * @see WebhookSignatureService For signature verification
  */
 enum WebhookEventType: string
 {

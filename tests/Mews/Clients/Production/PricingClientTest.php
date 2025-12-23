@@ -11,6 +11,7 @@ use Shelfwood\PhpPms\Mews\Payloads\GetPricingPayload;
 use Shelfwood\PhpPms\Mews\Responses\RatesResponse;
 use Shelfwood\PhpPms\Mews\Responses\PricingResponse;
 use Shelfwood\PhpPms\Mews\Responses\CalendarResponse;
+use Shelfwood\PhpPms\Mews\Enums\RateType;
 
 beforeEach(function () {
     $this->config = new MewsConfig(
@@ -65,7 +66,7 @@ it('gets all service rates successfully', function () {
         ->and($response->items)->toHaveCount(1)
         ->and($response->items[0]->id)->toBe('11672368-e0d7-4a6d-bd85-ad7200d77428')
         ->and($response->items[0]->names['en-GB'])->toBe('Fully Flexible')
-        ->and($response->items[0]->type)->toBe('Public')
+        ->and($response->items[0]->type)->toBe(RateType::Public)
         ->and($response->items[0]->isActive)->toBeTrue()
         ->and($response->items[0]->isPublic)->toBeTrue();
 });
@@ -100,10 +101,10 @@ it('gets pricing for rate and date range successfully', function () {
     $response = $pricingClient->getPricing($payload);
 
     expect($response)->toBeInstanceOf(PricingResponse::class)
-        ->and($response->currency)->toBe('EUR')
-        ->and($response->timeUnitStartsUtc)->toHaveCount(3)
-        ->and($response->baseAmountPrices)->toHaveCount(3)
-        ->and($response->categoryPrices)->toHaveCount(1);
+        ->and($response->currency)->toBe('GBP')
+        ->and($response->timeUnitStartsUtc)->toHaveCount(4)
+        ->and($response->baseAmountPrices)->toHaveCount(4)
+        ->and($response->categoryPrices)->toHaveCount(4);
 });
 
 it('validates pricing response structure', function () {
@@ -127,14 +128,14 @@ it('validates pricing response structure', function () {
     $response = $pricingClient->getPricing($payload);
 
     // Validate base prices structure
-    expect($response->baseAmountPrices[0]['Index'])->toBe(0)
-        ->and($response->baseAmountPrices[0]['Amount'])->toHaveKeys(['GrossValue', 'NetValue', 'TaxValues', 'Currency'])
-        ->and($response->baseAmountPrices[0]['Amount']['GrossValue'])->toEqual(150.00)
-        ->and($response->baseAmountPrices[0]['Amount']['NetValue'])->toEqual(137.61);
+    expect($response->baseAmountPrices[0])->toHaveKeys(['GrossValue', 'NetValue', 'TaxValues', 'Currency'])
+        ->and($response->baseAmountPrices[0]['GrossValue'])->toEqual(10000.0)
+        ->and($response->baseAmountPrices[0]['NetValue'])->toEqual(8333.33)
+        ->and($response->baseAmountPrices[0]['Currency'])->toBe('GBP');
 
     // Validate category prices structure
     expect($response->categoryPrices[0]->resourceCategoryId)->toBe('44bd8ad0-e70b-4bd9-8445-ad7200d7c349')
-        ->and($response->categoryPrices[0]->amountPrices)->toHaveCount(3);
+        ->and($response->categoryPrices[0]->amountPrices)->toHaveCount(4);
 });
 
 it('gets calendar data with availability and pricing', function () {

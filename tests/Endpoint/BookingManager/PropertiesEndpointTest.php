@@ -61,6 +61,6 @@ describe('PropertiesEndpointTest', function () {
         $response = $this->api->properties();
 
         expect($response)->toBeInstanceOf(PropertiesResponse::class);
-        expect($response->properties)->toBeArray()->toBeEmpty();
+        expect($response->properties)->toBeInstanceOf(\Illuminate\Support\Collection::class)->toBeEmpty();
     });
 });

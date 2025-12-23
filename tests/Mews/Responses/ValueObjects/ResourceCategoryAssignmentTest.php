@@ -3,15 +3,14 @@
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\ResourceCategoryAssignment;
 
 it('maps resource category assignment from API response', function () {
-    $mockPath = __DIR__ . '/../../../../mocks/mews/responses/resourcecategoryassignments-getall.json';
-    $mockData = json_decode(file_get_contents($mockPath), true);
-    $assignmentData = $mockData['ResourceCategoryAssignments'][0];
+    $mockPath = __DIR__ . '/../../../../mocks/mews/responses/resourcecategoryassignment-getforresource.json';
+    $assignmentData = json_decode(file_get_contents($mockPath), true);
 
     $assignment = ResourceCategoryAssignment::map($assignmentData);
 
-    expect($assignment->id)->toBe('e1a2b3c4-5d6e-7f8a-9b0c-1d2e3f4a5b6c')
+    expect($assignment->id)->toBe('abc12345-6789-0def-1234-567890abcdef')
         ->and($assignment->resourceId)->toBe('095a6d7f-4893-4a3b-9c35-ff595d4bfa0c')
-        ->and($assignment->categoryId)->toBe('44bd8ad0-e70b-4bd9-8445-ad7200d7c349')
+        ->and($assignment->categoryId)->toBe('773d5e42-de1e-43a0-9ce6-c3e7511c1e0a')
         ->and($assignment->isActive)->toBeTrue();
 });
 

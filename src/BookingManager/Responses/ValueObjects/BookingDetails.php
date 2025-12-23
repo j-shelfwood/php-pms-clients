@@ -4,6 +4,7 @@ namespace Shelfwood\PhpPms\BookingManager\Responses\ValueObjects;
 
 use Carbon\Carbon;
 use Shelfwood\PhpPms\BookingManager\Enums\BookingStatus;
+use Shelfwood\PhpPms\BookingManager\Utils\XmlDataExtractor;
 use Shelfwood\PhpPms\Exceptions\MappingException;
 
 class BookingDetails
@@ -51,41 +52,6 @@ class BookingDetails
 
             $attributes = $bookingData['@attributes'] ?? [];
 
-            // Helper functions for safe data extraction
-            $getString = function($key, $default = null) use ($bookingData) {
-                $value = $bookingData[$key] ?? $default;
-
-                // Handle new XML parser structure where elements with attributes become arrays
-                if (is_array($value) && isset($value['#text'])) {
-                    $value = $value['#text'];
-                }
-
-                if (is_array($value) && empty($value)) {
-                    return $default;
-                }
-                if (!is_scalar($value) && $value !== null) {
-                    return $default;
-                }
-                return $value === null ? $default : (string) $value;
-            };
-
-            $getInt = function($key, $default = 0) use ($bookingData) {
-                $value = $bookingData[$key] ?? $default;
-                return is_numeric($value) ? (int) $value : $default;
-            };
-
-            $getDate = function($key) use ($bookingData, $attributes) {
-                $value = $bookingData[$key] ?? $attributes[$key] ?? null;
-                if ($value === null || empty($value) || is_array($value)) {
-                    return null;
-                }
-                try {
-                    return Carbon::parse((string) $value);
-                } catch (\Exception $e) {
-                    return null;
-                }
-            };
-
             // Extract name attributes
             $nameData = $bookingData['name'] ?? [];
             $nameAttributes = $nameData['@attributes'] ?? [];
@@ -94,50 +60,33 @@ class BookingDetails
             $propertyData = $bookingData['property'] ?? [];
             $propertyAttributes = $propertyData['@attributes'] ?? [];
 
-            // Helper function to extract text content from elements that might have attributes
-            $getTextContent = function($key, $default = '') use ($bookingData) {
-                $value = $bookingData[$key] ?? $default;
-
-                // Handle array structure with attributes and text content
-                if (is_array($value) && isset($value['#text'])) {
-                    return (string) $value['#text'];
-                }
-
-                // Handle simple string value
-                if (is_string($value)) {
-                    return $value;
-                }
-
-                return $default;
-            };
-
             return new self(
                 id: (int) ($attributes['id'] ?? 0),
                 identifier: $attributes['identifier'] ?? null,
                 provider_identifier: $attributes['provider_identifier'] ?? null,
                 channel_identifier: $attributes['channel_identifier'] ?? null,
-                arrival: $getDate('arrival') ?? Carbon::create(1970, 1, 1),
-                departure: $getDate('departure') ?? Carbon::create(1970, 1, 1),
+                arrival: XmlDataExtractor::getDate($bookingData, 'arrival', $attributes) ?? Carbon::create(1970, 1, 1),
+                departure: XmlDataExtractor::getDate($bookingData, 'departure', $attributes) ?? Carbon::create(1970, 1, 1),
                 first_name: (string) ($nameAttributes['first'] ?? ''),
                 last_name: (string) ($nameAttributes['last'] ?? ''),
-                email: $getString('email', ''),
-                address_1: $getString('address_1'),
-                address_2: $getString('address_2'),
-                city: $getString('city'),
-                country: $getString('country'),
-                phone: $getString('phone'),
-                amount_adults: $getInt('amount_adults'),
-                amount_children: $getInt('amount_childs'), // Note: API uses 'childs'
-                time_arrival: $getString('time_arrival'),
-                flight: $getString('flight'),
-                notes: $getTextContent('notes'),
+                email: XmlDataExtractor::getString($bookingData, 'email', ''),
+                address_1: XmlDataExtractor::getString($bookingData, 'address_1'),
+                address_2: XmlDataExtractor::getString($bookingData, 'address_2'),
+                city: XmlDataExtractor::getString($bookingData, 'city'),
+                country: XmlDataExtractor::getString($bookingData, 'country'),
+                phone: XmlDataExtractor::getString($bookingData, 'phone'),
+                amount_adults: XmlDataExtractor::getInt($bookingData, 'amount_adults'),
+                amount_children: XmlDataExtractor::getInt($bookingData, 'amount_childs'), // Note: API uses 'childs'
+                time_arrival: XmlDataExtractor::getString($bookingData, 'time_arrival'),
+                flight: XmlDataExtractor::getString($bookingData, 'flight'),
+                notes: XmlDataExtractor::getTextContent($bookingData, 'notes'),
                 property_id: (int) ($propertyAttributes['id'] ?? 0),
                 property_identifier: $propertyAttributes['identifier'] ?? null,
-                property_name: $getTextContent('property'),
-                status: BookingStatus::tryFrom($getString('status', 'pending')) ?? BookingStatus::PENDING,
+                property_name: XmlDataExtractor::getTextContent($bookingData, 'property'),
+                status: BookingStatus::tryFrom(XmlDataExtractor::getString($bookingData, 'status', 'pending')) ?? BookingStatus::PENDING,
                 rate: BookingRate::fromXml($bookingData['rate'] ?? []),
-                created: $getDate('created') ?? Carbon::now(),
-                modified: $getDate('modified') ?? Carbon::now()
+                created: XmlDataExtractor::getDate($bookingData, 'created', $attributes) ?? Carbon::now(),
+                modified: XmlDataExtractor::getDate($bookingData, 'modified', $attributes) ?? Carbon::now()
             );
         } catch (\Exception $e) {
             throw new MappingException('Failed to map BookingDetails: ' . $e->getMessage(), 0, $e);

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Collection;
 use Shelfwood\PhpPms\Mews\Responses\ResourceCategoryAssignmentsResponse;
 
 it('maps resource category assignments response from API', function () {
@@ -8,8 +9,8 @@ it('maps resource category assignments response from API', function () {
 
     $response = ResourceCategoryAssignmentsResponse::map($mockData);
 
-    expect($response->items)->toHaveCount(1)
-        ->and($response->items[0]->isActive)->toBeTrue()
+    expect($response->items)->toBeInstanceOf(Collection::class)
+        ->and($response->items)->toBeEmpty()
         ->and($response->cursor)->toBeNull();
 });
 

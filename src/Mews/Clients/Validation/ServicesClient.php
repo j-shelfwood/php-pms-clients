@@ -29,10 +29,10 @@ class ServicesClient
     {
         $servicesResponse = $this->getAll([$serviceId]);
 
-        if (empty($servicesResponse->items)) {
+        if ($servicesResponse->items->isEmpty()) {
             throw new MewsApiException("Service not found: {$serviceId}", 404);
         }
 
-        return $servicesResponse->items[0];
+        return $servicesResponse->items->first();
     }
 }

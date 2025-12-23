@@ -6,6 +6,7 @@ use Shelfwood\PhpPms\Mews\Config\MewsConfig;
 use Shelfwood\PhpPms\Mews\Http\MewsHttpClient;
 use Shelfwood\PhpPms\Mews\Clients\Validation\AgeCategoriesClient;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\AgeCategory;
+use Shelfwood\PhpPms\Mews\Enums\AgeClassification;
 
 beforeEach(function () {
     $this->config = new MewsConfig(
@@ -47,8 +48,8 @@ it('gets all age categories for service', function () {
 
     expect($response->items)->toHaveCount(2)
         ->and($response->items[0])->toBeInstanceOf(AgeCategory::class)
-        ->and($response->items[0]->classification)->toBe('Adult')
-        ->and($response->items[1]->classification)->toBe('Child');
+        ->and($response->items[0]->classification)->toBe(AgeClassification::Adult)
+        ->and($response->items[1]->classification)->toBe(AgeClassification::Child);
 });
 
 it('gets adult category successfully', function () {
@@ -65,7 +66,7 @@ it('gets adult category successfully', function () {
     $adultCategory = $ageCategoriesClient->getAdultCategory('ec9d261c-1ef1-4a6e-8565-ad7200d77411');
 
     expect($adultCategory)->toBeInstanceOf(AgeCategory::class)
-        ->and($adultCategory->classification)->toBe('Adult')
+        ->and($adultCategory->classification)->toBe(AgeClassification::Adult)
         ->and($adultCategory->isActive)->toBeTrue()
         ->and($adultCategory->id)->toBe('d39dcfc0-69c5-43fe-b28e-ade3011a680a');
 });
@@ -84,7 +85,7 @@ it('gets child category successfully', function () {
     $childCategory = $ageCategoriesClient->getChildCategory('ec9d261c-1ef1-4a6e-8565-ad7200d77411');
 
     expect($childCategory)->toBeInstanceOf(AgeCategory::class)
-        ->and($childCategory->classification)->toBe('Child')
+        ->and($childCategory->classification)->toBe(AgeClassification::Child)
         ->and($childCategory->isActive)->toBeTrue()
         ->and($childCategory->id)->toBe('3d76a1c6-a7c7-40df-badc-ade3011a680a')
         ->and($childCategory->minimalAge)->toBe(0)

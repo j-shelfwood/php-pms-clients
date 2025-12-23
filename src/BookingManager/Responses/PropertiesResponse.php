@@ -2,23 +2,24 @@
 
 namespace Shelfwood\PhpPms\BookingManager\Responses;
 
+use Illuminate\Support\Collection;
 use Shelfwood\PhpPms\BookingManager\Responses\ValueObjects\PropertyDetails;
 
 class PropertiesResponse
 {
+    /**
+     * @param Collection<int, PropertyDetails> $properties
+     */
     public function __construct(
-        /** @var PropertyDetails[] */
-        public readonly array $properties
+        public readonly Collection $properties
     ) {}
+
     public static function map(array $data): self
     {
         try {
-            $properties = [];
-            foreach ($data['property'] as $property) {
-                $properties[] = PropertyDetails::map($property);
-            }
             return new self(
-                properties: $properties
+                properties: collect($data['property'] ?? [])
+                    ->map(fn($property) => PropertyDetails::map($property))
             );
         } catch (\Throwable $e) {
             throw new \Shelfwood\PhpPms\Exceptions\MappingException($e->getMessage(), 0, $e);

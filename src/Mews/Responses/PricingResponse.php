@@ -2,15 +2,30 @@
 
 namespace Shelfwood\PhpPms\Mews\Responses;
 
+use Illuminate\Support\Collection;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\PricingBlock;
 
 class PricingResponse
 {
+    /**
+     * @param string $currency
+     * @param array<int, string> $timeUnitStartsUtc
+     * @param array<int, float> $baseAmountPrices
+     * @param Collection<int, PricingBlock> $categoryPrices
+     * @param array<int, string>|null $datesUtc
+     * @param array<int, float>|null $basePrices
+     * @param array<string, mixed>|null $categoryAdjustments
+     * @param array<string, mixed>|null $ageCategoryAdjustments
+     * @param float|null $relativeAdjustment
+     * @param float|null $absoluteAdjustment
+     * @param float|null $emptyUnitAdjustment
+     * @param float|null $extraUnitAdjustment
+     */
     public function __construct(
         public readonly string $currency,
         public readonly array $timeUnitStartsUtc,
         public readonly array $baseAmountPrices,
-        public readonly array $categoryPrices,
+        public readonly Collection $categoryPrices,
         // Additional fields from API
         public readonly ?array $datesUtc,
         public readonly ?array $basePrices,
@@ -28,10 +43,8 @@ class PricingResponse
             currency: $data['Currency'] ?? 'EUR',
             timeUnitStartsUtc: $data['TimeUnitStartsUtc'] ?? [],
             baseAmountPrices: $data['BaseAmountPrices'] ?? [],
-            categoryPrices: array_map(
-                fn($item) => PricingBlock::map($item),
-                $data['CategoryPrices'] ?? []
-            ),
+            categoryPrices: collect($data['CategoryPrices'] ?? [])
+                ->map(fn($item) => PricingBlock::map($item)),
             // Additional fields from API
             datesUtc: $data['DatesUtc'] ?? null,
             basePrices: $data['BasePrices'] ?? null,

@@ -11,6 +11,7 @@ use Shelfwood\PhpPms\Mews\Responses\CalendarResponse;
 use Shelfwood\PhpPms\Mews\Responses\AvailabilityResponse;
 use Shelfwood\PhpPms\Mews\Payloads\GetAvailabilityPayload;
 use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
+use Shelfwood\PhpPms\Mews\Enums\RateType;
 
 class PricingClient
 {
@@ -99,15 +100,15 @@ class PricingClient
         $rates = $this->getServiceRates($serviceId);
 
         // Find best public rate
-        $publicRates = array_filter($rates->items, function ($rate) {
+        $publicRates = $rates->items->filter(function ($rate) {
             return $rate->isActive &&
-                   $rate->type === 'Public' &&
+                   $rate->type === RateType::Public &&
                    $rate->baseRateId === null;
         });
 
         $pricing = null;
-        if (!empty($publicRates)) {
-            $bestRate = array_values($publicRates)[0];
+        if ($publicRates->isNotEmpty()) {
+            $bestRate = $publicRates->first();
             $pricingPayload = new GetPricingPayload(
                 rateId: $bestRate->id,
                 firstTimeUnitStartUtc: $start,

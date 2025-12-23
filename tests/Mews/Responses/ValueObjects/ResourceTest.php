@@ -1,6 +1,7 @@
 <?php
 
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Resource;
+use Shelfwood\PhpPms\Mews\Enums\ResourceState;
 
 it('maps resource from API response', function () {
     $mockPath = __DIR__ . '/../../../../mocks/mews/responses/resources-getall.json';
@@ -9,10 +10,10 @@ it('maps resource from API response', function () {
 
     $resource = Resource::map($resourceData);
 
-    expect($resource->id)->toBe('095a6d7f-4893-4a3b-9c35-ff595d4bfa0c')
-        ->and($resource->name)->toBe('Updated Updated Updated Updated Updated')
+    expect($resource->id)->toBe('68aa4760-1b63-452e-9060-b32501247b08')
+        ->and($resource->name)->toBe('0. Sirius ')
         ->and($resource->isActive)->toBeTrue()
-        ->and($resource->state)->toBe('Clean');
+        ->and($resource->state)->toBe(ResourceState::Dirty);
 });
 
 it('throws exception on missing required field', function () {

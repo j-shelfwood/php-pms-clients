@@ -6,6 +6,10 @@ use Shelfwood\PhpPms\Exceptions\MappingException;
 
 class PricingBlock
 {
+    /**
+     * @param string $resourceCategoryId
+     * @param array<int, float> $amountPrices
+     */
     public function __construct(
         public readonly string $resourceCategoryId,
         public readonly array $amountPrices,

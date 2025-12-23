@@ -3,13 +3,26 @@
 namespace Shelfwood\PhpPms\Mews\Responses\ValueObjects;
 
 use Shelfwood\PhpPms\Exceptions\MappingException;
+use Shelfwood\PhpPms\Mews\Enums\AgeClassification;
 
 class AgeCategory
 {
+    /**
+     * @param string $id
+     * @param string $serviceId
+     * @param AgeClassification $classification
+     * @param int $minimalAge
+     * @param int|null $maximalAge
+     * @param array<string, string> $names
+     * @param array<string, string>|null $shortNames
+     * @param bool $isActive
+     * @param string $createdUtc
+     * @param string $updatedUtc
+     */
     public function __construct(
         public readonly string $id,
         public readonly string $serviceId,
-        public readonly string $classification,
+        public readonly AgeClassification $classification,
         public readonly int $minimalAge,
         public readonly ?int $maximalAge,
         public readonly array $names,
@@ -25,7 +38,7 @@ class AgeCategory
             return new self(
                 id: $data['Id'] ?? throw new \InvalidArgumentException('Id is required'),
                 serviceId: $data['ServiceId'] ?? throw new \InvalidArgumentException('ServiceId required'),
-                classification: $data['Classification'] ?? throw new \InvalidArgumentException('Classification required'),
+                classification: AgeClassification::from($data['Classification'] ?? throw new \InvalidArgumentException('Classification required')),
                 minimalAge: $data['MinimalAge'] ?? 0,
                 maximalAge: $data['MaximalAge'] ?? null,
                 names: $data['Names'] ?? [],

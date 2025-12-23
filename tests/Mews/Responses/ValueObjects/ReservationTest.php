@@ -1,6 +1,7 @@
 <?php
 
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Reservation;
+use Shelfwood\PhpPms\Mews\Enums\ReservationState;
 
 it('maps reservation from API response', function () {
     $mockPath = __DIR__ . '/../../../../mocks/mews/responses/reservations-add.json';
@@ -11,7 +12,7 @@ it('maps reservation from API response', function () {
 
     expect($reservation->id)->toBe('bfee2c44-1f84-4326-a862-5289598a6cea')
         ->and($reservation->number)->toBe('52')
-        ->and($reservation->state)->toBe('Confirmed')
+        ->and($reservation->state)->toBe(ReservationState::Confirmed)
         ->and($reservation->personCounts)->toBeArray()
         ->and($reservation->adultCount)->toBe(2)
         ->and($reservation->childCount)->toBe(0)

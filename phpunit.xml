@@ -11,6 +11,12 @@
         <testsuite name="Endpoint">
             <directory>tests/Endpoint</directory>
         </testsuite>
+        <testsuite name="Mews">
+            <directory>tests/Mews</directory>
+        </testsuite>
+        <testsuite name="Support">
+            <directory>tests/Support</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>

@@ -43,10 +43,10 @@ class ResourcesClient
     {
         $resourcesResponse = $this->getAll(resourceIds: [$resourceId]);
 
-        if (empty($resourcesResponse->items)) {
+        if ($resourcesResponse->items->isEmpty()) {
             throw new MewsApiException("Resource not found: {$resourceId}", 404);
         }
 
-        return $resourcesResponse->items[0];
+        return $resourcesResponse->items->first();
     }
 }

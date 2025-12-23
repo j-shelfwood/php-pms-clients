@@ -53,11 +53,11 @@ it('gets availability successfully', function () {
     $response = $availabilityClient->get($payload);
 
     expect($response)->toBeInstanceOf(AvailabilityResponse::class)
-        ->and($response->categoryAvailabilities)->toHaveCount(1)
+        ->and($response->categoryAvailabilities)->toHaveCount(4)
         ->and($response->categoryAvailabilities[0]->categoryId)->toBe('44bd8ad0-e70b-4bd9-8445-ad7200d7c349')
-        ->and($response->categoryAvailabilities[0]->availabilities)->toBe([5, 4, 3, 2, 1])
-        ->and($response->categoryAvailabilities[0]->adjustments)->toBe([0, -1, -1, -1, -1])
-        ->and($response->timeUnitStartsUtc)->toHaveCount(5);
+        ->and($response->categoryAvailabilities[0]->availabilities)->toBe([6, 6, 6, 6, 6, 6])
+        ->and($response->categoryAvailabilities[0]->adjustments)->toBe([0, 0, 0, 0, 0, 0])
+        ->and($response->timeUnitStartsUtc)->toHaveCount(6);
 });
 
 it('handles empty availability response', function () {

@@ -1,6 +1,7 @@
 <?php
 
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\AgeCategory;
+use Shelfwood\PhpPms\Mews\Enums\AgeClassification;
 
 it('maps age category from API response', function () {
     $mockPath = __DIR__ . '/../../../../mocks/mews/responses/agecategories-getall.json';
@@ -10,7 +11,7 @@ it('maps age category from API response', function () {
     $ageCategory = AgeCategory::map($ageCategoryData);
 
     expect($ageCategory->id)->toBe('d39dcfc0-69c5-43fe-b28e-ade3011a680a')
-        ->and($ageCategory->classification)->toBe('Adult')
+        ->and($ageCategory->classification)->toBe(AgeClassification::Adult)
         ->and($ageCategory->minimalAge)->toBe(0)
         ->and($ageCategory->isActive)->toBeTrue();
 });

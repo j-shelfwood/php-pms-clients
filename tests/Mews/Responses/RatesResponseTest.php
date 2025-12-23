@@ -1,6 +1,9 @@
 <?php
 
+use Illuminate\Support\Collection;
+use Shelfwood\PhpPms\Mews\Enums\RateType;
 use Shelfwood\PhpPms\Mews\Responses\RatesResponse;
+use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Rate;
 
 it('maps rates response from API', function () {
     $mockPath = __DIR__ . '/../../../mocks/mews/responses/rates-getall.json';
@@ -8,8 +11,10 @@ it('maps rates response from API', function () {
 
     $response = RatesResponse::map($mockData);
 
-    expect($response->items)->toHaveCount(1)
-        ->and($response->items[0]->type)->toBe('Public')
+    expect($response->items)->toBeInstanceOf(Collection::class)
+        ->and($response->items)->toHaveCount(1)
+        ->and($response->items[0])->toBeInstanceOf(Rate::class)
+        ->and($response->items[0]->type)->toBe(RateType::Public)
         ->and($response->rateGroups)->toBeArray()
         ->and($response->cursor)->toBeNull();
 });

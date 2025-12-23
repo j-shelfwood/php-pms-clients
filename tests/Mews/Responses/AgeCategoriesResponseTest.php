@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Collection;
+use Shelfwood\PhpPms\Mews\Enums\AgeClassification;
 use Shelfwood\PhpPms\Mews\Responses\AgeCategoriesResponse;
 
 it('maps age categories response from API', function () {
@@ -8,8 +10,9 @@ it('maps age categories response from API', function () {
 
     $response = AgeCategoriesResponse::map($mockData);
 
-    expect($response->items)->toHaveCount(2)
-        ->and($response->items[0]->classification)->toBe('Adult')
+    expect($response->items)->toBeInstanceOf(Collection::class)
+        ->and($response->items)->toHaveCount(2)
+        ->and($response->items[0]->classification)->toBe(AgeClassification::Adult)
         ->and($response->cursor)->toBeNull();
 });
 
