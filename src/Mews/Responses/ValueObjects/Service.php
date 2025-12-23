@@ -19,6 +19,12 @@ class Service
         public readonly int $ordering,
         public readonly string $createdUtc,
         public readonly string $updatedUtc,
+        // Additional fields from API
+        public readonly ?string $name,
+        public readonly ?string $type,
+        public readonly ?string $startTime,
+        public readonly ?string $endTime,
+        public readonly ?array $promotions,
     ) {}
 
     public static function map(array $data): self
@@ -37,6 +43,12 @@ class Service
                 ordering: $data['Ordering'] ?? 0,
                 createdUtc: $data['CreatedUtc'] ?? '',
                 updatedUtc: $data['UpdatedUtc'] ?? '',
+                // Additional fields from API
+                name: $data['Name'] ?? null,
+                type: $data['Type'] ?? null,
+                startTime: $data['StartTime'] ?? null,
+                endTime: $data['EndTime'] ?? null,
+                promotions: $data['Promotions'] ?? null,
             );
         } catch (\Throwable $e) {
             throw new MappingException("Failed to map Service: {$e->getMessage()}", 0, $e);

@@ -1,102 +1,493 @@
 {
-  "Currency": "EUR",
-  "TimeUnitStartsUtc": [
-    "2025-01-15T00:00:00Z",
-    "2025-01-16T00:00:00Z",
-    "2025-01-17T00:00:00Z"
-  ],
-  "BaseAmountPrices": [
-    {
-      "Index": 0,
-      "Amount": {
-        "GrossValue": 150.00,
-        "NetValue": 137.61,
-        "TaxValues": [
-          {
-            "Code": "VAT",
-            "Value": 12.39
-          }
-        ],
-        "Currency": "EUR"
-      }
-    },
-    {
-      "Index": 1,
-      "Amount": {
-        "GrossValue": 150.00,
-        "NetValue": 137.61,
-        "TaxValues": [
-          {
-            "Code": "VAT",
-            "Value": 12.39
-          }
-        ],
-        "Currency": "EUR"
-      }
-    },
-    {
-      "Index": 2,
-      "Amount": {
-        "GrossValue": 180.00,
-        "NetValue": 165.14,
-        "TaxValues": [
-          {
-            "Code": "VAT",
-            "Value": 14.86
-          }
-        ],
-        "Currency": "EUR"
-      }
-    }
-  ],
-  "CategoryPrices": [
-    {
-      "ResourceCategoryId": "44bd8ad0-e70b-4bd9-8445-ad7200d7c349",
-      "AmountPrices": [
+    "Currency": "GBP",
+    "DatesUtc": [
+        "2025-01-14T23:00:00Z",
+        "2025-01-15T23:00:00Z",
+        "2025-01-16T23:00:00Z",
+        "2025-01-17T23:00:00Z"
+    ],
+    "TimeUnitStartsUtc": [
+        "2025-01-14T23:00:00Z",
+        "2025-01-15T23:00:00Z",
+        "2025-01-16T23:00:00Z",
+        "2025-01-17T23:00:00Z"
+    ],
+    "BasePrices": [
+        10000.0,
+        10000.0,
+        10000.0,
+        10000.0
+    ],
+    "BaseAmountPrices": [
         {
-          "Index": 0,
-          "Amount": {
-            "GrossValue": 150.00,
-            "NetValue": 137.61,
+            "Currency": "GBP",
+            "NetValue": 8333.33,
+            "GrossValue": 10000.0,
             "TaxValues": [
-              {
-                "Code": "VAT",
-                "Value": 12.39
-              }
+                {
+                    "Code": "UK-2022-20%",
+                    "Value": 1666.67
+                }
             ],
-            "Currency": "EUR"
-          }
+            "Breakdown": {
+                "Items": [
+                    {
+                        "TaxRateCode": "UK-2022-20%",
+                        "NetValue": 8333.33,
+                        "TaxValue": 1666.67
+                    }
+                ]
+            }
         },
         {
-          "Index": 1,
-          "Amount": {
-            "GrossValue": 150.00,
-            "NetValue": 137.61,
+            "Currency": "GBP",
+            "NetValue": 8333.33,
+            "GrossValue": 10000.0,
             "TaxValues": [
-              {
-                "Code": "VAT",
-                "Value": 12.39
-              }
+                {
+                    "Code": "UK-2022-20%",
+                    "Value": 1666.67
+                }
             ],
-            "Currency": "EUR"
-          }
+            "Breakdown": {
+                "Items": [
+                    {
+                        "TaxRateCode": "UK-2022-20%",
+                        "NetValue": 8333.33,
+                        "TaxValue": 1666.67
+                    }
+                ]
+            }
         },
         {
-          "Index": 2,
-          "Amount": {
-            "GrossValue": 180.00,
-            "NetValue": 165.14,
+            "Currency": "GBP",
+            "NetValue": 8333.33,
+            "GrossValue": 10000.0,
             "TaxValues": [
-              {
-                "Code": "VAT",
-                "Value": 14.86
-              }
+                {
+                    "Code": "UK-2022-20%",
+                    "Value": 1666.67
+                }
             ],
-            "Currency": "EUR"
-          }
+            "Breakdown": {
+                "Items": [
+                    {
+                        "TaxRateCode": "UK-2022-20%",
+                        "NetValue": 8333.33,
+                        "TaxValue": 1666.67
+                    }
+                ]
+            }
+        },
+        {
+            "Currency": "GBP",
+            "NetValue": 8333.33,
+            "GrossValue": 10000.0,
+            "TaxValues": [
+                {
+                    "Code": "UK-2022-20%",
+                    "Value": 1666.67
+                }
+            ],
+            "Breakdown": {
+                "Items": [
+                    {
+                        "TaxRateCode": "UK-2022-20%",
+                        "NetValue": 8333.33,
+                        "TaxValue": 1666.67
+                    }
+                ]
+            }
         }
-      ]
-    }
-  ],
-  "AgeCategoryAdjustments": []
+    ],
+    "CategoryPrices": [
+        {
+            "CategoryId": "44bd8ad0-e70b-4bd9-8445-ad7200d7c349",
+            "Prices": [
+                10000.0,
+                10000.0,
+                10000.0,
+                10000.0
+            ],
+            "AmountPrices": [
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "CategoryId": "be7f282a-bdda-426f-8abe-ae5100402f7b",
+            "Prices": [
+                10000.0,
+                10000.0,
+                10000.0,
+                10000.0
+            ],
+            "AmountPrices": [
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "CategoryId": "77621038-5a0f-4269-9648-b12600d1091b",
+            "Prices": [
+                10000.0,
+                10000.0,
+                10000.0,
+                10000.0
+            ],
+            "AmountPrices": [
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "CategoryId": "895d7917-ce46-4984-957f-b203008b442c",
+            "Prices": [
+                10000.0,
+                10000.0,
+                10000.0,
+                10000.0
+            ],
+            "AmountPrices": [
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Currency": "GBP",
+                    "NetValue": 8333.33,
+                    "GrossValue": 10000.0,
+                    "TaxValues": [
+                        {
+                            "Code": "UK-2022-20%",
+                            "Value": 1666.67
+                        }
+                    ],
+                    "Breakdown": {
+                        "Items": [
+                            {
+                                "TaxRateCode": "UK-2022-20%",
+                                "NetValue": 8333.33,
+                                "TaxValue": 1666.67
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "CategoryAdjustments": [
+        {
+            "CategoryId": "44bd8ad0-e70b-4bd9-8445-ad7200d7c349",
+            "ParentCategoryId": null,
+            "AbsoluteValue": 0.0,
+            "RelativeValue": 0.0
+        }
+    ],
+    "AgeCategoryAdjustments": [
+        {
+            "AgeCategoryId": "d39dcfc0-69c5-43fe-b28e-ade3011a680a",
+            "AbsoluteValue": 0.0,
+            "Type": "NegativeOccupancyAdjustment"
+        },
+        {
+            "AgeCategoryId": "d39dcfc0-69c5-43fe-b28e-ade3011a680a",
+            "AbsoluteValue": 0.0,
+            "Type": "ExtraOccupancyAdjustment"
+        }
+    ],
+    "RelativeAdjustment": 0.0,
+    "AbsoluteAdjustment": 0.0,
+    "EmptyUnitAdjustment": 0.0,
+    "ExtraUnitAdjustment": 0.0
 }

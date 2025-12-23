@@ -1,51 +1,62 @@
 {
-  "Restrictions": [
-    {
-      "Id": "d4e5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a",
-      "ServiceId": "bd26d8db-86a4-4f18-9e94-1b2362a1073c",
-      "ResourceCategoryId": "773d5e42-de1e-43a0-9ce6-c3e7511c1e0a",
-      "StartUtc": "2025-12-20T00:00:00Z",
-      "EndUtc": "2026-01-05T00:00:00Z",
-      "MinimumStay": 3,
-      "MaximumStay": null,
-      "MinAdvance": null,
-      "MaxAdvance": null,
-      "Type": "Stay",
-      "Conditions": {
-        "Type": "Stay",
-        "ResourceCategoryId": "773d5e42-de1e-43a0-9ce6-c3e7511c1e0a",
-        "RateId": null,
-        "RateGroupId": null,
-        "Days": ["Friday", "Saturday"]
-      },
-      "Exceptions": [],
-      "Origin": "User",
-      "CreatedUtc": "2024-10-01T09:00:00Z",
-      "UpdatedUtc": "2024-10-01T09:00:00Z"
-    },
-    {
-      "Id": "e5f6a7b8-9c0d-1e2f-3a4b-5c6d7e8f9a0b",
-      "ServiceId": "bd26d8db-86a4-4f18-9e94-1b2362a1073c",
-      "ResourceCategoryId": "a9f42c86-1e95-4e3b-a7c9-82bca5a2d610",
-      "StartUtc": "2025-07-01T00:00:00Z",
-      "EndUtc": "2025-08-31T00:00:00Z",
-      "MinimumStay": 7,
-      "MaximumStay": 14,
-      "MinAdvance": null,
-      "MaxAdvance": null,
-      "Type": "Stay",
-      "Conditions": {
-        "Type": "Stay",
-        "ResourceCategoryId": "a9f42c86-1e95-4e3b-a7c9-82bca5a2d610",
-        "RateId": null,
-        "RateGroupId": null,
-        "Days": []
-      },
-      "Exceptions": [],
-      "Origin": "User",
-      "CreatedUtc": "2024-05-15T12:00:00Z",
-      "UpdatedUtc": "2024-05-15T12:00:00Z"
-    }
-  ],
-  "Cursor": null
+    "Restrictions": [
+        {
+            "Id": "b51c6a3a-48cd-4d81-a53e-b3b600af812e",
+            "ServiceId": "ec9d261c-1ef1-4a6e-8565-ad7200d77411",
+            "ExternalIdentifier": null,
+            "Origin": "Integration",
+            "Conditions": {
+                "Type": "Start",
+                "ExactRateId": "11672368-e0d7-4a6d-bd85-ad7200d77428",
+                "BaseRateId": null,
+                "RateGroupId": null,
+                "ResourceCategoryId": "895d7917-ce46-4984-957f-b203008b442c",
+                "ResourceCategoryType": null,
+                "StartUtc": "2026-01-02T23:00:00Z",
+                "EndUtc": "2026-01-03T23:00:00Z",
+                "Days": [
+                    "Friday",
+                    "Saturday",
+                    "Sunday"
+                ],
+                "Hours": {
+                    "Zero": true,
+                    "One": true,
+                    "Two": true,
+                    "Three": true,
+                    "Four": true,
+                    "Five": true,
+                    "Six": true,
+                    "Seven": true,
+                    "Eight": true,
+                    "Nine": true,
+                    "Ten": true,
+                    "Eleven": true,
+                    "Twelve": true,
+                    "Thirteen": true,
+                    "Fourteen": true,
+                    "Fifteen": true,
+                    "Sixteen": true,
+                    "Seventeen": true,
+                    "Eighteen": true,
+                    "Nineteen": true,
+                    "Twenty": true,
+                    "TwentyOne": true,
+                    "TwentyTwo": true,
+                    "TwentyThree": true
+                }
+            },
+            "Exceptions": {
+                "MinAdvance": null,
+                "MaxAdvance": null,
+                "MinLength": "P0M3DT0H0M0S",
+                "MaxLength": null,
+                "MinPrice": null,
+                "MaxPrice": null,
+                "MinReservationCount": null,
+                "MaxReservationCount": null
+            }
+        }
+    ],
+    "Cursor": null
 }

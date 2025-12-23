@@ -18,8 +18,8 @@
             },
             "ShortName": "FF",
             "UpdatedUtc": "2025-09-17T11:22:18Z",
-            "ExternalNames": [],
-            "Description": [],
+            "ExternalNames": {},
+            "Description": {},
             "ExternalIdentifier": null,
             "Options": {
                 "HidePriceFromGuest": false,
@@ -31,7 +31,7 @@
                     "Amount": {
                         "Currency": "GBP",
                         "NetValue": 8333.33,
-                        "GrossValue": 10000,
+                        "GrossValue": 10000.0,
                         "TaxValues": [
                             {
                                 "Code": "UK-2022-20%",

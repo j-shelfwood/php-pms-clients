@@ -55,8 +55,8 @@
             "Names": {
                 "en-US": "Jeep Chimney"
             },
-            "ShortNames": [],
-            "Descriptions": [],
+            "ShortNames": {},
+            "Descriptions": {},
             "Ordering": 0,
             "Capacity": 5,
             "ExtraCapacity": 0,

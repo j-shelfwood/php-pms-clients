@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="PHP PMS Clients Library" version="1.0" last_updated="2025-12-23">
+  <!-- External PMS API Documentation -->
+  <external_documentation>
+    <mews_connector_api>
+      <description>Official Mews Connector API documentation. Required reading for all Mews integration work.</description>
+      <main_url>https://mews-systems.gitbook.io/connector-api</main_url>
+
+      <critical_endpoints>
+        <operations>https://mews-systems.gitbook.io/connector-api/operations</operations>
+        <reservations>https://mews-systems.gitbook.io/connector-api/operations/reservations</reservations>
+        <services>https://mews-systems.gitbook.io/connector-api/operations/services</services>
+        <rates>https://mews-systems.gitbook.io/connector-api/operations/rates</rates>
+        <resources>https://mews-systems.gitbook.io/connector-api/operations/resources</resources>
+      </critical_endpoints>
+
+      <api_gotchas>
+        <field_naming>
+          <note>Mews API uses inconsistent field naming conventions between endpoints</note>
+          <example>Rate Pricing returns "CategoryId" but some docs reference "ResourceCategoryId"</example>
+          <best_practice>Always verify exact field names from actual API responses, not just documentation</best_practice>
+        </field_naming>
+        <request_structure>
+          <note>ServiceId must be at TOP-LEVEL of request body (not inside nested arrays)</note>
+        </request_structure>
+        <resource_categories>
+          <note>Use RequestedCategoryId (not RequestedResourceCategoryId) for resource category specification</note>
+        </resource_categories>
+        <age_categories>
+          <note>AgeCategoryId values are enterprise/service-specific, not universal constants</note>
+        </age_categories>
+      </api_gotchas>
+    </mews_connector_api>
+
+    <booking_manager_api>
+      <description>BookingManager XML API documentation</description>
+      <note>Legacy XML-based API. Mock responses available in mocks/bookingmanager/</note>
+    </booking_manager_api>
+  </external_documentation>
+
+  <!-- Testing Strategy -->
+  <testing>
+    <mocks_location>mocks/mews/ and mocks/bookingmanager/</mocks_location>
+    <critical_rule>Mock data MUST match real API responses exactly, including field names</critical_rule>
+    <validation>Always validate mocks against live API responses when implementing new features</validation>
+    <test_framework>Pest PHP</test_framework>
+    <run_tests>composer test</run_tests>
+  </testing>
+
+  <!-- Architecture -->
+  <architecture>
+    <namespace>Shelfwood\PhpPms</namespace>
+    <structure>
+      <clients>src/{Provider}/Clients/ - API client implementations</clients>
+      <responses>src/{Provider}/Responses/ - Response DTOs and value objects</responses>
+      <payloads>src/{Provider}/Payloads/ - Request payload builders</payloads>
+      <exceptions>src/{Provider}/Exceptions/ - Provider-specific exceptions</exceptions>
+    </structure>
+    <providers>
+      <mews>Production Mews Connector API client</mews>
+      <booking_manager>BookingManager XML API client</booking_manager>
+    </providers>
+  </architecture>
+
+  <!-- Development Workflow -->
+  <workflow>
+    <update_main_project>
+      <script>./update-main-project.sh</script>
+      <description>Copies changes to main prj-more-apartments project for integration testing</description>
+      <when_to_use>After making changes that need testing in the parent project</when_to_use>
+    </update_main_project>
+
+    <composer_commands>
+      <test>composer test - Run Pest test suite</test>
+      <update>composer update - Update dependencies</update>
+    </composer_commands>
+  </workflow>
+
+  <!-- Critical Notes -->
+  <critical_notes>
+    <rule>This is a shared library package. Changes affect prj-more-apartments and potentially other consumers.</rule>
+    <rule>Always ensure backward compatibility when modifying response DTOs or value objects.</rule>
+    <rule>Test changes both in isolation (composer test) and in parent project (update-main-project.sh).</rule>
+    <rule>Mock data must accurately reflect real API responses to prevent production issues.</rule>
+  </critical_notes>
+</project>

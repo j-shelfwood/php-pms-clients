@@ -17749,44 +17749,6 @@
             "UpdatedUtc": "2025-07-08T08:35:34Z"
         },
         {
-            "Id": "bd26d8db-86da-4f96-9efc-e5a4654a4a94",
-            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
-            "IsActive": true,
-            "Name": "Accommodation (real)",
-            "Names": {
-                "cs-CZ": "Connector API Hotel (Gross Pricing)",
-                "de-DE": "Hotel ERS",
-                "en-GB": "Accommodation",
-                "es-ES": "Accommodations",
-                "et-EE": "Accomodation",
-                "fr-FR": "nuit",
-                "nl-NL": "Connector API Hotel (Gross Pricing)",
-                "en-US": "Accommodation (real)"
-            },
-            "StartTime": "P0M0DT15H0M0S",
-            "EndTime": "P0M0DT11H46M0S",
-            "Options": {
-                "BillAsPackage": true
-            },
-            "Promotions": null,
-            "Type": "Reservable",
-            "Ordering": 666,
-            "Data": {
-                "Discriminator": "Bookable",
-                "Value": {
-                    "StartOffset": "P0M0DT15H0M0S",
-                    "EndOffset": "P0M0DT11H46M0S",
-                    "OccupancyStartOffset": "P0M0DT15H0M0S",
-                    "OccupancyEndOffset": "P0M0DT10H0M0S",
-                    "TimeUnit": "Day",
-                    "TimeUnitPeriod": "Day"
-                }
-            },
-            "ExternalIdentifier": "Accommodation",
-            "CreatedUtc": "2015-07-07T13:33:18Z",
-            "UpdatedUtc": "2025-07-14T20:08:48Z"
-        },
-        {
             "Id": "a6aee71c-40e4-4f88-9e33-b18c013858d6",
             "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
             "IsActive": true,
@@ -18191,6 +18153,75 @@
             "UpdatedUtc": "2025-11-04T14:21:57Z"
         },
         {
+            "Id": "7d35e0b2-9739-411e-9078-b3b7013dc9a3",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "IsActive": true,
+            "Name": "Apartments - Don't Delete Until March 2026",
+            "Names": {
+                "en-US": "Apartments - Don't Delete Until March 2026"
+            },
+            "StartTime": "P0M0DT8H0M0S",
+            "EndTime": "P0M0DT20H0M0S",
+            "Options": {
+                "BillAsPackage": false
+            },
+            "Promotions": null,
+            "Type": "Reservable",
+            "Ordering": 0,
+            "Data": {
+                "Discriminator": "Bookable",
+                "Value": {
+                    "StartOffset": "P0M0DT8H0M0S",
+                    "EndOffset": "P0M0DT-4H0M0S",
+                    "OccupancyStartOffset": "P0M0DT8H0M0S",
+                    "OccupancyEndOffset": "P0M0DT-4H0M0S",
+                    "TimeUnit": "Day",
+                    "TimeUnitPeriod": "Day"
+                }
+            },
+            "ExternalIdentifier": null,
+            "CreatedUtc": "2025-12-18T19:17:01Z",
+            "UpdatedUtc": "2025-12-18T19:17:01Z"
+        },
+        {
+            "Id": "bd26d8db-86da-4f96-9efc-e5a4654a4a94",
+            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
+            "IsActive": true,
+            "Name": "Accommodation (real)",
+            "Names": {
+                "cs-CZ": "Connector API Hotel (Gross Pricing)",
+                "de-DE": "Hotel ERS",
+                "en-GB": "Accommodation",
+                "es-ES": "Accommodations",
+                "et-EE": "Accomodation",
+                "fr-FR": "nuit",
+                "nl-NL": "Connector API Hotel (Gross Pricing)",
+                "en-US": "Accommodation (real)"
+            },
+            "StartTime": "P0M0DT15H0M0S",
+            "EndTime": "P0M0DT11H46M0S",
+            "Options": {
+                "BillAsPackage": true
+            },
+            "Promotions": null,
+            "Type": "Reservable",
+            "Ordering": 666,
+            "Data": {
+                "Discriminator": "Bookable",
+                "Value": {
+                    "StartOffset": "P0M0DT15H0M0S",
+                    "EndOffset": "P0M0DT11H46M0S",
+                    "OccupancyStartOffset": "P0M0DT15H0M0S",
+                    "OccupancyEndOffset": "P0M0DT10H0M0S",
+                    "TimeUnit": "Day",
+                    "TimeUnitPeriod": "Day"
+                }
+            },
+            "ExternalIdentifier": "Accommodation",
+            "CreatedUtc": "2015-07-07T13:33:18Z",
+            "UpdatedUtc": "2025-12-21T18:45:56Z"
+        },
+        {
             "Id": "f38cac87-196b-4a5a-9c45-b046006ba01b",
             "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
             "IsActive": true,
@@ -18221,38 +18252,7 @@
             },
             "ExternalIdentifier": "STA",
             "CreatedUtc": "2023-07-21T06:31:51Z",
-            "UpdatedUtc": "2025-12-11T07:38:57Z"
-        },
-        {
-            "Id": "7d35e0b2-9739-411e-9078-b3b7013dc9a3",
-            "EnterpriseId": "851df8c8-90f2-4c4a-8e01-a4fc46b25178",
-            "IsActive": true,
-            "Name": "Apartments - Don't Delete Until March 2026",
-            "Names": {
-                "en-US": "Apartments - Don't Delete Until March 2026"
-            },
-            "StartTime": "P0M0DT8H0M0S",
-            "EndTime": "P0M0DT20H0M0S",
-            "Options": {
-                "BillAsPackage": false
-            },
-            "Promotions": null,
-            "Type": "Reservable",
-            "Ordering": 0,
-            "Data": {
-                "Discriminator": "Bookable",
-                "Value": {
-                    "StartOffset": "P0M0DT8H0M0S",
-                    "EndOffset": "P0M0DT-4H0M0S",
-                    "OccupancyStartOffset": "P0M0DT8H0M0S",
-                    "OccupancyEndOffset": "P0M0DT-4H0M0S",
-                    "TimeUnit": "Day",
-                    "TimeUnitPeriod": "Day"
-                }
-            },
-            "ExternalIdentifier": null,
-            "CreatedUtc": "2025-12-18T19:17:01Z",
-            "UpdatedUtc": "2025-12-18T19:17:01Z"
+            "UpdatedUtc": "2025-12-22T06:42:30Z"
         }
     ],
     "Cursor": null

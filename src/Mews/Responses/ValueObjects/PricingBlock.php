@@ -14,8 +14,14 @@ class PricingBlock
     public static function map(array $data): self
     {
         try {
+            // Mews API returns 'CategoryId' not 'ResourceCategoryId'
+            // Try both for backwards compatibility
+            $categoryId = $data['CategoryId']
+                ?? $data['ResourceCategoryId']
+                ?? throw new \InvalidArgumentException('CategoryId or ResourceCategoryId is required');
+
             return new self(
-                resourceCategoryId: $data['ResourceCategoryId'] ?? throw new \InvalidArgumentException('ResourceCategoryId is required'),
+                resourceCategoryId: $categoryId,
                 amountPrices: $data['AmountPrices'] ?? [],
             );
         } catch (\Throwable $e) {

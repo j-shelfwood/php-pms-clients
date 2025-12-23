@@ -17,6 +17,10 @@ class Resource
         public readonly array $data,
         public readonly string $createdUtc,
         public readonly string $updatedUtc,
+        // Additional fields from API
+        public readonly ?array $descriptions,
+        public readonly ?array $directions,
+        public readonly ?array $externalNames,
     ) {}
 
     public static function map(array $data): self
@@ -33,6 +37,10 @@ class Resource
                 data: $data['Data'] ?? [],
                 createdUtc: $data['CreatedUtc'] ?? '',
                 updatedUtc: $data['UpdatedUtc'] ?? '',
+                // Additional fields from API
+                descriptions: $data['Descriptions'] ?? null,
+                directions: $data['Directions'] ?? null,
+                externalNames: $data['ExternalNames'] ?? null,
             );
         } catch (\Throwable $e) {
             throw new MappingException("Failed to map Resource: {$e->getMessage()}", 0, $e);

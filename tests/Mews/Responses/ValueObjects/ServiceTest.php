@@ -11,7 +11,10 @@ it('maps service from API response', function () {
 
     expect($service->id)->toBe('98a8bc9e-7b0e-4b9d-af1c-516fc60bf038')
         ->and($service->isActive)->toBeFalse()
-        ->and($service->names)->toHaveKey('en-US');
+        ->and($service->names)->toHaveKey('en-US')
+        ->and($service->type)->toBe('Orderable')
+        ->and($service->name)->toBe('Eating at the Family')
+        ->and($service->promotions)->toBeArray();
 });
 
 it('throws exception on missing required field', function () {

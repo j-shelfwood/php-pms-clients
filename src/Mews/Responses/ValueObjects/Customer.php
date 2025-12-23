@@ -32,6 +32,9 @@ class Customer
         public readonly bool $isActive,
         public readonly string $createdUtc,
         public readonly string $updatedUtc,
+        // Additional fields from API
+        public readonly ?string $addressId,
+        public readonly ?string $billingCode,
     ) {}
 
     public static function map(array $data): self
@@ -63,6 +66,9 @@ class Customer
                 isActive: $data['IsActive'] ?? true,
                 createdUtc: $data['CreatedUtc'] ?? '',
                 updatedUtc: $data['UpdatedUtc'] ?? '',
+                // Additional fields from API
+                addressId: $data['AddressId'] ?? null,
+                billingCode: $data['BillingCode'] ?? null,
             );
         } catch (\Throwable $e) {
             throw new MappingException("Failed to map Customer: {$e->getMessage()}", 0, $e);
