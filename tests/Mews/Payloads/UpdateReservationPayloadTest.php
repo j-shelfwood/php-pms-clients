@@ -29,8 +29,8 @@ it('converts to array with only non-null values', function () {
 it('updates reservation dates', function () {
     $payload = new UpdateReservationPayload(
         reservationId: 'reservation-123',
-        startUtc: Carbon::parse('2025-01-20'),
-        endUtc: Carbon::parse('2025-01-25')
+        startUtc: Carbon::parse('2025-01-20 00:00:00 UTC'),
+        endUtc: Carbon::parse('2025-01-25 00:00:00 UTC')
     );
 
     $array = $payload->toArray();
@@ -56,8 +56,8 @@ it('throws exception when reservation ID is empty', function () {
 it('throws exception when start date is after end date', function () {
     new UpdateReservationPayload(
         reservationId: 'reservation-123',
-        startUtc: Carbon::parse('2025-01-25'),
-        endUtc: Carbon::parse('2025-01-20')
+        startUtc: Carbon::parse('2025-01-25 00:00:00 UTC'),
+        endUtc: Carbon::parse('2025-01-20 00:00:00 UTC')
     );
 })->throws(\InvalidArgumentException::class, 'StartUtc must be before EndUtc');
 
@@ -72,8 +72,8 @@ it('allows optional state with releaseUtc', function () {
     $payload = new UpdateReservationPayload(
         reservationId: 'reservation-123',
         state: ReservationState::Optional,
-        releaseUtc: Carbon::parse('2025-01-10')
+        releaseUtc: Carbon::parse('2025-01-10 00:00:00 UTC')
     );
 
-    expect($payload->toArray())->toHaveKeys(['State', 'ReleaseUtc']);
+    expect($payload->toArray())->toHaveKeys(['State', 'ReleasedUtc']);
 });

@@ -63,9 +63,15 @@ class ReservationsClient
     {
         $body = $this->httpClient->buildRequestBody([
             'ReservationIds' => [$reservationId],
+            'Extent' => [
+                'Reservations' => true,
+            ],
+            'Limitation' => [
+                'Count' => 1,
+            ],
         ]);
 
-        $response = $this->httpClient->post('/api/connector/v1/reservations/getAll', $body);
+        $response = $this->httpClient->post('/api/connector/v1/reservations/getAll/2023-06-06', $body);
 
         $reservationsResponse = ReservationsResponse::map($response);
 
@@ -92,16 +98,34 @@ class ReservationsClient
         Carbon $endDate,
         ?array $states = null
     ): ReservationsResponse {
-        $body = $this->httpClient->buildRequestBody([
-            'ServiceIds' => [$serviceId],
-            'FirstTimeUnitStartUtc' => $startDate->toIso8601String(),
-            'LastTimeUnitStartUtc' => $endDate->toIso8601String(),
-            'ReservationStates' => $states,
-        ]);
+        $allReservations = [];
+        $cursor = null;
 
-        $response = $this->httpClient->post('/api/connector/v1/reservations/getAll', $body);
+        do {
+            $body = $this->httpClient->buildRequestBody([
+                'ServiceIds' => [$serviceId],
+                'Extent' => [
+                    'Reservations' => true,
+                ],
+                'CollidingUtc' => [
+                    'StartUtc' => $startDate->copy()->utc()->toIso8601ZuluString(),
+                    'EndUtc' => $endDate->copy()->utc()->toIso8601ZuluString(),
+                ],
+                'States' => $states,
+                'Limitation' => [
+                    'Count' => 1000,
+                    ...($cursor !== null ? ['Cursor' => $cursor] : []),
+                ],
+            ]);
 
-        return ReservationsResponse::map($response);
+            $response = $this->httpClient->post('/api/connector/v1/reservations/getAll/2023-06-06', $body);
+
+            $pageResponse = ReservationsResponse::map($response);
+            $allReservations = array_merge($allReservations, $pageResponse->items->all());
+            $cursor = $pageResponse->cursor;
+        } while ($cursor !== null);
+
+        return new ReservationsResponse(items: collect($allReservations));
     }
 
     /**

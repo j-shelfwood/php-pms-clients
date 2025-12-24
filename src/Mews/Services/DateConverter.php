@@ -2,7 +2,7 @@
 
 namespace Shelfwood\PhpPms\Mews\Services;
 
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 
 /**
  * Date Converter for Mews API Requirements

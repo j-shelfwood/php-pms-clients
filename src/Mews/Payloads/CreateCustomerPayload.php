@@ -9,6 +9,8 @@ class CreateCustomerPayload
         public readonly bool $overwriteExisting = false,
         public readonly ?string $email = null,
         public readonly ?string $firstName = null,
+        public readonly ?string $title = null,
+        public readonly ?string $secondLastName = null,
         public readonly ?string $phone = null,
         public readonly ?string $nationalityCode = null,
         public readonly ?string $preferredLanguageCode = null,
@@ -43,6 +45,12 @@ class CreateCustomerPayload
         if ($this->firstName !== null) {
             $data['FirstName'] = $this->firstName;
         }
+        if ($this->title !== null) {
+            $data['Title'] = $this->title;
+        }
+        if ($this->secondLastName !== null) {
+            $data['SecondLastName'] = $this->secondLastName;
+        }
         if ($this->phone !== null) {
             $data['Phone'] = $this->phone;
         }
@@ -50,7 +58,8 @@ class CreateCustomerPayload
             $data['NationalityCode'] = $this->nationalityCode;
         }
         if ($this->preferredLanguageCode !== null) {
-            $data['PreferredLanguageCode'] = $this->preferredLanguageCode;
+            // Mews API expects LanguageCode field
+            $data['LanguageCode'] = $this->preferredLanguageCode;
         }
         if ($this->birthDate !== null) {
             $data['BirthDate'] = $this->birthDate;

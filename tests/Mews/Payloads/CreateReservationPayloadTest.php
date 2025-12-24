@@ -9,8 +9,8 @@ it('creates payload with required fields', function () {
         serviceId: 'service-123',
         customerId: 'customer-456',
         rateId: 'rate-789',
-        startUtc: Carbon::parse('2025-01-15 14:00:00'),
-        endUtc: Carbon::parse('2025-01-18 10:00:00'),
+        startUtc: Carbon::parse('2025-01-15 14:00:00 UTC'),
+        endUtc: Carbon::parse('2025-01-18 10:00:00 UTC'),
         personCounts: [
             ['AgeCategoryId' => 'adult-category', 'Count' => 2]
         ]
@@ -28,8 +28,8 @@ it('converts to array with all fields', function () {
         serviceId: 'service-123',
         customerId: 'customer-456',
         rateId: 'rate-789',
-        startUtc: Carbon::parse('2025-01-15 14:00:00'),
-        endUtc: Carbon::parse('2025-01-18 10:00:00'),
+        startUtc: Carbon::parse('2025-01-15 14:00:00 UTC'),
+        endUtc: Carbon::parse('2025-01-18 10:00:00 UTC'),
         personCounts: [
             ['AgeCategoryId' => 'adult-category', 'Count' => 2],
             ['AgeCategoryId' => 'child-category', 'Count' => 1]
@@ -57,8 +57,8 @@ it('filters null values from array output', function () {
         serviceId: 'service-123',
         customerId: 'customer-456',
         rateId: 'rate-789',
-        startUtc: Carbon::parse('2025-01-15'),
-        endUtc: Carbon::parse('2025-01-18'),
+        startUtc: Carbon::parse('2025-01-15 00:00:00 UTC'),
+        endUtc: Carbon::parse('2025-01-18 00:00:00 UTC'),
         personCounts: [['AgeCategoryId' => 'adult', 'Count' => 2]]
     );
 
@@ -66,7 +66,7 @@ it('filters null values from array output', function () {
 
     expect($array)->not->toHaveKey('RequestedCategoryId')
         ->and($array)->not->toHaveKey('Notes')
-        ->and($array)->not->toHaveKey('ReleaseUtc');
+        ->and($array)->not->toHaveKey('ReleasedUtc');
 });
 
 it('includes releaseUtc for optional reservations', function () {
@@ -74,18 +74,18 @@ it('includes releaseUtc for optional reservations', function () {
         serviceId: 'service-123',
         customerId: 'customer-456',
         rateId: 'rate-789',
-        startUtc: Carbon::parse('2025-01-15'),
-        endUtc: Carbon::parse('2025-01-18'),
+        startUtc: Carbon::parse('2025-01-15 00:00:00 UTC'),
+        endUtc: Carbon::parse('2025-01-18 00:00:00 UTC'),
         personCounts: [['AgeCategoryId' => 'adult', 'Count' => 2]],
         state: ReservationState::Optional,
-        releaseUtc: Carbon::parse('2025-01-10 12:00:00')
+        releaseUtc: Carbon::parse('2025-01-10 12:00:00 UTC')
     );
 
     $array = $payload->toArray();
 
     expect($array['State'])->toBe('Optional')
-        ->and($array)->toHaveKey('ReleaseUtc')
-        ->and($array['ReleaseUtc'])->toMatch('/2025-01-10T12:00:00/');
+        ->and($array)->toHaveKey('ReleasedUtc')
+        ->and($array['ReleasedUtc'])->toMatch('/2025-01-10T12:00:00/');
 });
 
 it('throws exception when personCounts is empty', function () {
@@ -93,8 +93,8 @@ it('throws exception when personCounts is empty', function () {
         serviceId: 'service-123',
         customerId: 'customer-456',
         rateId: 'rate-789',
-        startUtc: Carbon::parse('2025-01-15'),
-        endUtc: Carbon::parse('2025-01-18'),
+        startUtc: Carbon::parse('2025-01-15 00:00:00 UTC'),
+        endUtc: Carbon::parse('2025-01-18 00:00:00 UTC'),
         personCounts: []
     );
 })->throws(\InvalidArgumentException::class, 'PersonCounts cannot be empty');
@@ -104,14 +104,14 @@ it('throws exception when start date is after end date', function () {
         serviceId: 'service-123',
         customerId: 'customer-456',
         rateId: 'rate-789',
-        startUtc: Carbon::parse('2025-01-18'),
-        endUtc: Carbon::parse('2025-01-15'),
+        startUtc: Carbon::parse('2025-01-18 00:00:00 UTC'),
+        endUtc: Carbon::parse('2025-01-15 00:00:00 UTC'),
         personCounts: [['AgeCategoryId' => 'adult', 'Count' => 2]]
     );
 })->throws(\InvalidArgumentException::class, 'StartUtc must be before EndUtc');
 
 it('throws exception when start and end dates are equal', function () {
-    $sameDate = Carbon::parse('2025-01-15');
+    $sameDate = Carbon::parse('2025-01-15 00:00:00 UTC');
 
     new CreateReservationPayload(
         serviceId: 'service-123',
@@ -128,8 +128,8 @@ it('throws exception when optional state missing releaseUtc', function () {
         serviceId: 'service-123',
         customerId: 'customer-456',
         rateId: 'rate-789',
-        startUtc: Carbon::parse('2025-01-15'),
-        endUtc: Carbon::parse('2025-01-18'),
+        startUtc: Carbon::parse('2025-01-15 00:00:00 UTC'),
+        endUtc: Carbon::parse('2025-01-18 00:00:00 UTC'),
         personCounts: [['AgeCategoryId' => 'adult', 'Count' => 2]],
         state: ReservationState::Optional
     );
@@ -140,8 +140,8 @@ it('validates confirmed state does not require releaseUtc', function () {
         serviceId: 'service-123',
         customerId: 'customer-456',
         rateId: 'rate-789',
-        startUtc: Carbon::parse('2025-01-15'),
-        endUtc: Carbon::parse('2025-01-18'),
+        startUtc: Carbon::parse('2025-01-15 00:00:00 UTC'),
+        endUtc: Carbon::parse('2025-01-18 00:00:00 UTC'),
         personCounts: [['AgeCategoryId' => 'adult', 'Count' => 2]],
         state: ReservationState::Confirmed
     );

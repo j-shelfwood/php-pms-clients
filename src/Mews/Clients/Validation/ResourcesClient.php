@@ -17,21 +17,39 @@ class ResourcesClient
         ?array $resourceCategoryIds = null,
         ?array $resourceIds = null
     ): ResourcesResponse {
-        $params = [];
+        $allResources = [];
+        $cursor = null;
 
-        if ($resourceCategoryIds !== null) {
-            $params['ResourceCategoryIds'] = $resourceCategoryIds;
-        }
+        do {
+            $params = [
+                'Extent' => [
+                    'Resources' => true,
+                    'Inactive' => false,
+                ],
+                'Limitation' => [
+                    'Count' => 1000,
+                    ...($cursor !== null ? ['Cursor' => $cursor] : []),
+                ],
+            ];
 
-        if ($resourceIds !== null) {
-            $params['ResourceIds'] = $resourceIds;
-        }
+            if ($resourceCategoryIds !== null) {
+                $params['ResourceCategoryIds'] = $resourceCategoryIds;
+            }
 
-        $body = $this->httpClient->buildRequestBody($params);
+            if ($resourceIds !== null) {
+                $params['ResourceIds'] = $resourceIds;
+            }
 
-        $response = $this->httpClient->post('/api/connector/v1/resources/getAll', $body);
+            $body = $this->httpClient->buildRequestBody($params);
 
-        return ResourcesResponse::map($response);
+            $response = $this->httpClient->post('/api/connector/v1/resources/getAll', $body);
+
+            $pageResponse = ResourcesResponse::map($response);
+            $allResources = array_merge($allResources, $pageResponse->items->all());
+            $cursor = $pageResponse->cursor;
+        } while ($cursor !== null);
+
+        return new ResourcesResponse(items: collect($allResources));
     }
 
     public function getForCategory(string $categoryId): ResourcesResponse

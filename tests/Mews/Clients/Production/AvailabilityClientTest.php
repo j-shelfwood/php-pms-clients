@@ -8,6 +8,7 @@ use Shelfwood\PhpPms\Mews\Http\MewsHttpClient;
 use Shelfwood\PhpPms\Mews\Clients\Production\AvailabilityClient;
 use Shelfwood\PhpPms\Mews\Payloads\GetAvailabilityPayload;
 use Shelfwood\PhpPms\Mews\Responses\AvailabilityResponse;
+use Shelfwood\PhpPms\Mews\Enums\ResourceAvailabilityMetricType;
 
 beforeEach(function () {
     $this->config = new MewsConfig(
@@ -31,10 +32,25 @@ it('gets availability successfully', function () {
     $httpClient->shouldReceive('post')
         ->once()
         ->with(
+            Mockery::pattern('#/api/connector/v1/configuration/get#'),
+            Mockery::on(function ($options) {
+                $body = $options['json'];
+                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'Client']);
+                return true;
+            })
+        )
+        ->andReturn(new Response(200, [], json_encode([
+            'Enterprise' => ['TimeZoneIdentifier' => 'Europe/Budapest'],
+        ])));
+
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
             Mockery::pattern('#/api/connector/v1/services/getAvailability#'),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceId', 'ResourceCategoryIds', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc']);
+                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceId', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc', 'Metrics']);
+                expect($body['Metrics'])->toContain(ResourceAvailabilityMetricType::Occupied->value);
                 return true;
             })
         )
@@ -46,27 +62,33 @@ it('gets availability successfully', function () {
     $payload = new GetAvailabilityPayload(
         serviceId: 'bd26d8db-86a4-4f18-9e94-1b2362a1073c',
         firstTimeUnitStartUtc: Carbon::parse('2025-12-19'),
-        lastTimeUnitStartUtc: Carbon::parse('2025-12-23'),
-        resourceCategoryIds: ['44bd8ad0-e70b-4bd9-8445-ad7200d7c349']
+        lastTimeUnitStartUtc: Carbon::parse('2025-12-23')
     );
 
     $response = $availabilityClient->get($payload);
 
     expect($response)->toBeInstanceOf(AvailabilityResponse::class)
-        ->and($response->categoryAvailabilities)->toHaveCount(4)
-        ->and($response->categoryAvailabilities[0]->categoryId)->toBe('44bd8ad0-e70b-4bd9-8445-ad7200d7c349')
-        ->and($response->categoryAvailabilities[0]->availabilities)->toBe([6, 6, 6, 6, 6, 6])
-        ->and($response->categoryAvailabilities[0]->adjustments)->toBe([0, 0, 0, 0, 0, 0])
+        ->and($response->resourceCategoryAvailabilities)->toHaveCount(4)
+        ->and($response->resourceCategoryAvailabilities[0]->resourceCategoryId)->toBe('44bd8ad0-e70b-4bd9-8445-ad7200d7c349')
+        ->and($response->resourceCategoryAvailabilities[0]->metrics[ResourceAvailabilityMetricType::Occupied->value])->toBe([6, 6, 6, 6, 6, 6])
+        ->and($response->resourceCategoryAvailabilities[0]->metrics[ResourceAvailabilityMetricType::PublicAvailabilityAdjustment->value])->toBe([0, 0, 0, 0, 0, 0])
         ->and($response->timeUnitStartsUtc)->toHaveCount(6);
 });
 
 it('handles empty availability response', function () {
     $mockResponse = new Response(200, [], json_encode([
-        'CategoryAvailabilities' => [],
+        'ResourceCategoryAvailabilities' => [],
         'TimeUnitStartsUtc' => []
     ]));
 
     $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(Mockery::pattern('#/api/connector/v1/configuration/get#'), Mockery::any())
+        ->andReturn(new Response(200, [], json_encode([
+            'Enterprise' => ['TimeZoneIdentifier' => 'Europe/Budapest'],
+        ])));
+
     $httpClient->shouldReceive('post')
         ->once()
         ->andReturn($mockResponse);
@@ -82,7 +104,7 @@ it('handles empty availability response', function () {
 
     $response = $availabilityClient->get($payload);
 
-    expect($response->categoryAvailabilities)->toBeEmpty()
+    expect($response->resourceCategoryAvailabilities)->toBeEmpty()
         ->and($response->timeUnitStartsUtc)->toBeEmpty();
 });
 
@@ -90,6 +112,13 @@ it('sends correct request structure', function () {
     $mockResponse = new Response(200, [], json_encode($this->mockData));
 
     $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(Mockery::pattern('#/api/connector/v1/configuration/get#'), Mockery::any())
+        ->andReturn(new Response(200, [], json_encode([
+            'Enterprise' => ['TimeZoneIdentifier' => 'Europe/Budapest'],
+        ])));
+
     $httpClient->shouldReceive('post')
         ->once()
         ->with(
@@ -100,7 +129,12 @@ it('sends correct request structure', function () {
                 // Verify request structure
                 expect($body['ServiceId'])->toBeString()
                     ->and($body['FirstTimeUnitStartUtc'])->toMatch('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/')
-                    ->and($body['LastTimeUnitStartUtc'])->toMatch('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/');
+                    ->and($body['LastTimeUnitStartUtc'])->toMatch('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/')
+                    ->and($body['Metrics'])->toBeArray()->not()->toBeEmpty();
+
+                // Enterprise-midnight boundaries (Budapest winter = UTC+1)
+                expect($body['FirstTimeUnitStartUtc'])->toBe('2024-12-31T23:00:00Z')
+                    ->and($body['LastTimeUnitStartUtc'])->toBe('2025-01-30T23:00:00Z');
 
                 return true;
             })

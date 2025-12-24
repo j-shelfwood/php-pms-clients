@@ -16,16 +16,26 @@ class AgeCategoriesClient
 
     public function getAll(string $serviceId): AgeCategoriesResponse
     {
-        $body = $this->httpClient->buildRequestBody([
-            'ServiceIds' => [$serviceId],
-            'Limitation' => [
-                'Count' => 100,
-            ],
-        ]);
+        $allCategories = [];
+        $cursor = null;
 
-        $response = $this->httpClient->post('/api/connector/v1/ageCategories/getAll', $body);
+        do {
+            $body = $this->httpClient->buildRequestBody([
+                'ServiceIds' => [$serviceId],
+                'Limitation' => [
+                    'Count' => 100,
+                    ...($cursor !== null ? ['Cursor' => $cursor] : []),
+                ],
+            ]);
 
-        return AgeCategoriesResponse::map($response);
+            $response = $this->httpClient->post('/api/connector/v1/ageCategories/getAll', $body);
+            $pageResponse = AgeCategoriesResponse::map($response);
+
+            $allCategories = array_merge($allCategories, $pageResponse->items->all());
+            $cursor = $pageResponse->cursor;
+        } while ($cursor !== null);
+
+        return new AgeCategoriesResponse(items: collect($allCategories));
     }
 
     public function getAdultCategory(string $serviceId): ?AgeCategory

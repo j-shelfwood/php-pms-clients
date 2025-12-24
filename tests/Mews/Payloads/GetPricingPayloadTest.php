@@ -16,8 +16,8 @@ it('creates payload with required fields', function () {
 it('converts to array with ISO 8601 dates', function () {
     $payload = new GetPricingPayload(
         rateId: 'rate-123',
-        firstTimeUnitStartUtc: Carbon::parse('2025-01-15 14:00:00'),
-        lastTimeUnitStartUtc: Carbon::parse('2025-01-18 10:00:00')
+        firstTimeUnitStartUtc: Carbon::parse('2025-01-15 14:00:00 UTC'),
+        lastTimeUnitStartUtc: Carbon::parse('2025-01-18 10:00:00 UTC')
     );
 
     $array = $payload->toArray();
@@ -26,35 +26,6 @@ it('converts to array with ISO 8601 dates', function () {
         ->and($array['RateId'])->toBe('rate-123')
         ->and($array['FirstTimeUnitStartUtc'])->toMatch('/2025-01-15T14:00:00/')
         ->and($array['LastTimeUnitStartUtc'])->toMatch('/2025-01-18T10:00:00/');
-});
-
-it('includes occupancy configuration when provided', function () {
-    $payload = new GetPricingPayload(
-        rateId: 'rate-123',
-        firstTimeUnitStartUtc: Carbon::parse('2025-01-01'),
-        lastTimeUnitStartUtc: Carbon::parse('2025-01-31'),
-        occupancyConfiguration: [
-            'AdultCount' => 2,
-            'ChildCount' => 1
-        ]
-    );
-
-    $array = $payload->toArray();
-
-    expect($array)->toHaveKey('OccupancyConfiguration')
-        ->and($array['OccupancyConfiguration'])->toBe(['AdultCount' => 2, 'ChildCount' => 1]);
-});
-
-it('filters null occupancy configuration', function () {
-    $payload = new GetPricingPayload(
-        rateId: 'rate-123',
-        firstTimeUnitStartUtc: Carbon::parse('2025-01-01'),
-        lastTimeUnitStartUtc: Carbon::parse('2025-01-31')
-    );
-
-    $array = $payload->toArray();
-
-    expect($array)->not->toHaveKey('OccupancyConfiguration');
 });
 
 it('throws exception when rateId is empty', function () {

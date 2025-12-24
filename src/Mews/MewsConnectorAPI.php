@@ -42,6 +42,7 @@ use Shelfwood\PhpPms\Mews\Responses\ValueObjects\ResourceCategoryAssignment;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Customer;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Reservation;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\AgeCategory;
+use Shelfwood\PhpPms\Mews\Enums\ReservationState;
 
 // Payload types
 use Shelfwood\PhpPms\Mews\Payloads\GetAvailabilityPayload;
@@ -231,20 +232,18 @@ class MewsConnectorAPI
      *
      * Supports two calling styles:
      * 1. With Payload object: getAvailability($payload)
-     * 2. With named parameters: getAvailability($serviceId, $start, $end, $categoryIds)
+     * 2. With named parameters: getAvailability($serviceId, $firstTimeUnitStartUtc, $lastTimeUnitStartUtc)
      *
      * @param GetAvailabilityPayload|string $payloadOrServiceId Payload object OR service UUID
-     * @param Carbon|null $start Start date (UTC) (if using named params)
-     * @param Carbon|null $end End date (UTC) (if using named params)
-     * @param array|null $resourceCategoryIds Specific categories to check (optional)
+     * @param Carbon|null $firstTimeUnitStartUtc Start boundary (UTC)
+     * @param Carbon|null $lastTimeUnitStartUtc End boundary (UTC)
      * @return AvailabilityResponse Availability data with metrics per time interval
      * @throws MewsApiException
      */
     public function getAvailability(
         GetAvailabilityPayload|string $payloadOrServiceId,
-        ?Carbon $start = null,
-        ?Carbon $end = null,
-        ?array $resourceCategoryIds = null
+        ?Carbon $firstTimeUnitStartUtc = null,
+        ?Carbon $lastTimeUnitStartUtc = null
     ): AvailabilityResponse {
         // Guard: If already a payload, use it directly
         if ($payloadOrServiceId instanceof GetAvailabilityPayload) {
@@ -254,9 +253,8 @@ class MewsConnectorAPI
         // Build payload from named parameters
         $payload = new GetAvailabilityPayload(
             serviceId: $payloadOrServiceId,
-            start: $start,
-            end: $end,
-            resourceCategoryIds: $resourceCategoryIds
+            firstTimeUnitStartUtc: $firstTimeUnitStartUtc ?? throw new \InvalidArgumentException('FirstTimeUnitStartUtc is required'),
+            lastTimeUnitStartUtc: $lastTimeUnitStartUtc ?? throw new \InvalidArgumentException('LastTimeUnitStartUtc is required')
         );
 
         return $this->availabilityClient->get($payload);
@@ -279,22 +277,18 @@ class MewsConnectorAPI
      *
      * Supports two calling styles:
      * 1. With Payload object: getPricing($payload)
-     * 2. With named parameters: getPricing($rateId, $start, $end, $adults, $children)
+     * 2. With named parameters: getPricing($rateId, $firstTimeUnitStartUtc, $lastTimeUnitStartUtc)
      *
      * @param GetPricingPayload|string $payloadOrRateId Payload object OR rate UUID
-     * @param Carbon|null $start Start date (UTC) (if using named params)
-     * @param Carbon|null $end End date (UTC) (if using named params)
-     * @param int $adults Number of adults
-     * @param int $children Number of children
+     * @param Carbon|null $firstTimeUnitStartUtc Start boundary (UTC)
+     * @param Carbon|null $lastTimeUnitStartUtc End boundary (UTC)
      * @return PricingResponse Pricing data with per-night rates
      * @throws MewsApiException
      */
     public function getPricing(
         GetPricingPayload|string $payloadOrRateId,
-        ?Carbon $start = null,
-        ?Carbon $end = null,
-        int $adults = 2,
-        int $children = 0
+        ?Carbon $firstTimeUnitStartUtc = null,
+        ?Carbon $lastTimeUnitStartUtc = null
     ): PricingResponse {
         // Guard: If already a payload, use it directly
         if ($payloadOrRateId instanceof GetPricingPayload) {
@@ -304,10 +298,8 @@ class MewsConnectorAPI
         // Build payload from named parameters
         $payload = new GetPricingPayload(
             rateId: $payloadOrRateId,
-            start: $start,
-            end: $end,
-            adults: $adults,
-            children: $children
+            firstTimeUnitStartUtc: $firstTimeUnitStartUtc ?? throw new \InvalidArgumentException('FirstTimeUnitStartUtc is required'),
+            lastTimeUnitStartUtc: $lastTimeUnitStartUtc ?? throw new \InvalidArgumentException('LastTimeUnitStartUtc is required')
         );
 
         return $this->pricingClient->getPricing($payload);
@@ -435,55 +427,62 @@ class MewsConnectorAPI
     // ========================================================================
 
     /**
-     * Create a new reservation
+     * Create a new reservation from payload
      *
-     * Supports two calling styles:
-     * 1. With Payload object: createReservation($payload, $sendEmail)
-     * 2. With named parameters: createReservation($customerId, $rateId, $start, $end, $personCounts, ...)
-     *
-     * @param CreateReservationPayload|string $payloadOrCustomerId Payload object OR customer UUID
-     * @param bool|string|null $sendEmailOrRateId Send email flag OR rate UUID
-     * @param Carbon|null $startUtc Start date (if using named params)
-     * @param Carbon|null $endUtc End date (if using named params)
-     * @param array|null $personCounts Person counts array (if using named params)
-     * @param string|null $requestedCategoryId Requested category (if using named params)
-     * @param string $state Reservation state (if using named params)
-     * @param string|null $notes Notes (if using named params)
-     * @param Carbon|null $releaseUtc Release date (if using named params)
-     * @return Reservation Reservation object with ID
+     * @param CreateReservationPayload $payload Reservation creation payload
+     * @param bool $sendConfirmationEmail Whether to send confirmation email
+     * @return Reservation Created reservation object
      * @throws MewsApiException
      */
-    public function createReservation(
-        CreateReservationPayload|string $payloadOrCustomerId,
-        bool|string|null $sendEmailOrRateId = true,
-        ?Carbon $startUtc = null,
-        ?Carbon $endUtc = null,
-        ?array $personCounts = null,
-        ?string $requestedCategoryId = null,
-        string $state = 'Confirmed',
-        ?string $notes = null,
-        ?Carbon $releaseUtc = null
-    ): Reservation {
-        // Guard: If already a payload, use it directly
-        if ($payloadOrCustomerId instanceof CreateReservationPayload) {
-            $sendConfirmationEmail = is_bool($sendEmailOrRateId) ? $sendEmailOrRateId : true;
-            return $this->reservationsClient->create($payloadOrCustomerId, $sendConfirmationEmail);
-        }
+    public function createReservation(CreateReservationPayload $payload, bool $sendConfirmationEmail = true): Reservation
+    {
+        return $this->reservationsClient->create($payload, $sendConfirmationEmail);
+    }
 
-        // Build payload from named parameters
+    /**
+     * Create a new reservation from parameters
+     *
+     * @param string $serviceId Service UUID
+     * @param string $customerId Customer UUID
+     * @param string $rateId Rate UUID
+     * @param Carbon $startUtc Start (UTC)
+     * @param Carbon $endUtc End (UTC)
+     * @param array $personCounts Person counts array
+     * @param string|null $requestedCategoryId Requested category UUID (optional)
+     * @param ReservationState $state Reservation state
+     * @param string|null $notes Notes (optional)
+     * @param Carbon|null $releasedUtc Release date/time (required for Optional)
+     * @param bool $sendConfirmationEmail Whether to send confirmation email
+     * @return Reservation Created reservation object
+     * @throws MewsApiException
+     */
+    public function createReservationFromParams(
+        string $serviceId,
+        string $customerId,
+        string $rateId,
+        Carbon $startUtc,
+        Carbon $endUtc,
+        array $personCounts,
+        ?string $requestedCategoryId = null,
+        ReservationState $state = ReservationState::Confirmed,
+        ?string $notes = null,
+        ?Carbon $releasedUtc = null,
+        bool $sendConfirmationEmail = true
+    ): Reservation {
         $payload = new CreateReservationPayload(
-            customerId: $payloadOrCustomerId,
-            rateId: $sendEmailOrRateId,
+            serviceId: $serviceId,
+            customerId: $customerId,
+            rateId: $rateId,
             startUtc: $startUtc,
             endUtc: $endUtc,
-            personCounts: $personCounts ?? [],
+            personCounts: $personCounts,
             requestedCategoryId: $requestedCategoryId,
             state: $state,
             notes: $notes,
-            releaseUtc: $releaseUtc
+            releaseUtc: $releasedUtc
         );
 
-        return $this->reservationsClient->create($payload, true);
+        return $this->reservationsClient->create($payload, $sendConfirmationEmail);
     }
 
     /**
@@ -550,7 +549,7 @@ class MewsConnectorAPI
      * @return Reservation Updated reservation object
      * @throws MewsApiException
      */
-    public function updateReservationState(string $reservationId, string $newState): Reservation
+    public function updateReservationState(string $reservationId, ReservationState $newState): Reservation
     {
         return $this->reservationsClient->updateState($reservationId, $newState);
     }
@@ -631,8 +630,7 @@ class MewsConnectorAPI
      */
     public function getConfiguration(): array
     {
-        $body = $this->httpClient->buildRequestBody([]);
-        return $this->httpClient->post('/api/connector/v1/configuration/get', $body);
+        return $this->httpClient->getConfiguration();
     }
 
     /**
@@ -643,8 +641,6 @@ class MewsConnectorAPI
      */
     public function getEnterpriseTimezone(): string
     {
-        $config = $this->getConfiguration();
-        return $config['Enterprise']['TimeZoneIdentifier']
-            ?? throw new \RuntimeException('Enterprise timezone not found in configuration');
+        return $this->httpClient->getEnterpriseTimezoneIdentifier();
     }
 }

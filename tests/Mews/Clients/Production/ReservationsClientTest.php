@@ -105,7 +105,9 @@ it('gets reservation by ID successfully', function () {
                 $body = $options['json'];
                 expect($body)->toHaveKey('ReservationIds')
                     ->and($body['ReservationIds'])->toBeArray()
-                    ->and($body['ReservationIds'])->toHaveCount(1);
+                    ->and($body['ReservationIds'])->toHaveCount(1)
+                    ->and($body)->toHaveKey('Extent')
+                    ->and($body)->toHaveKey('Limitation');
                 return true;
             })
         )
@@ -141,13 +143,12 @@ it('gets all reservations for service and date range', function () {
     $httpClient->shouldReceive('post')
         ->once()
         ->with(
-            Mockery::pattern('#/api/connector/v1/reservations/getAll#'),
+            Mockery::pattern('#/api/connector/v1/reservations/getAll/2023-06-06#'),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body)->toHaveKeys(['ServiceIds', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc'])
+                expect($body)->toHaveKeys(['ServiceIds', 'Extent', 'CollidingUtc', 'Limitation'])
                     ->and($body['ServiceIds'])->toBeArray()
-                    ->and($body['FirstTimeUnitStartUtc'])->toBeString()
-                    ->and($body['LastTimeUnitStartUtc'])->toBeString();
+                    ->and($body['CollidingUtc'])->toHaveKeys(['StartUtc', 'EndUtc']);
                 return true;
             })
         )
@@ -181,8 +182,8 @@ it('filters reservations by states', function () {
             Mockery::any(),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body)->toHaveKey('ReservationStates')
-                    ->and($body['ReservationStates'])->toBe(['Confirmed', 'Started']);
+                expect($body)->toHaveKey('States')
+                    ->and($body['States'])->toBe(['Confirmed', 'Started']);
                 return true;
             })
         )

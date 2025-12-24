@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Shelfwood\PhpPms\Mews\Payloads\GetAvailabilityPayload;
+use Shelfwood\PhpPms\Mews\Enums\ResourceAvailabilityMetricType;
 
 it('creates payload with required fields', function () {
     $payload = new GetAvailabilityPayload(
@@ -16,30 +17,17 @@ it('creates payload with required fields', function () {
 it('converts to array with ISO 8601 dates', function () {
     $payload = new GetAvailabilityPayload(
         serviceId: 'service-123',
-        firstTimeUnitStartUtc: Carbon::parse('2025-01-01 00:00:00'),
-        lastTimeUnitStartUtc: Carbon::parse('2025-01-31 23:59:59')
+        firstTimeUnitStartUtc: Carbon::parse('2025-01-01 00:00:00 UTC'),
+        lastTimeUnitStartUtc: Carbon::parse('2025-01-31 23:59:59 UTC')
     );
 
     $array = $payload->toArray();
 
-    expect($array)->toHaveKeys(['ServiceId', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc'])
+    expect($array)->toHaveKeys(['ServiceId', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc', 'Metrics'])
         ->and($array['ServiceId'])->toBe('service-123')
         ->and($array['FirstTimeUnitStartUtc'])->toMatch('/2025-01-01T00:00:00/')
-        ->and($array['LastTimeUnitStartUtc'])->toMatch('/2025-01-31T23:59:59/');
-});
-
-it('includes resource category IDs when provided', function () {
-    $payload = new GetAvailabilityPayload(
-        serviceId: 'service-123',
-        firstTimeUnitStartUtc: Carbon::parse('2025-01-01'),
-        lastTimeUnitStartUtc: Carbon::parse('2025-01-31'),
-        resourceCategoryIds: ['category-1', 'category-2']
-    );
-
-    $array = $payload->toArray();
-
-    expect($array)->toHaveKey('ResourceCategoryIds')
-        ->and($array['ResourceCategoryIds'])->toBe(['category-1', 'category-2']);
+        ->and($array['LastTimeUnitStartUtc'])->toMatch('/2025-01-31T23:59:59/')
+        ->and($array['Metrics'])->toContain(ResourceAvailabilityMetricType::Occupied->value);
 });
 
 it('throws exception when serviceId is empty', function () {
@@ -67,3 +55,12 @@ it('throws exception when dates are equal', function () {
         lastTimeUnitStartUtc: $sameDate
     );
 })->throws(\InvalidArgumentException::class, 'FirstTimeUnitStartUtc must be before LastTimeUnitStartUtc');
+
+it('throws exception when metrics list is empty', function () {
+    new GetAvailabilityPayload(
+        serviceId: 'service-123',
+        firstTimeUnitStartUtc: Carbon::parse('2025-01-01 00:00:00 UTC'),
+        lastTimeUnitStartUtc: Carbon::parse('2025-01-02 00:00:00 UTC'),
+        metrics: []
+    );
+})->throws(\InvalidArgumentException::class, 'Metrics cannot be empty');

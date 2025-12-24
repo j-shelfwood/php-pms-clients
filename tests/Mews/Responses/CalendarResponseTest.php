@@ -13,6 +13,6 @@ it('maps calendar response from availability and pricing data', function () {
 
     expect($response->availability)->toBeInstanceOf(\Shelfwood\PhpPms\Mews\Responses\AvailabilityResponse::class)
         ->and($response->pricing)->toBeInstanceOf(\Shelfwood\PhpPms\Mews\Responses\PricingResponse::class)
-        ->and($response->availability->categoryAvailabilities)->toHaveCount(4)
+        ->and($response->availability->resourceCategoryAvailabilities)->toHaveCount(4)
         ->and($response->pricing->currency)->toBe('GBP');
 });

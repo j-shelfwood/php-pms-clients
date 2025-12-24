@@ -25,3 +25,19 @@ it('maps reservation from API response', function () {
 it('throws exception on missing required field', function () {
     Reservation::map(['Id' => 'test-id']);
 })->throws(\Shelfwood\PhpPms\Exceptions\MappingException::class);
+
+it('falls back to StartUtc/EndUtc when ScheduledStartUtc/ScheduledEndUtc missing', function () {
+    $reservation = Reservation::map([
+        'Id' => 'reservation-1',
+        'ServiceId' => 'service-1',
+        'AccountId' => 'account-1',
+        'Number' => '1',
+        'State' => 'Confirmed',
+        'RateId' => 'rate-1',
+        'StartUtc' => '2025-01-01T00:00:00Z',
+        'EndUtc' => '2025-01-02T00:00:00Z',
+    ]);
+
+    expect($reservation->scheduledStartUtc)->toBe('2025-01-01T00:00:00Z')
+        ->and($reservation->scheduledEndUtc)->toBe('2025-01-02T00:00:00Z');
+});

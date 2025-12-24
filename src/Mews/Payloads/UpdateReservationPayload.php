@@ -39,13 +39,13 @@ class UpdateReservationPayload
     {
         return array_filter([
             'ReservationId' => $this->reservationId,
-            'StartUtc' => $this->startUtc?->toIso8601String(),
-            'EndUtc' => $this->endUtc?->toIso8601String(),
+            'StartUtc' => $this->startUtc?->copy()->utc()->toIso8601ZuluString(),
+            'EndUtc' => $this->endUtc?->copy()->utc()->toIso8601ZuluString(),
             'PersonCounts' => $this->personCounts,
             'RequestedCategoryId' => $this->requestedCategoryId,
             'State' => $this->state?->value,
             'Notes' => $this->notes,
-            'ReleaseUtc' => $this->releaseUtc?->toIso8601String(),
+            'ReleasedUtc' => $this->releaseUtc?->copy()->utc()->toIso8601ZuluString(),
         ], fn($value) => $value !== null);
     }
 }

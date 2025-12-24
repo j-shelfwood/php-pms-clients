@@ -48,7 +48,7 @@ it('gets all service rates successfully', function () {
             Mockery::pattern('#/api/connector/v1/rates/getAll#'),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceIds'])
+                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'ServiceIds', 'Limitation'])
                     ->and($body['ServiceIds'])->toBeArray()
                     ->and($body['ServiceIds'])->toHaveCount(1);
                 return true;
@@ -77,11 +77,21 @@ it('gets pricing for rate and date range successfully', function () {
     $httpClient = Mockery::mock(Client::class);
     $httpClient->shouldReceive('post')
         ->once()
+        ->with(Mockery::pattern('#/api/connector/v1/configuration/get#'), Mockery::any())
+        ->andReturn(new Response(200, [], json_encode([
+            'Enterprise' => ['TimeZoneIdentifier' => 'Europe/Budapest'],
+        ])));
+
+    $httpClient->shouldReceive('post')
+        ->once()
         ->with(
             Mockery::pattern('#/api/connector/v1/rates/getPricing#'),
             Mockery::on(function ($options) {
                 $body = $options['json'];
                 expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'RateId', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc']);
+                // Enterprise-midnight boundaries (Budapest winter = UTC+1)
+                expect($body['FirstTimeUnitStartUtc'])->toBe('2025-01-14T23:00:00Z')
+                    ->and($body['LastTimeUnitStartUtc'])->toBe('2025-01-16T23:00:00Z');
                 return true;
             })
         )
@@ -94,8 +104,7 @@ it('gets pricing for rate and date range successfully', function () {
     $payload = new GetPricingPayload(
         rateId: '11672368-e0d7-4a6d-bd85-ad7200d77428',
         firstTimeUnitStartUtc: Carbon::parse('2025-01-15'),
-        lastTimeUnitStartUtc: Carbon::parse('2025-01-17'),
-        occupancyConfiguration: ['AdultCount' => 2]
+        lastTimeUnitStartUtc: Carbon::parse('2025-01-17')
     );
 
     $response = $pricingClient->getPricing($payload);
@@ -111,6 +120,13 @@ it('validates pricing response structure', function () {
     $mockResponse = new Response(200, [], json_encode($this->pricingMockData));
 
     $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(Mockery::pattern('#/api/connector/v1/configuration/get#'), Mockery::any())
+        ->andReturn(new Response(200, [], json_encode([
+            'Enterprise' => ['TimeZoneIdentifier' => 'Europe/Budapest'],
+        ])));
+
     $httpClient->shouldReceive('post')
         ->once()
         ->andReturn($mockResponse);
@@ -145,19 +161,27 @@ it('gets calendar data with availability and pricing', function () {
 
     $httpClient = Mockery::mock(Client::class);
 
-    // First call: get availability
+    // First call: configuration (timezone)
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(Mockery::pattern('#/api/connector/v1/configuration/get#'), Mockery::any())
+        ->andReturn(new Response(200, [], json_encode([
+            'Enterprise' => ['TimeZoneIdentifier' => 'Europe/Budapest'],
+        ])));
+
+    // Second call: get availability
     $httpClient->shouldReceive('post')
         ->once()
         ->with(Mockery::pattern('#/services/getAvailability#'), Mockery::any())
         ->andReturn($mockAvailabilityResponse);
 
-    // Second call: get rates
+    // Third call: get rates
     $httpClient->shouldReceive('post')
         ->once()
         ->with(Mockery::pattern('#/rates/getAll#'), Mockery::any())
         ->andReturn($mockRatesResponse);
 
-    // Third call: get pricing
+    // Fourth call: get pricing
     $httpClient->shouldReceive('post')
         ->once()
         ->with(Mockery::pattern('#/rates/getPricing#'), Mockery::any())
@@ -193,13 +217,21 @@ it('gets calendar without pricing when no public rates exist', function () {
 
     $httpClient = Mockery::mock(Client::class);
 
-    // First call: get availability
+    // First call: configuration (timezone)
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(Mockery::pattern('#/api/connector/v1/configuration/get#'), Mockery::any())
+        ->andReturn(new Response(200, [], json_encode([
+            'Enterprise' => ['TimeZoneIdentifier' => 'Europe/Budapest'],
+        ])));
+
+    // Second call: get availability
     $httpClient->shouldReceive('post')
         ->once()
         ->with(Mockery::pattern('#/services/getAvailability#'), Mockery::any())
         ->andReturn($mockAvailabilityResponse);
 
-    // Second call: get rates
+    // Third call: get rates
     $httpClient->shouldReceive('post')
         ->once()
         ->with(Mockery::pattern('#/rates/getAll#'), Mockery::any())
@@ -224,10 +256,17 @@ it('gets calendar without pricing when no public rates exist', function () {
         ->and($response->pricing)->toBeNull();
 });
 
-it('sends correct pricing request with guest counts', function () {
+it('sends pricing request without occupancy configuration', function () {
     $mockResponse = new Response(200, [], json_encode($this->pricingMockData));
 
     $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(Mockery::pattern('#/api/connector/v1/configuration/get#'), Mockery::any())
+        ->andReturn(new Response(200, [], json_encode([
+            'Enterprise' => ['TimeZoneIdentifier' => 'Europe/Budapest'],
+        ])));
+
     $httpClient->shouldReceive('post')
         ->once()
         ->with(
@@ -235,10 +274,7 @@ it('sends correct pricing request with guest counts', function () {
             Mockery::on(function ($options) {
                 $body = $options['json'];
 
-                // Verify occupancy configuration is included
-                expect($body)->toHaveKey('OccupancyConfiguration')
-                    ->and($body['OccupancyConfiguration']['AdultCount'])->toBe(2)
-                    ->and($body['OccupancyConfiguration']['ChildCount'])->toBe(1);
+                expect($body)->not->toHaveKey('OccupancyConfiguration');
 
                 return true;
             })
@@ -252,8 +288,7 @@ it('sends correct pricing request with guest counts', function () {
     $payload = new GetPricingPayload(
         rateId: 'test-rate',
         firstTimeUnitStartUtc: Carbon::parse('2025-01-15'),
-        lastTimeUnitStartUtc: Carbon::parse('2025-01-17'),
-        occupancyConfiguration: ['AdultCount' => 2, 'ChildCount' => 1]
+        lastTimeUnitStartUtc: Carbon::parse('2025-01-17')
     );
 
     $pricingClient->getPricing($payload);

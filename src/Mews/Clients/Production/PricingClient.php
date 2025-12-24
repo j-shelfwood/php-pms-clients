@@ -12,6 +12,7 @@ use Shelfwood\PhpPms\Mews\Responses\AvailabilityResponse;
 use Shelfwood\PhpPms\Mews\Payloads\GetAvailabilityPayload;
 use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
 use Shelfwood\PhpPms\Mews\Enums\RateType;
+use Shelfwood\PhpPms\Mews\Services\DateConverter;
 
 class PricingClient
 {
@@ -35,6 +36,9 @@ class PricingClient
     {
         $body = $this->httpClient->buildRequestBody([
             'ServiceIds' => [$serviceId],
+            'Limitation' => [
+                'Count' => 1000,
+            ],
         ]);
 
         $response = $this->httpClient->post('/api/connector/v1/rates/getAll', $body);
@@ -56,7 +60,15 @@ class PricingClient
      */
     public function getPricing(GetPricingPayload $payload): PricingResponse
     {
-        $body = $this->httpClient->buildRequestBody($payload->toArray());
+        $enterpriseTimezone = $this->httpClient->getEnterpriseTimezoneIdentifier();
+
+        $normalizedPayload = new GetPricingPayload(
+            rateId: $payload->rateId,
+            firstTimeUnitStartUtc: $this->toEnterpriseMidnightBoundaryUtc($payload->firstTimeUnitStartUtc, $enterpriseTimezone),
+            lastTimeUnitStartUtc: $this->toEnterpriseMidnightBoundaryUtc($payload->lastTimeUnitStartUtc, $enterpriseTimezone),
+        );
+
+        $body = $this->httpClient->buildRequestBody($normalizedPayload->toArray());
 
         $response = $this->httpClient->post('/api/connector/v1/rates/getPricing', $body);
 
@@ -112,11 +124,7 @@ class PricingClient
             $pricingPayload = new GetPricingPayload(
                 rateId: $bestRate->id,
                 firstTimeUnitStartUtc: $start,
-                lastTimeUnitStartUtc: $end,
-                occupancyConfiguration: [
-                    'AdultCount' => $adults,
-                    'ChildCount' => $children
-                ]
+                lastTimeUnitStartUtc: $end
             );
             $pricing = $this->getPricing($pricingPayload);
         }
@@ -125,5 +133,11 @@ class PricingClient
             availability: $availability,
             pricing: $pricing
         );
+    }
+
+    private function toEnterpriseMidnightBoundaryUtc(Carbon $date, string $enterpriseTimezone): Carbon
+    {
+        $utcDate = Carbon::parse($date->format('Y-m-d'), 'UTC');
+        return DateConverter::toEnterpriseMidnightUtc($utcDate, $enterpriseTimezone);
     }
 }

@@ -37,11 +37,12 @@ it('searches for customers by email', function () {
     $httpClient->shouldReceive('post')
         ->once()
         ->with(
-            Mockery::pattern('#/api/connector/v1/customers/search#'),
+            Mockery::pattern('#/api/connector/v1/customers/getAll#'),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'Emails'])
-                    ->and($body['Emails'])->toBeArray();
+                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'Emails', 'Extent', 'Limitation'])
+                    ->and($body['Emails'])->toBeArray()
+                    ->and($body['Limitation'])->toHaveKey('Count');
                 return true;
             })
         )
@@ -89,7 +90,9 @@ it('gets customer by ID successfully', function () {
                 $body = $options['json'];
                 expect($body)->toHaveKey('CustomerIds')
                     ->and($body['CustomerIds'])->toBeArray()
-                    ->and($body['CustomerIds'])->toHaveCount(1);
+                    ->and($body['CustomerIds'])->toHaveCount(1)
+                    ->and($body)->toHaveKey('Extent')
+                    ->and($body)->toHaveKey('Limitation');
                 return true;
             })
         )
@@ -125,7 +128,7 @@ it('finds existing customer without creating new one', function () {
     $httpClient = Mockery::mock(Client::class);
     $httpClient->shouldReceive('post')
         ->once()
-        ->with(Mockery::pattern('#/customers/search#'), Mockery::any())
+        ->with(Mockery::pattern('#/customers/getAll#'), Mockery::any())
         ->andReturn($mockSearchResponse);
 
     // Should NOT call customers/add since customer exists
@@ -155,7 +158,7 @@ it('creates new customer when not found', function () {
     // First call: search returns empty
     $httpClient->shouldReceive('post')
         ->once()
-        ->with(Mockery::pattern('#/customers/search#'), Mockery::any())
+        ->with(Mockery::pattern('#/customers/getAll#'), Mockery::any())
         ->andReturn($mockSearchResponse);
 
     // Second call: add creates new customer
@@ -192,7 +195,7 @@ it('throws exception when customer creation fails', function () {
 
     $httpClient = Mockery::mock(Client::class);
     $httpClient->shouldReceive('post')
-        ->with(Mockery::pattern('#/customers/search#'), Mockery::any())
+        ->with(Mockery::pattern('#/customers/getAll#'), Mockery::any())
         ->andReturn($mockSearchResponse);
 
     $httpClient->shouldReceive('post')

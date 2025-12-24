@@ -68,6 +68,31 @@ class MewsFixtures
     }
 
     /**
+     * Load API request fixture
+     *
+     * @param string $name Fixture name (without .json extension)
+     * @return array Parsed API request body
+     * @throws \RuntimeException If fixture file not found
+     */
+    public static function apiRequest(string $name): array
+    {
+        $path = __DIR__ . '/../../mocks/mews/requests/' . $name . '.json';
+
+        if (!file_exists($path)) {
+            throw new \RuntimeException("API request fixture not found: {$name} at {$path}");
+        }
+
+        $content = file_get_contents($path);
+        $data = json_decode($content, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new \RuntimeException("Invalid JSON in request fixture {$name}: " . json_last_error_msg());
+        }
+
+        return $data;
+    }
+
+    /**
      * Generate HMAC-SHA256 webhook signature
      *
      * Delegates to production WebhookSignatureService for consistent behavior.
@@ -187,6 +212,21 @@ class MewsFixtures
     public static function availableResponses(): array
     {
         $dir = __DIR__ . '/../../mocks/mews/responses/';
+        $files = glob($dir . '*.json');
+
+        return array_map(function ($file) {
+            return basename($file, '.json');
+        }, $files);
+    }
+
+    /**
+     * Get all available API request fixture names
+     *
+     * @return array List of request fixture names (without .json)
+     */
+    public static function availableRequests(): array
+    {
+        $dir = __DIR__ . '/../../mocks/mews/requests/';
         $files = glob($dir . '*.json');
 
         return array_map(function ($file) {

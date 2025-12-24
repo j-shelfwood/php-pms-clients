@@ -2,23 +2,21 @@
   "ClientToken": "E0D7BAAA5F704DA6B78CD1BE50000E3E-DA39A3EE5E6B4B0D3255BFEF95601890",
   "AccessToken": "C66EF7B239D24632943D115EDE9E3DCC-EA00F8FD8294692C976C01A74C5A4AE",
   "Client": "MoreApartments/1.0",
-  "Customers": [
-    {
-      "Email": "jane.smith@example.com",
-      "FirstName": "Jane",
-      "LastName": "Smith",
-      "Phone": "+441234567890",
-      "NationalityCode": "GB",
-      "PreferredLanguageCode": "en-GB",
-      "BirthDate": "1990-07-22",
-      "Address": {
-        "Line1": "123 High Street",
-        "Line2": "Flat 4B",
-        "City": "London",
-        "PostalCode": "SW1A 1AA",
-        "CountryCode": "GB"
-      }
-    }
-  ],
+  "Title": "Mrs",
+  "FirstName": "Jane",
+  "LastName": "Smith",
+  "SecondLastName": null,
+  "Email": "jane.smith@example.com",
+  "Phone": "+441234567890",
+  "LanguageCode": "en-GB",
+  "NationalityCode": "GB",
+  "BirthDate": "1990-07-22",
+  "Address": {
+    "Line1": "123 High Street",
+    "Line2": "Flat 4B",
+    "City": "London",
+    "PostalCode": "SW1A 1AA",
+    "CountryCode": "GB"
+  },
   "OverwriteExisting": false
 }

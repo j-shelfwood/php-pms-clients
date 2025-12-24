@@ -21,6 +21,16 @@ class Reservation
      * @param string|null $notes
      * @param string $createdUtc
      * @param string $updatedUtc
+     * @param string|null $accountType
+     * @param string|null $creatorProfileId
+     * @param string|null $updaterProfileId
+     * @param string|null $originDetails
+     * @param string|null $cancelledUtc
+     * @param string|null $voucherId
+     * @param string|null $availabilityBlockId
+     * @param string|null $requestedResourceCategoryId
+     * @param string|null $partnerCompanyId
+     * @param string|null $qrCodeData
      * @param string|null $actualStartUtc
      * @param string|null $actualEndUtc
      * @param int|null $adultCount
@@ -58,6 +68,16 @@ class Reservation
         public readonly ?string $notes,
         public readonly string $createdUtc,
         public readonly string $updatedUtc,
+        public readonly ?string $accountType,
+        public readonly ?string $creatorProfileId,
+        public readonly ?string $updaterProfileId,
+        public readonly ?string $originDetails,
+        public readonly ?string $cancelledUtc,
+        public readonly ?string $voucherId,
+        public readonly ?string $availabilityBlockId,
+        public readonly ?string $requestedResourceCategoryId,
+        public readonly ?string $partnerCompanyId,
+        public readonly ?string $qrCodeData,
         // Additional fields from API
         public readonly ?string $actualStartUtc,
         public readonly ?string $actualEndUtc,
@@ -86,6 +106,17 @@ class Reservation
     public static function map(array $data): self
     {
         try {
+            $scheduledStartUtc = $data['ScheduledStartUtc'] ?? $data['StartUtc'] ?? null;
+            $scheduledEndUtc = $data['ScheduledEndUtc'] ?? $data['EndUtc'] ?? null;
+
+            if ($scheduledStartUtc === null) {
+                throw new \InvalidArgumentException('ScheduledStartUtc required');
+            }
+
+            if ($scheduledEndUtc === null) {
+                throw new \InvalidArgumentException('ScheduledEndUtc required');
+            }
+
             return new self(
                 id: $data['Id'] ?? throw new \InvalidArgumentException('Id is required'),
                 serviceId: $data['ServiceId'] ?? throw new \InvalidArgumentException('ServiceId required'),
@@ -93,13 +124,23 @@ class Reservation
                 number: $data['Number'] ?? throw new \InvalidArgumentException('Number required'),
                 state: ReservationState::from($data['State'] ?? throw new \InvalidArgumentException('State required')),
                 personCounts: $data['PersonCounts'] ?? [],
-                scheduledStartUtc: $data['ScheduledStartUtc'] ?? throw new \InvalidArgumentException('ScheduledStartUtc required'),
-                scheduledEndUtc: $data['ScheduledEndUtc'] ?? throw new \InvalidArgumentException('ScheduledEndUtc required'),
+                scheduledStartUtc: $scheduledStartUtc,
+                scheduledEndUtc: $scheduledEndUtc,
                 assignedResourceId: $data['AssignedResourceId'] ?? null,
                 rateId: $data['RateId'] ?? throw new \InvalidArgumentException('RateId required'),
                 notes: $data['Notes'] ?? null,
                 createdUtc: $data['CreatedUtc'] ?? '',
                 updatedUtc: $data['UpdatedUtc'] ?? '',
+                accountType: $data['AccountType'] ?? null,
+                creatorProfileId: $data['CreatorProfileId'] ?? null,
+                updaterProfileId: $data['UpdaterProfileId'] ?? null,
+                originDetails: $data['OriginDetails'] ?? null,
+                cancelledUtc: $data['CancelledUtc'] ?? null,
+                voucherId: $data['VoucherId'] ?? null,
+                availabilityBlockId: $data['AvailabilityBlockId'] ?? null,
+                requestedResourceCategoryId: $data['RequestedResourceCategoryId'] ?? null,
+                partnerCompanyId: $data['PartnerCompanyId'] ?? null,
+                qrCodeData: $data['QrCodeData'] ?? null,
                 // Additional fields from API
                 actualStartUtc: $data['ActualStartUtc'] ?? null,
                 actualEndUtc: $data['ActualEndUtc'] ?? null,
@@ -119,8 +160,8 @@ class Reservation
                 options: $data['Options'] ?? null,
                 origin: $data['Origin'] ?? null,
                 purpose: $data['Purpose'] ?? null,
-                releaseUtc: $data['ReleaseUtc'] ?? null,
-                requestedCategoryId: $data['RequestedCategoryId'] ?? null,
+                releaseUtc: $data['ReleasedUtc'] ?? $data['ReleaseUtc'] ?? null,
+                requestedCategoryId: $data['RequestedCategoryId'] ?? $data['RequestedResourceCategoryId'] ?? null,
                 travelAgencyId: $data['TravelAgencyId'] ?? null,
                 voucherCode: $data['VoucherCode'] ?? null,
             );

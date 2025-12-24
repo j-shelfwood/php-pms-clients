@@ -17,28 +17,38 @@ class ResourceCategoryAssignmentsClient
         ?array $activityStates = null,
         ?int $limitCount = 1000
     ): ResourceCategoryAssignmentsResponse {
-        $params = [
-            'Limitation' => [
-                'Count' => min(max($limitCount ?? 1000, 1), 1000),
-            ],
-        ];
+        $allAssignments = [];
+        $cursor = null;
 
-        if ($resourceCategoryIds !== null) {
-            $params['ResourceCategoryIds'] = $resourceCategoryIds;
-        }
+        do {
+            $params = [
+                'Limitation' => [
+                    'Count' => min(max($limitCount ?? 1000, 1), 1000),
+                    ...($cursor !== null ? ['Cursor' => $cursor] : []),
+                ],
+            ];
 
-        if ($resourceIds !== null) {
-            $params['ResourceIds'] = $resourceIds;
-        }
+            if ($resourceCategoryIds !== null) {
+                $params['ResourceCategoryIds'] = $resourceCategoryIds;
+            }
 
-        if ($activityStates !== null) {
-            $params['ActivityStates'] = $activityStates;
-        }
+            if ($resourceIds !== null) {
+                $params['ResourceIds'] = $resourceIds;
+            }
 
-        $body = $this->httpClient->buildRequestBody($params);
+            if ($activityStates !== null) {
+                $params['ActivityStates'] = $activityStates;
+            }
 
-        $response = $this->httpClient->post('/api/connector/v1/resourceCategoryAssignments/getAll', $body);
+            $body = $this->httpClient->buildRequestBody($params);
 
-        return ResourceCategoryAssignmentsResponse::map($response);
+            $response = $this->httpClient->post('/api/connector/v1/resourceCategoryAssignments/getAll', $body);
+            $pageResponse = ResourceCategoryAssignmentsResponse::map($response);
+
+            $allAssignments = array_merge($allAssignments, $pageResponse->items->all());
+            $cursor = $pageResponse->cursor;
+        } while ($cursor !== null);
+
+        return new ResourceCategoryAssignmentsResponse(items: collect($allAssignments));
     }
 }

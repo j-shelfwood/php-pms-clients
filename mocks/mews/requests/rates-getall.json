@@ -4,7 +4,6 @@
   "Client": "MoreApartments/1.0",
   "ServiceIds": ["bd26d8db-86a4-4f18-9e94-1b2362a1073c"],
   "Limitation": {
-    "Count": 100,
-    "Cursor": null
+    "Count": 1000
   }
 }

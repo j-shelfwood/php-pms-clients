@@ -10,7 +10,6 @@ class GetPricingPayload
         public readonly string $rateId,
         public readonly Carbon $firstTimeUnitStartUtc,
         public readonly Carbon $lastTimeUnitStartUtc,
-        public readonly ?array $occupancyConfiguration = null,
     ) {
         $this->validate();
     }
@@ -28,11 +27,10 @@ class GetPricingPayload
 
     public function toArray(): array
     {
-        return array_filter([
+        return [
             'RateId' => $this->rateId,
-            'FirstTimeUnitStartUtc' => $this->firstTimeUnitStartUtc->toIso8601String(),
-            'LastTimeUnitStartUtc' => $this->lastTimeUnitStartUtc->toIso8601String(),
-            'OccupancyConfiguration' => $this->occupancyConfiguration,
-        ], fn($value) => $value !== null);
+            'FirstTimeUnitStartUtc' => $this->firstTimeUnitStartUtc->copy()->utc()->toIso8601ZuluString(),
+            'LastTimeUnitStartUtc' => $this->lastTimeUnitStartUtc->copy()->utc()->toIso8601ZuluString(),
+        ];
     }
 }

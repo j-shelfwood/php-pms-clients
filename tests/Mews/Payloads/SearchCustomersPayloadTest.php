@@ -8,13 +8,16 @@ it('creates payload with email array', function () {
     expect($payload->emails)->toBe(['john@example.com', 'jane@example.com']);
 });
 
-it('converts to array with Emails key', function () {
+it('converts to array with required getAll fields', function () {
     $payload = new SearchCustomersPayload(emails: ['test@example.com']);
 
     $array = $payload->toArray();
 
     expect($array)->toHaveKey('Emails')
-        ->and($array['Emails'])->toBe(['test@example.com']);
+        ->and($array['Emails'])->toBe(['test@example.com'])
+        ->and($array)->toHaveKey('Extent')
+        ->and($array)->toHaveKey('Limitation')
+        ->and($array['Limitation'])->toHaveKey('Count');
 });
 
 it('throws exception when emails array is empty', function () {

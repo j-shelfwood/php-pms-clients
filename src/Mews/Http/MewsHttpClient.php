@@ -10,6 +10,9 @@ use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
 
 class MewsHttpClient
 {
+    private ?array $configurationCache = null;
+    private ?string $enterpriseTimezoneIdentifierCache = null;
+
     public function __construct(
         private MewsConfig $config,
         private Client $httpClient,
@@ -101,5 +104,47 @@ class MewsHttpClient
         });
 
         return array_merge($body, $additionalParams);
+    }
+
+    /**
+     * Get enterprise configuration (cached per client instance).
+     *
+     * @return array Decoded configuration response
+     * @throws MewsApiException
+     */
+    public function getConfiguration(): array
+    {
+        if ($this->configurationCache !== null) {
+            return $this->configurationCache;
+        }
+
+        $body = $this->buildRequestBody([]);
+        $this->configurationCache = $this->post('/api/connector/v1/configuration/get', $body);
+
+        return $this->configurationCache;
+    }
+
+    /**
+     * Get enterprise timezone identifier (cached per client instance).
+     *
+     * @return string IANA timezone identifier (e.g., "Europe/Budapest")
+     * @throws MewsApiException
+     */
+    public function getEnterpriseTimezoneIdentifier(): string
+    {
+        if ($this->enterpriseTimezoneIdentifierCache !== null) {
+            return $this->enterpriseTimezoneIdentifierCache;
+        }
+
+        $config = $this->getConfiguration();
+        $timezone = $config['Enterprise']['TimeZoneIdentifier'] ?? null;
+
+        if (!is_string($timezone) || $timezone === '') {
+            throw new \RuntimeException('Enterprise timezone not found in configuration');
+        }
+
+        $this->enterpriseTimezoneIdentifierCache = $timezone;
+
+        return $timezone;
     }
 }

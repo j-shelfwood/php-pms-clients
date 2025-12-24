@@ -98,6 +98,20 @@ describe('MewsFixtures Utility', function () {
         })->throws(\RuntimeException::class, 'API response fixture not found');
     });
 
+    describe('API Request Loading', function () {
+        it('loads services-getavailability request', function () {
+            $request = MewsFixtures::apiRequest('services-getavailability');
+
+            expect($request)->toBeArray()
+                ->and($request)->toHaveKeys(['ServiceId', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc', 'Metrics'])
+                ->and($request['Metrics'])->toBeArray()->not()->toBeEmpty();
+        });
+
+        it('throws exception for non-existent request', function () {
+            MewsFixtures::apiRequest('non-existent');
+        })->throws(\RuntimeException::class, 'API request fixture not found');
+    });
+
     describe('Signature Generation', function () {
         it('generates valid HMAC-SHA256 signature', function () {
             $payload = ['test' => 'data'];
@@ -214,6 +228,14 @@ describe('MewsFixtures Utility', function () {
                 ->and($responses)->toContain('resource-getbyid')
                 ->and($responses)->toContain('service-getbyid')
                 ->and($responses)->toContain('customer-getbyid');
+        });
+
+        it('lists available request fixtures', function () {
+            $requests = MewsFixtures::availableRequests();
+
+            expect($requests)->toBeArray()
+                ->and($requests)->toContain('services-getavailability')
+                ->and($requests)->toContain('rates-getpricing');
         });
     });
 });

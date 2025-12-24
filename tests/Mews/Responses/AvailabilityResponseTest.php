@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Collection;
 use Shelfwood\PhpPms\Mews\Responses\AvailabilityResponse;
-use Shelfwood\PhpPms\Mews\Responses\ValueObjects\AvailabilityBlock;
+use Shelfwood\PhpPms\Mews\Responses\ValueObjects\ResourceCategoryAvailability;
 
 it('maps availability response from API', function () {
     $mockPath = __DIR__ . '/../../../mocks/mews/responses/services-getavailability.json';
@@ -12,15 +12,15 @@ it('maps availability response from API', function () {
 
     expect($response->timeUnitStartsUtc)->toBeArray()
         ->and($response->timeUnitStartsUtc)->toHaveCount(6)
-        ->and($response->categoryAvailabilities)->toBeInstanceOf(Collection::class)
-        ->and($response->categoryAvailabilities)->toHaveCount(4)
-        ->and($response->categoryAvailabilities[0])->toBeInstanceOf(AvailabilityBlock::class)
-        ->and($response->categoryAvailabilities[0]->categoryId)->toBe('44bd8ad0-e70b-4bd9-8445-ad7200d7c349');
+        ->and($response->resourceCategoryAvailabilities)->toBeInstanceOf(Collection::class)
+        ->and($response->resourceCategoryAvailabilities)->toHaveCount(4)
+        ->and($response->resourceCategoryAvailabilities[0])->toBeInstanceOf(ResourceCategoryAvailability::class)
+        ->and($response->resourceCategoryAvailabilities[0]->resourceCategoryId)->toBe('44bd8ad0-e70b-4bd9-8445-ad7200d7c349');
 });
 
 it('handles empty availability', function () {
     $response = AvailabilityResponse::map([]);
 
     expect($response->timeUnitStartsUtc)->toBeEmpty()
-        ->and($response->categoryAvailabilities)->toBeEmpty();
+        ->and($response->resourceCategoryAvailabilities)->toBeEmpty();
 });

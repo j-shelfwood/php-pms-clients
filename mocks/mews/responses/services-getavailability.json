@@ -1,96 +1,73 @@
 {
-    "DatesUtc": [
-        "2025-12-18T23:00:00Z",
-        "2025-12-19T23:00:00Z",
-        "2025-12-20T23:00:00Z",
-        "2025-12-21T23:00:00Z",
-        "2025-12-22T23:00:00Z",
-        "2025-12-23T23:00:00Z"
-    ],
-    "TimeUnitStartsUtc": [
-        "2025-12-18T23:00:00Z",
-        "2025-12-19T23:00:00Z",
-        "2025-12-20T23:00:00Z",
-        "2025-12-21T23:00:00Z",
-        "2025-12-22T23:00:00Z",
-        "2025-12-23T23:00:00Z"
-    ],
-    "CategoryAvailabilities": [
-        {
-            "CategoryId": "44bd8ad0-e70b-4bd9-8445-ad7200d7c349",
-            "Availabilities": [
-                6,
-                6,
-                6,
-                6,
-                6,
-                6
-            ],
-            "Adjustments": [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "CategoryId": "be7f282a-bdda-426f-8abe-ae5100402f7b",
-            "Availabilities": [
-                7,
-                7,
-                7,
-                6,
-                6,
-                6
-            ],
-            "Adjustments": [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "CategoryId": "77621038-5a0f-4269-9648-b12600d1091b",
-            "Availabilities": [
-                1,
-                1,
-                1,
-                1,
-                1,
-                1
-            ],
-            "Adjustments": [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "CategoryId": "895d7917-ce46-4984-957f-b203008b442c",
-            "Availabilities": [
-                19,
-                19,
-                19,
-                19,
-                19,
-                19
-            ],
-            "Adjustments": [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
-            ]
-        }
-    ]
+  "TimeUnitStartsUtc": [
+    "2025-12-18T23:00:00Z",
+    "2025-12-19T23:00:00Z",
+    "2025-12-20T23:00:00Z",
+    "2025-12-21T23:00:00Z",
+    "2025-12-22T23:00:00Z",
+    "2025-12-23T23:00:00Z"
+  ],
+  "ResourceCategoryAvailabilities": [
+    {
+      "ResourceCategoryId": "44bd8ad0-e70b-4bd9-8445-ad7200d7c349",
+      "Metrics": {
+        "OutOfOrderBlocks": [0, 0, 0, 0, 0, 0],
+        "PublicAvailabilityAdjustment": [0, 0, 0, 0, 0, 0],
+        "OtherServiceReservationCount": [0, 0, 0, 0, 0, 0],
+        "Occupied": [6, 6, 6, 6, 6, 6],
+        "ConfirmedReservations": [6, 6, 6, 6, 6, 6],
+        "OptionalReservations": [0, 0, 0, 0, 0, 0],
+        "BlockAvailability": [0, 0, 0, 0, 0, 0],
+        "AllocatedBlockAvailability": [0, 0, 0, 0, 0, 0],
+        "UsableResources": [8, 8, 8, 8, 8, 8],
+        "ActiveResources": [8, 8, 8, 8, 8, 8]
+      }
+    },
+    {
+      "ResourceCategoryId": "be7f282a-bdda-426f-8abe-ae5100402f7b",
+      "Metrics": {
+        "OutOfOrderBlocks": [0, 0, 0, 0, 0, 0],
+        "PublicAvailabilityAdjustment": [0, 0, 0, 0, 0, 0],
+        "OtherServiceReservationCount": [0, 0, 0, 0, 0, 0],
+        "Occupied": [7, 7, 7, 6, 6, 6],
+        "ConfirmedReservations": [7, 7, 7, 6, 6, 6],
+        "OptionalReservations": [0, 0, 0, 0, 0, 0],
+        "BlockAvailability": [0, 0, 0, 0, 0, 0],
+        "AllocatedBlockAvailability": [0, 0, 0, 0, 0, 0],
+        "UsableResources": [8, 8, 8, 8, 8, 8],
+        "ActiveResources": [8, 8, 8, 8, 8, 8]
+      }
+    },
+    {
+      "ResourceCategoryId": "77621038-5a0f-4269-9648-b12600d1091b",
+      "Metrics": {
+        "OutOfOrderBlocks": [0, 0, 0, 0, 0, 0],
+        "PublicAvailabilityAdjustment": [0, 0, 0, 0, 0, 0],
+        "OtherServiceReservationCount": [0, 0, 0, 0, 0, 0],
+        "Occupied": [1, 1, 1, 1, 1, 1],
+        "ConfirmedReservations": [1, 1, 1, 1, 1, 1],
+        "OptionalReservations": [0, 0, 0, 0, 0, 0],
+        "BlockAvailability": [0, 0, 0, 0, 0, 0],
+        "AllocatedBlockAvailability": [0, 0, 0, 0, 0, 0],
+        "UsableResources": [1, 1, 1, 1, 1, 1],
+        "ActiveResources": [1, 1, 1, 1, 1, 1]
+      }
+    },
+    {
+      "ResourceCategoryId": "214ee9a5-44e3-4cdc-9fc0-b18b00eb2dd7",
+      "Metrics": {
+        "OutOfOrderBlocks": [0, 0, 0, 0, 0, 0],
+        "PublicAvailabilityAdjustment": [0, 0, 0, 0, 0, 0],
+        "OtherServiceReservationCount": [0, 0, 0, 0, 0, 0],
+        "Occupied": [2, 2, 2, 2, 2, 2],
+        "ConfirmedReservations": [2, 2, 2, 2, 2, 2],
+        "OptionalReservations": [0, 0, 0, 0, 0, 0],
+        "BlockAvailability": [0, 0, 0, 0, 0, 0],
+        "AllocatedBlockAvailability": [0, 0, 0, 0, 0, 0],
+        "UsableResources": [2, 2, 2, 2, 2, 2],
+        "ActiveResources": [2, 2, 2, 2, 2, 2]
+      }
+    }
+  ]
 }
+

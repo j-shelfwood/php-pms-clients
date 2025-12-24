@@ -24,12 +24,14 @@ class CustomersClient
      */
     public function findOrCreate(CreateCustomerPayload $createPayload): string
     {
-        // First, search for existing customer by email
-        $searchPayload = new SearchCustomersPayload(emails: [$createPayload->email]);
-        $existing = $this->search($searchPayload);
+        // First, search for existing customer by email (if provided)
+        if ($createPayload->email !== null) {
+            $searchPayload = new SearchCustomersPayload(emails: [$createPayload->email]);
+            $existing = $this->search($searchPayload);
 
-        if ($existing->items->isNotEmpty()) {
-            return $existing->items->first()->id;
+            if ($existing->items->isNotEmpty()) {
+                return $existing->items->first()->id;
+            }
         }
 
         // Create new customer if not found
@@ -55,11 +57,27 @@ class CustomersClient
      */
     public function search(SearchCustomersPayload $payload): CustomersResponse
     {
-        $body = $this->httpClient->buildRequestBody($payload->toArray());
+        $allCustomers = [];
+        $cursor = $payload->cursor;
 
-        $response = $this->httpClient->post('/api/connector/v1/customers/search', $body);
+        do {
+            $pagePayload = new SearchCustomersPayload(
+                emails: $payload->emails,
+                extent: $payload->extent,
+                limitCount: $payload->limitCount,
+                cursor: $cursor
+            );
 
-        return CustomersResponse::map($response);
+            $body = $this->httpClient->buildRequestBody($pagePayload->toArray());
+
+            $response = $this->httpClient->post('/api/connector/v1/customers/getAll', $body);
+
+            $pageResponse = CustomersResponse::map($response);
+            $allCustomers = array_merge($allCustomers, $pageResponse->items->all());
+            $cursor = $pageResponse->cursor;
+        } while ($cursor !== null);
+
+        return new CustomersResponse(items: collect($allCustomers));
     }
 
     /**
@@ -73,6 +91,14 @@ class CustomersClient
     {
         $body = $this->httpClient->buildRequestBody([
             'CustomerIds' => [$customerId],
+            'Extent' => [
+                'Customers' => true,
+                'Documents' => false,
+                'Addresses' => false,
+            ],
+            'Limitation' => [
+                'Count' => 100,
+            ],
         ]);
 
         $response = $this->httpClient->post('/api/connector/v1/customers/getAll', $body);

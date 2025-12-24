@@ -15,14 +15,26 @@ class ServicesClient
 
     public function getAll(?array $serviceIds = null): ServicesResponse
     {
-        $body = $this->httpClient->buildRequestBody([
-            'ServiceIds' => $serviceIds,
-            'Limitation' => ['Count' => 1000],
-        ]);
+        $allServices = [];
+        $cursor = null;
 
-        $response = $this->httpClient->post('/api/connector/v1/services/getAll', $body);
+        do {
+            $body = $this->httpClient->buildRequestBody([
+                'ServiceIds' => $serviceIds,
+                'Limitation' => [
+                    'Count' => 1000,
+                    ...($cursor !== null ? ['Cursor' => $cursor] : []),
+                ],
+            ]);
 
-        return ServicesResponse::map($response);
+            $response = $this->httpClient->post('/api/connector/v1/services/getAll', $body);
+            $pageResponse = ServicesResponse::map($response);
+
+            $allServices = array_merge($allServices, $pageResponse->items->all());
+            $cursor = $pageResponse->cursor;
+        } while ($cursor !== null);
+
+        return new ServicesResponse(items: collect($allServices));
     }
 
     public function getById(string $serviceId): Service
