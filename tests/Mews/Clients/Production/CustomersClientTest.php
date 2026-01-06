@@ -191,7 +191,9 @@ it('creates new customer when not found', function () {
 
 it('throws exception when customer creation fails', function () {
     $mockSearchResponse = new Response(200, [], json_encode(['Customers' => []]));
-    $mockAddResponse = new Response(200, [], json_encode(['Customers' => []]));
+    // Mews API returns a single customer object directly, not wrapped in Customers array
+    // When creation fails, the response might be missing the Id field
+    $mockAddResponse = new Response(200, [], json_encode(['Error' => 'Invalid request']));
 
     $httpClient = Mockery::mock(Client::class);
     $httpClient->shouldReceive('post')
@@ -212,4 +214,4 @@ it('throws exception when customer creation fails', function () {
     );
 
     $customersClient->findOrCreate($payload);
-})->throws(MewsApiException::class, 'Failed to create customer');
+})->throws(MewsApiException::class, 'Failed to create customer: Invalid API response');

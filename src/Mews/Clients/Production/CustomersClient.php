@@ -39,13 +39,15 @@ class CustomersClient
 
         $response = $this->httpClient->post('/api/connector/v1/customers/add', $body);
 
-        $customersResponse = CustomersResponse::map($response);
-
-        if ($customersResponse->items->isEmpty()) {
-            throw new MewsApiException('Failed to create customer', 500);
+        // /customers/add returns a single customer object directly, not wrapped in Customers array
+        // This differs from /customers/getAll which returns { "Customers": [...] }
+        if (!isset($response['Id'])) {
+            throw new MewsApiException('Failed to create customer: Invalid API response', 500);
         }
 
-        return $customersResponse->items->first()->id;
+        $customer = Customer::map($response);
+
+        return $customer->id;
     }
 
     /**
