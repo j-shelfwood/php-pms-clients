@@ -10,7 +10,7 @@ class Reservation
     /**
      * @param string $id
      * @param string $serviceId
-     * @param string $accountId
+     * @param string|null $accountId
      * @param string $number
      * @param ReservationState $state
      * @param array<string, int> $personCounts
@@ -57,7 +57,7 @@ class Reservation
     public function __construct(
         public readonly string $id,
         public readonly string $serviceId,
-        public readonly string $accountId,
+        public readonly ?string $accountId,
         public readonly string $number,
         public readonly ReservationState $state,
         public readonly array $personCounts,
@@ -120,7 +120,7 @@ class Reservation
             return new self(
                 id: $data['Id'] ?? throw new \InvalidArgumentException('Id is required'),
                 serviceId: $data['ServiceId'] ?? throw new \InvalidArgumentException('ServiceId required'),
-                accountId: $data['AccountId'] ?? throw new \InvalidArgumentException('AccountId required'),
+                accountId: $data['AccountId'] ?? null,
                 number: $data['Number'] ?? throw new \InvalidArgumentException('Number required'),
                 state: ReservationState::from($data['State'] ?? throw new \InvalidArgumentException('State required')),
                 personCounts: $data['PersonCounts'] ?? [],

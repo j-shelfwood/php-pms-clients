@@ -22,6 +22,22 @@ it('maps reservation from API response', function () {
         ->and($reservation->channelNumber)->toBe('WEB_001');
 });
 
+it('handles nullable AccountId gracefully', function () {
+    $reservation = Reservation::map([
+        'Id' => 'reservation-1',
+        'ServiceId' => 'service-1',
+        'Number' => '1',
+        'State' => 'Confirmed',
+        'RateId' => 'rate-1',
+        'StartUtc' => '2025-01-01T00:00:00Z',
+        'EndUtc' => '2025-01-02T00:00:00Z',
+    ]);
+
+    expect($reservation->accountId)->toBeNull()
+        ->and($reservation->id)->toBe('reservation-1')
+        ->and($reservation->serviceId)->toBe('service-1');
+});
+
 it('throws exception on missing required field', function () {
     Reservation::map(['Id' => 'test-id']);
 })->throws(\Shelfwood\PhpPms\Exceptions\MappingException::class);
