@@ -14,8 +14,8 @@ class RestrictionConditions
      * @param string|null $rateGroupId
      * @param string|null $resourceCategoryId
      * @param string|null $resourceCategoryType
-     * @param string $startUtc
-     * @param string $endUtc
+     * @param string|null $startUtc Nullable - indefinite restrictions have no start
+     * @param string|null $endUtc Nullable - indefinite restrictions have no end
      * @param array<int, string> $days
      * @param array<string, bool> $hours
      */
@@ -26,8 +26,8 @@ class RestrictionConditions
         public readonly ?string $rateGroupId,
         public readonly ?string $resourceCategoryId,
         public readonly ?string $resourceCategoryType,
-        public readonly string $startUtc,
-        public readonly string $endUtc,
+        public readonly ?string $startUtc,
+        public readonly ?string $endUtc,
         public readonly array $days,
         public readonly array $hours,
     ) {}
@@ -44,8 +44,8 @@ class RestrictionConditions
                 rateGroupId: $data['RateGroupId'] ?? null,
                 resourceCategoryId: $data['ResourceCategoryId'] ?? null,
                 resourceCategoryType: $data['ResourceCategoryType'] ?? null,
-                startUtc: $data['StartUtc'] ?? throw new \InvalidArgumentException('StartUtc is required'),
-                endUtc: $data['EndUtc'] ?? throw new \InvalidArgumentException('EndUtc is required'),
+                startUtc: $data['StartUtc'] ?? null,
+                endUtc: $data['EndUtc'] ?? null,
                 days: $data['Days'] ?? [],
                 hours: $data['Hours'] ?? [],
             );
