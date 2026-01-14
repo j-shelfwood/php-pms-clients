@@ -7,6 +7,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Shelfwood\PhpPms\Mews\Config\MewsConfig;
 use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
+use Shelfwood\PhpPms\Exceptions\NetworkException;
 
 class MewsHttpClient
 {
@@ -25,7 +26,8 @@ class MewsHttpClient
      * @param string $endpoint API endpoint path
      * @param array $body Request body
      * @return array Decoded JSON response
-     * @throws MewsApiException
+     * @throws MewsApiException For JSON decode errors
+     * @throws NetworkException For HTTP/network errors
      */
     public function post(string $endpoint, array $body): array
     {
@@ -76,7 +78,9 @@ class MewsHttpClient
                 'exception' => get_class($e),
             ]);
 
-            throw new MewsApiException(
+            // Throw NetworkException to align with BookingManager adapter
+            // and enable unified Retry-After header handling in application layer
+            throw new NetworkException(
                 "Mews API request failed: {$message}",
                 $statusCode,
                 $e
@@ -110,7 +114,8 @@ class MewsHttpClient
      * Get enterprise configuration (cached per client instance).
      *
      * @return array Decoded configuration response
-     * @throws MewsApiException
+     * @throws MewsApiException For JSON decode errors
+     * @throws NetworkException For HTTP/network errors
      */
     public function getConfiguration(): array
     {
@@ -128,7 +133,9 @@ class MewsHttpClient
      * Get enterprise timezone identifier (cached per client instance).
      *
      * @return string IANA timezone identifier (e.g., "Europe/Budapest")
-     * @throws MewsApiException
+     * @throws MewsApiException For JSON decode errors
+     * @throws NetworkException For HTTP/network errors
+     * @throws \RuntimeException If timezone missing from configuration
      */
     public function getEnterpriseTimezoneIdentifier(): string
     {
