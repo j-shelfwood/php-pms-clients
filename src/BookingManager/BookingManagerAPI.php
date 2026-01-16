@@ -62,7 +62,7 @@ class BookingManagerAPI extends XMLClient
     public function pendingBookings(int $bookingId): PendingBookingResponse
     {
         $apiParams = [
-            'bookingid' => $bookingId,
+            'id' => $bookingId,
         ];
         $parsedData = $this->performApiCall('booking_pending', $apiParams);
         return PendingBookingResponse::map($parsedData);
@@ -262,7 +262,7 @@ class BookingManagerAPI extends XMLClient
     public function finalizeBooking(int $externalBookingId): FinalizeBookingResponse
     {
         $apiParams = [
-            'booking_id' => $externalBookingId,
+            'id' => $externalBookingId,
             'overwrite_rates' => 1,
         ];
         $parsedData = $this->performApiCall('booking_finalize', $apiParams);
@@ -272,7 +272,7 @@ class BookingManagerAPI extends XMLClient
     public function cancelBooking(int $bookingId, string $reason): CancelBookingResponse
     {
         $apiParams = [
-            'booking_id' => $bookingId,
+            'id' => $bookingId,
             'reason' => $reason,
         ];
         $parsedData = $this->performApiCall('booking_cancel', $apiParams);
@@ -282,7 +282,7 @@ class BookingManagerAPI extends XMLClient
     public function viewBooking(int $bookingId): ViewBookingResponse
     {
         $apiParams = [
-            'bookingid' => $bookingId,
+            'id' => $bookingId,
         ];
         $parsedData = $this->performApiCall('booking_view', $apiParams);
         return ViewBookingResponse::map($parsedData);
