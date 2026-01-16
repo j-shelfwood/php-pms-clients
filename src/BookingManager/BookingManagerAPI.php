@@ -251,7 +251,10 @@ class BookingManagerAPI extends XMLClient
 
     public function createBooking(CreateBookingPayload $payload): CreateBookingResponse
     {
-        $apiParams = $payload->toArray();
+        $apiParams = [
+            ...$payload->toArray(),
+            'overwrite_rates' => 1,
+        ];
         $parsedData = $this->performApiCall('booking_create', $apiParams);
         return CreateBookingResponse::map($parsedData);
     }
