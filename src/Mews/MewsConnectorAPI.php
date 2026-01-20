@@ -39,6 +39,7 @@ use Shelfwood\PhpPms\Mews\Responses\RestrictionsResponse;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Service;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Resource;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\ResourceCategoryAssignment;
+use Shelfwood\PhpPms\Mews\Responses\ValueObjects\ResourceBlock;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Customer;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Reservation;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\AgeCategory;
@@ -602,6 +603,38 @@ class MewsConnectorAPI
     public function getReservationsClient(): ReservationsClient
     {
         return $this->reservationsClient;
+    }
+
+    // ========================================================================
+    // RESOURCE BLOCKS
+    // ========================================================================
+
+    /**
+     * Get resource block details by ID
+     *
+     * Fetches detailed information about a specific resource block (calendar availability block).
+     * Resource blocks represent periods where a resource is blocked from booking, either manually
+     * by property managers or automatically by reservations.
+     *
+     * @param string $serviceId Service UUID
+     * @param string $blockId Resource block UUID
+     * @return ResourceBlock Resource block details
+     * @throws MewsApiException
+     * @see https://mews-systems.gitbook.io/connector-api/operations/resourceblocks
+     */
+    public function getResourceBlock(string $serviceId, string $blockId): ResourceBlock
+    {
+        $response = $this->httpClient->post('resourceBlocks/get', [
+            'ClientToken' => uniqid('', true),
+            'ServiceIds' => [$serviceId],
+            'ResourceBlockIds' => [$blockId],
+        ]);
+
+        if (empty($response['ResourceBlocks'])) {
+            throw new MewsApiException("Resource block not found: {$blockId}");
+        }
+
+        return ResourceBlock::fromApiResponse($response['ResourceBlocks'][0]);
     }
 
     // ========================================================================
