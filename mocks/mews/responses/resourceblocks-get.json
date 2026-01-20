@@ -1,0 +1,22 @@
+{
+  "ResourceBlocks": [
+    {
+      "Id": "7cccbdc6-73cf-4cd4-8056-6fd00f4d9699",
+      "ServiceId": "bd26d8db-86a4-4f18-9e94-1b2362a1073c",
+      "AssignedResourceId": "68aa4760-1b63-452e-9060-b32501247b08",
+      "StartUtc": "2025-01-20T14:00:00Z",
+      "EndUtc": "2025-01-25T10:00:00Z",
+      "Type": "OutOfOrder",
+      "ReservationId": null
+    },
+    {
+      "Id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "ServiceId": "bd26d8db-86a4-4f18-9e94-1b2362a1073c",
+      "AssignedResourceId": null,
+      "StartUtc": "2025-02-01T14:00:00Z",
+      "EndUtc": "2025-02-05T10:00:00Z",
+      "Type": "OutOfService",
+      "ReservationId": "bfee2c44-1f84-4326-a862-5289598a6cea"
+    }
+  ]
+}

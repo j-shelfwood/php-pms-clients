@@ -624,11 +624,12 @@ class MewsConnectorAPI
      */
     public function getResourceBlock(string $serviceId, string $blockId): ?ResourceBlock
     {
-        $response = $this->httpClient->post('resourceBlocks/get', [
-            'ClientToken' => uniqid('', true),
+        $body = $this->httpClient->buildRequestBody([
             'ServiceIds' => [$serviceId],
             'ResourceBlockIds' => [$blockId],
         ]);
+
+        $response = $this->httpClient->post('/api/connector/v1/resourceBlocks/get', $body);
 
         if (empty($response['ResourceBlocks'])) {
             return null;

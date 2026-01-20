@@ -187,3 +187,63 @@ it('updates reservation state via enum', function () {
     expect($reservation)->toBeInstanceOf(Reservation::class)
         ->and($reservation->state)->toBe(ReservationState::Canceled);
 });
+
+it('fetches resource block by ID', function () {
+    $mockData = json_decode(
+        file_get_contents(__DIR__ . '/../../mocks/mews/responses/resourceblocks-get.json'),
+        true
+    );
+
+    $mockResponse = new Response(200, [], json_encode($mockData));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/api/connector/v1/resourceBlocks/get#'),
+            Mockery::on(function ($options) {
+                $body = $options['json'];
+                expect($body)->toHaveKeys(['ClientToken', 'ServiceIds', 'ResourceBlockIds']);
+                expect($body['ServiceIds'])->toContain('bd26d8db-86a4-4f18-9e94-1b2362a1073c');
+                expect($body['ResourceBlockIds'])->toContain('7cccbdc6-73cf-4cd4-8056-6fd00f4d9699');
+                return true;
+            })
+        )
+        ->andReturn($mockResponse);
+
+    $api = new MewsConnectorAPI($this->config, $httpClient);
+
+    $block = $api->getResourceBlock(
+        serviceId: 'bd26d8db-86a4-4f18-9e94-1b2362a1073c',
+        blockId: '7cccbdc6-73cf-4cd4-8056-6fd00f4d9699'
+    );
+
+    expect($block)->toBeInstanceOf(\Shelfwood\PhpPms\Mews\Responses\ValueObjects\ResourceBlock::class)
+        ->and($block->id)->toBe('7cccbdc6-73cf-4cd4-8056-6fd00f4d9699')
+        ->and($block->serviceId)->toBe('bd26d8db-86a4-4f18-9e94-1b2362a1073c')
+        ->and($block->type)->toBe('OutOfOrder');
+});
+
+it('returns null when resource block not found', function () {
+    $mockResponse = new Response(200, [], json_encode([
+        'ResourceBlocks' => [],
+    ]));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/api/connector/v1/resourceBlocks/get#'),
+            Mockery::type('array')
+        )
+        ->andReturn($mockResponse);
+
+    $api = new MewsConnectorAPI($this->config, $httpClient);
+
+    $block = $api->getResourceBlock(
+        serviceId: 'bd26d8db-86a4-4f18-9e94-1b2362a1073c',
+        blockId: 'nonexistent-block-id'
+    );
+
+    expect($block)->toBeNull();
+});
