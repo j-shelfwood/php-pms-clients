@@ -618,11 +618,11 @@ class MewsConnectorAPI
      *
      * @param string $serviceId Service UUID
      * @param string $blockId Resource block UUID
-     * @return ResourceBlock Resource block details
+     * @return ResourceBlock|null Resource block details or null if not found
      * @throws MewsApiException
      * @see https://mews-systems.gitbook.io/connector-api/operations/resourceblocks
      */
-    public function getResourceBlock(string $serviceId, string $blockId): ResourceBlock
+    public function getResourceBlock(string $serviceId, string $blockId): ?ResourceBlock
     {
         $response = $this->httpClient->post('resourceBlocks/get', [
             'ClientToken' => uniqid('', true),
@@ -631,7 +631,7 @@ class MewsConnectorAPI
         ]);
 
         if (empty($response['ResourceBlocks'])) {
-            throw new MewsApiException("Resource block not found: {$blockId}");
+            return null;
         }
 
         return ResourceBlock::fromApiResponse($response['ResourceBlocks'][0]);
