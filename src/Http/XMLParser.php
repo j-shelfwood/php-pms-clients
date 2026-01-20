@@ -22,6 +22,12 @@ class XMLParser
             }
             $element = new SimpleXMLElement($xml, LIBXML_NOCDATA | LIBXML_NOERROR | LIBXML_NOWARNING);
             $array = self::xmlToArray($element);
+
+            // Ensure we always return an array (handle edge case where root element is text-only)
+            if (!is_array($array)) {
+                return ['#text' => $array];
+            }
+
             return $array;
         } catch (Exception $e) {
             if ($e instanceof XmlParsingException) {
@@ -194,8 +200,8 @@ class XMLParser
             }
             // Handle direct code and message children (e.g., BookingManager <error><code>...</code><message>...</message></error>)
             if (isset($directErrorData['code']) && !empty($directErrorData['code'])) {
-                $code = (string) $directErrorData['code'];
-                $message = (string) ($directErrorData['message'] ?? 'Error details not provided.');
+                $code = self::getTextContent($directErrorData['code']);
+                $message = self::getTextContent($directErrorData['message'] ?? 'Error details not provided.');
                 $rawFragment = $directErrorData;
                 return new ErrorDetails($code, $message, $rawFragment);
             }
@@ -218,13 +224,30 @@ class XMLParser
         // Check for BookingManager <e> error structure
         $bookingManagerError = $response['e'] ?? null;
         if (is_array($bookingManagerError) && isset($bookingManagerError['code']) && !empty($bookingManagerError['code'])) {
-            $code = (string) $bookingManagerError['code'];
-            $message = (string) ($bookingManagerError['message'] ?? 'Error details not provided.');
+            $code = self::getTextContent($bookingManagerError['code']);
+            $message = self::getTextContent($bookingManagerError['message'] ?? 'Error details not provided.');
             $rawFragment = $bookingManagerError;
             return new ErrorDetails($code, $message, $rawFragment);
         }
 
         return new ErrorDetails($code, $message, $response);
+    }
+
+    /**
+     * Safely extracts text content from a value that might be a string or array with #text key.
+     */
+    private static function getTextContent($value): string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+        if (is_array($value) && isset($value['#text'])) {
+            return (string) $value['#text'];
+        }
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+        return '';
     }
 
     /**

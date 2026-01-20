@@ -103,4 +103,34 @@ describe('XMLParserTest', function () {
         expect($details->message)->toBe('Property is unavailable');
     });
 
+    it('returns array for text-only elements without attributes', function () {
+        $xml = '<message>Authentication failed</message>';
+        $result = XmlParser::parse($xml);
+
+        // Should return array, not string (fixes type violation)
+        expect($result)->toBeArray()
+            ->and($result)->toHaveKey('#text')
+            ->and($result['#text'])->toBe('Authentication failed');
+    });
+
+    it('returns array for empty elements', function () {
+        $xml = '<empty></empty>';
+        $result = XmlParser::parse($xml);
+
+        // Empty root element should return array with empty string value
+        expect($result)->toBeArray()
+            ->and($result)->toHaveKey('#text')
+            ->and($result['#text'])->toBe('');
+    });
+
+    it('returns array for nested text-only elements', function () {
+        $xml = '<response><status>success</status><data>Test data</data></response>';
+        $result = XmlParser::parse($xml);
+
+        // Child elements with only text return as strings (not wrapped in arrays)
+        expect($result)->toBeArray()
+            ->and($result['status'])->toBe('success')
+            ->and($result['data'])->toBe('Test data');
+    });
+
     });
