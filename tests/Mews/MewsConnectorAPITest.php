@@ -200,12 +200,12 @@ it('fetches resource block by ID', function () {
     $httpClient->shouldReceive('post')
         ->once()
         ->with(
-            Mockery::pattern('#/api/connector/v1/resourceBlocks/get#'),
+            Mockery::pattern('#/api/connector/v1/resourceBlocks/getAll#'),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body)->toHaveKeys(['ClientToken', 'ServiceIds', 'ResourceBlockIds']);
-                expect($body['ServiceIds'])->toContain('bd26d8db-86a4-4f18-9e94-1b2362a1073c');
-                expect($body['ResourceBlockIds'])->toContain('7cccbdc6-73cf-4cd4-8056-6fd00f4d9699');
+                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'Client', 'ResourceBlockIds', 'CollidingUtc', 'Limitation']);
+                expect($body['ResourceBlockIds'])->toContain('73dd4eb5-1c8e-48c1-9677-ae4500b918ab');
+                expect($body['Limitation']['Count'])->toBe(1);
                 return true;
             })
         )
@@ -214,14 +214,15 @@ it('fetches resource block by ID', function () {
     $api = new MewsConnectorAPI($this->config, $httpClient);
 
     $block = $api->getResourceBlock(
-        serviceId: 'bd26d8db-86a4-4f18-9e94-1b2362a1073c',
-        blockId: '7cccbdc6-73cf-4cd4-8056-6fd00f4d9699'
+        blockId: '73dd4eb5-1c8e-48c1-9677-ae4500b918ab'
     );
 
     expect($block)->toBeInstanceOf(\Shelfwood\PhpPms\Mews\Responses\ValueObjects\ResourceBlock::class)
-        ->and($block->id)->toBe('7cccbdc6-73cf-4cd4-8056-6fd00f4d9699')
-        ->and($block->serviceId)->toBe('bd26d8db-86a4-4f18-9e94-1b2362a1073c')
-        ->and($block->type)->toBe('OutOfOrder');
+        ->and($block->id)->toBe('73dd4eb5-1c8e-48c1-9677-ae4500b918ab')
+        ->and($block->enterpriseId)->toBe('851df8c8-90f2-4c4a-8e01-a4fc46b25178')
+        ->and($block->assignedResourceId)->toBe('aea0d575-0284-4958-b387-ab1300d8fa6b')
+        ->and($block->type)->toBe('OutOfOrder')
+        ->and($block->name)->toBe('Space block unit: Spatie room sdsdxc (28-02-26 - 27-02-27)');
 });
 
 it('returns null when resource block not found', function () {
@@ -233,7 +234,7 @@ it('returns null when resource block not found', function () {
     $httpClient->shouldReceive('post')
         ->once()
         ->with(
-            Mockery::pattern('#/api/connector/v1/resourceBlocks/get#'),
+            Mockery::pattern('#/api/connector/v1/resourceBlocks/getAll#'),
             Mockery::type('array')
         )
         ->andReturn($mockResponse);
@@ -241,7 +242,6 @@ it('returns null when resource block not found', function () {
     $api = new MewsConnectorAPI($this->config, $httpClient);
 
     $block = $api->getResourceBlock(
-        serviceId: 'bd26d8db-86a4-4f18-9e94-1b2362a1073c',
         blockId: 'nonexistent-block-id'
     );
 

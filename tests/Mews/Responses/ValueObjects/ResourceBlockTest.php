@@ -5,45 +5,60 @@ use Shelfwood\PhpPms\Mews\Responses\ValueObjects\ResourceBlock;
 
 it('creates resource block from API response', function () {
     $data = [
-        'Id' => '7cccbdc6-73cf-4cd4-8056-6fd00f4d9699',
-        'ServiceId' => 'bd26d8db-86a4-4f18-9e94-1b2362a1073c',
-        'AssignedResourceId' => '68aa4760-1b63-452e-9060-b32501247b08',
-        'StartUtc' => '2025-01-20T14:00:00Z',
-        'EndUtc' => '2025-01-25T10:00:00Z',
+        'Id' => '73dd4eb5-1c8e-48c1-9677-ae4500b918ab',
+        'EnterpriseId' => '851df8c8-90f2-4c4a-8e01-a4fc46b25178',
+        'AssignedResourceId' => 'aea0d575-0284-4958-b387-ab1300d8fa6b',
+        'IsActive' => true,
         'Type' => 'OutOfOrder',
-        'ReservationId' => null,
+        'StartUtc' => '2026-02-28T12:00:00Z',
+        'EndUtc' => '2027-02-27T12:00:00Z',
+        'CreatedUtc' => '2022-02-23T11:13:54Z',
+        'UpdatedUtc' => '2022-02-23T11:13:54Z',
+        'DeletedUtc' => null,
+        'Name' => 'Space block unit: Spatie room sdsdxc (28-02-26 - 27-02-27)',
+        'Notes' => 'Created with space',
     ];
 
     $block = ResourceBlock::fromApiResponse($data);
 
-    expect($block->id)->toBe('7cccbdc6-73cf-4cd4-8056-6fd00f4d9699')
-        ->and($block->serviceId)->toBe('bd26d8db-86a4-4f18-9e94-1b2362a1073c')
-        ->and($block->assignedResourceId)->toBe('68aa4760-1b63-452e-9060-b32501247b08')
-        ->and($block->startUtc)->toBeInstanceOf(Carbon::class)
-        ->and($block->startUtc->toIso8601String())->toBe('2025-01-20T14:00:00+00:00')
-        ->and($block->endUtc)->toBeInstanceOf(Carbon::class)
-        ->and($block->endUtc->toIso8601String())->toBe('2025-01-25T10:00:00+00:00')
+    expect($block->id)->toBe('73dd4eb5-1c8e-48c1-9677-ae4500b918ab')
+        ->and($block->enterpriseId)->toBe('851df8c8-90f2-4c4a-8e01-a4fc46b25178')
+        ->and($block->assignedResourceId)->toBe('aea0d575-0284-4958-b387-ab1300d8fa6b')
+        ->and($block->isActive)->toBeTrue()
         ->and($block->type)->toBe('OutOfOrder')
-        ->and($block->reservationId)->toBeNull();
+        ->and($block->startUtc)->toBeInstanceOf(Carbon::class)
+        ->and($block->startUtc->toIso8601String())->toBe('2026-02-28T12:00:00+00:00')
+        ->and($block->endUtc)->toBeInstanceOf(Carbon::class)
+        ->and($block->endUtc->toIso8601String())->toBe('2027-02-27T12:00:00+00:00')
+        ->and($block->createdUtc)->toBeInstanceOf(Carbon::class)
+        ->and($block->updatedUtc)->toBeInstanceOf(Carbon::class)
+        ->and($block->deletedUtc)->toBeNull()
+        ->and($block->name)->toBe('Space block unit: Spatie room sdsdxc (28-02-26 - 27-02-27)')
+        ->and($block->notes)->toBe('Created with space');
 });
 
-it('handles resource block with reservation ID', function () {
+it('handles resource block with null notes', function () {
     $data = [
-        'Id' => 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-        'ServiceId' => 'bd26d8db-86a4-4f18-9e94-1b2362a1073c',
-        'AssignedResourceId' => null,
-        'StartUtc' => '2025-02-01T14:00:00Z',
-        'EndUtc' => '2025-02-05T10:00:00Z',
-        'Type' => 'OutOfService',
-        'ReservationId' => 'bfee2c44-1f84-4326-a862-5289598a6cea',
+        'Id' => '655b4f11-faf6-4a59-82d6-ae4500b918ab',
+        'EnterpriseId' => '851df8c8-90f2-4c4a-8e01-a4fc46b25178',
+        'AssignedResourceId' => 'aea0d575-0284-4958-b387-ab1300d8fa6b',
+        'IsActive' => true,
+        'Type' => 'OutOfOrder',
+        'StartUtc' => '2025-03-01T12:00:00Z',
+        'EndUtc' => '2026-02-28T12:00:00Z',
+        'CreatedUtc' => '2022-02-23T11:13:54Z',
+        'UpdatedUtc' => '2022-02-23T11:13:54Z',
+        'DeletedUtc' => null,
+        'Name' => 'Test block without notes',
+        'Notes' => null,
     ];
 
     $block = ResourceBlock::fromApiResponse($data);
 
-    expect($block->id)->toBe('a1b2c3d4-e5f6-7890-abcd-ef1234567890')
-        ->and($block->assignedResourceId)->toBeNull()
-        ->and($block->type)->toBe('OutOfService')
-        ->and($block->reservationId)->toBe('bfee2c44-1f84-4326-a862-5289598a6cea');
+    expect($block->id)->toBe('655b4f11-faf6-4a59-82d6-ae4500b918ab')
+        ->and($block->enterpriseId)->toBe('851df8c8-90f2-4c4a-8e01-a4fc46b25178')
+        ->and($block->isActive)->toBeTrue()
+        ->and($block->notes)->toBeNull();
 });
 
 it('parses resource blocks from mock API response', function () {
@@ -53,7 +68,10 @@ it('parses resource blocks from mock API response', function () {
 
     $block = ResourceBlock::fromApiResponse($blockData);
 
-    expect($block->id)->toBe('7cccbdc6-73cf-4cd4-8056-6fd00f4d9699')
-        ->and($block->serviceId)->toBe('bd26d8db-86a4-4f18-9e94-1b2362a1073c')
-        ->and($block->type)->toBe('OutOfOrder');
+    expect($block->id)->toBe('73dd4eb5-1c8e-48c1-9677-ae4500b918ab')
+        ->and($block->enterpriseId)->toBe('851df8c8-90f2-4c4a-8e01-a4fc46b25178')
+        ->and($block->assignedResourceId)->toBe('aea0d575-0284-4958-b387-ab1300d8fa6b')
+        ->and($block->type)->toBe('OutOfOrder')
+        ->and($block->name)->toBe('Space block unit: Spatie room sdsdxc (28-02-26 - 27-02-27)')
+        ->and($block->notes)->toBe('Created with space');
 });

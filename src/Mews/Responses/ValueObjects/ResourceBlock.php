@@ -10,7 +10,7 @@ use Carbon\Carbon;
  * Mews Resource Block Value Object
  *
  * Represents a calendar availability block or restriction on a resource.
- * These blocks can be manual (set by property managers) or automatic (created by reservations).
+ * These blocks can be manual (set by property managers) or automatic (created by system).
  *
  * @see https://mews-systems.gitbook.io/connector-api/operations/resourceblocks
  */
@@ -18,12 +18,17 @@ final readonly class ResourceBlock
 {
     public function __construct(
         public string $id,
-        public string $serviceId,
-        public ?string $assignedResourceId,
+        public string $enterpriseId,
+        public string $assignedResourceId,
+        public bool $isActive,
+        public string $type,
         public Carbon $startUtc,
         public Carbon $endUtc,
-        public string $type,
-        public ?string $reservationId = null,
+        public Carbon $createdUtc,
+        public Carbon $updatedUtc,
+        public ?Carbon $deletedUtc,
+        public string $name,
+        public ?string $notes,
     ) {
     }
 
@@ -34,12 +39,17 @@ final readonly class ResourceBlock
     {
         return new self(
             id: $data['Id'],
-            serviceId: $data['ServiceId'],
-            assignedResourceId: $data['AssignedResourceId'] ?? null,
+            enterpriseId: $data['EnterpriseId'],
+            assignedResourceId: $data['AssignedResourceId'],
+            isActive: $data['IsActive'],
+            type: $data['Type'],
             startUtc: Carbon::parse($data['StartUtc']),
             endUtc: Carbon::parse($data['EndUtc']),
-            type: $data['Type'],
-            reservationId: $data['ReservationId'] ?? null,
+            createdUtc: Carbon::parse($data['CreatedUtc']),
+            updatedUtc: Carbon::parse($data['UpdatedUtc']),
+            deletedUtc: isset($data['DeletedUtc']) && $data['DeletedUtc'] ? Carbon::parse($data['DeletedUtc']) : null,
+            name: $data['Name'],
+            notes: $data['Notes'] ?? null,
         );
     }
 }

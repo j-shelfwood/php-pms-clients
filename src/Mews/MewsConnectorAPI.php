@@ -614,22 +614,37 @@ class MewsConnectorAPI
      *
      * Fetches detailed information about a specific resource block (calendar availability block).
      * Resource blocks represent periods where a resource is blocked from booking, either manually
-     * by property managers or automatically by reservations.
+     * by property managers or automatically by the system.
      *
-     * @param string $serviceId Service UUID
+     * Note: Uses resourceBlocks/getAll endpoint with ResourceBlockIds filter, as there is no
+     * dedicated single-block retrieval endpoint in the Mews API.
+     *
      * @param string $blockId Resource block UUID
+     * @param string|null $enterpriseId Optional enterprise UUID for scoping (defaults to all accessible)
      * @return ResourceBlock|null Resource block details or null if not found
      * @throws MewsApiException
      * @see https://mews-systems.gitbook.io/connector-api/operations/resourceblocks
      */
-    public function getResourceBlock(string $serviceId, string $blockId): ?ResourceBlock
+    public function getResourceBlock(string $blockId, ?string $enterpriseId = null): ?ResourceBlock
     {
-        $body = $this->httpClient->buildRequestBody([
-            'ServiceIds' => [$serviceId],
+        $payload = [
             'ResourceBlockIds' => [$blockId],
-        ]);
+            'CollidingUtc' => [
+                'StartUtc' => '2020-01-01T00:00:00Z',
+                'EndUtc' => \Carbon\Carbon::now()->addYears(5)->format('Y-m-d\TH:i:s\Z'),
+            ],
+            'Limitation' => [
+                'Count' => 1,
+            ],
+        ];
 
-        $response = $this->httpClient->post('/api/connector/v1/resourceBlocks/get', $body);
+        if ($enterpriseId) {
+            $payload['EnterpriseIds'] = [$enterpriseId];
+        }
+
+        $body = $this->httpClient->buildRequestBody($payload);
+
+        $response = $this->httpClient->post('/api/connector/v1/resourceBlocks/getAll', $body);
 
         if (empty($response['ResourceBlocks'])) {
             return null;
