@@ -50,6 +50,7 @@ use Shelfwood\PhpPms\Mews\Payloads\GetAvailabilityPayload;
 use Shelfwood\PhpPms\Mews\Payloads\GetPricingPayload;
 use Shelfwood\PhpPms\Mews\Payloads\SearchCustomersPayload;
 use Shelfwood\PhpPms\Mews\Payloads\CreateCustomerPayload;
+use Shelfwood\PhpPms\Mews\Payloads\UpdateCustomerPayload;
 use Shelfwood\PhpPms\Mews\Payloads\CreateReservationPayload;
 use Shelfwood\PhpPms\Mews\Payloads\UpdateReservationPayload;
 
@@ -164,7 +165,14 @@ class MewsConnectorAPI
      */
     public function getAllResources(string $serviceId): ResourcesResponse
     {
-        return $this->resourcesClient->getForService($serviceId);
+        $categories = $this->resourceCategoriesClient->getForService($serviceId);
+        $categoryIds = $categories->items->pluck('id')->all();
+
+        if (empty($categoryIds)) {
+            return new ResourcesResponse(items: collect());
+        }
+
+        return $this->resourcesClient->getAll(resourceCategoryIds: $categoryIds);
     }
 
     /**
@@ -183,6 +191,7 @@ class MewsConnectorAPI
      * Get a single resource by ID (direct lookup)
      *
      * @param string $resourceId Resource UUID
+     * @param string|null $serviceId Optional service UUID to avoid extra lookup
      * @return Resource Resource object
      * @throws MewsApiException
      */
@@ -216,12 +225,39 @@ class MewsConnectorAPI
      * Get resource category assignment for a specific resource
      *
      * @param string $resourceId Resource UUID
+     * @param string|null $serviceId Optional service UUID to avoid extra lookup
      * @return ResourceCategoryAssignment|null Assignment object or null if not found
      * @throws MewsApiException
      */
-    public function getResourceCategoryAssignment(string $resourceId): ?ResourceCategoryAssignment
+    public function getResourceCategoryAssignment(string $resourceId, ?string $serviceId = null): ?ResourceCategoryAssignment
     {
-        return $this->resourceCategoryAssignmentsClient->getForResource($resourceId);
+        if (!$serviceId) {
+            $resources = $this->resourcesClient->getAll(resourceIds: [$resourceId]);
+
+            if ($resources->items->isEmpty()) {
+                return null;
+            }
+
+            $serviceId = $resources->items->first()->serviceId ?? null;
+        }
+
+        if (!$serviceId) {
+            return null;
+        }
+
+        $categories = $this->resourceCategoriesClient->getForService($serviceId);
+        $categoryIds = $categories->items->pluck('id')->all();
+
+        if (empty($categoryIds)) {
+            return null;
+        }
+
+        $assignments = $this->resourceCategoryAssignmentsClient->getAll(
+            resourceCategoryIds: $categoryIds,
+            resourceIds: [$resourceId]
+        );
+
+        return $assignments->items->first();
     }
 
     // ========================================================================
@@ -421,6 +457,18 @@ class MewsConnectorAPI
     public function getCustomer(string $customerId): Customer
     {
         return $this->customersClient->getById($customerId);
+    }
+
+
+    /**
+     * Update customer profile
+     *
+     * @param UpdateCustomerPayload $payload Update payload
+     * @return Customer Updated customer object
+     */
+    public function updateCustomer(UpdateCustomerPayload $payload): Customer
+    {
+        return $this->customersClient->update($payload);
     }
 
     // ========================================================================

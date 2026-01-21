@@ -82,6 +82,21 @@ class CustomersClient
         return new CustomersResponse(items: collect($allCustomers));
     }
 
+
+    /**
+     * Update customer profile
+     *
+     * @param \Shelfwood\PhpPms\Mews\Payloads\UpdateCustomerPayload $payload Update payload
+     * @return Customer Updated customer object
+     */
+    public function update(\Shelfwood\PhpPms\Mews\Payloads\UpdateCustomerPayload $payload): Customer
+    {
+        $body = $this->httpClient->buildRequestBody($payload->toArray());
+        $response = $this->httpClient->post('/api/connector/v1/customers/update', $body);
+
+        return Customer::map($response);
+    }
+
     /**
      * Get customer by ID
      *

@@ -4,7 +4,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Shelfwood\PhpPms\Mews\Config\MewsConfig;
 use Shelfwood\PhpPms\Mews\Http\MewsHttpClient;
-use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
+use Shelfwood\PhpPms\Exceptions\NetworkException;
 
 beforeEach(function () {
     $this->config = new MewsConfig(
@@ -52,4 +52,4 @@ it('throws exception on API error', function () {
     $mewsClient = new MewsHttpClient($this->config, $httpClient);
 
     $mewsClient->post('/api/connector/v1/test', []);
-})->throws(MewsApiException::class);
+})->throws(NetworkException::class);

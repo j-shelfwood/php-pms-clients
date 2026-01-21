@@ -23,7 +23,7 @@ it('converts to array with ISO 8601 dates', function () {
 
     $array = $payload->toArray();
 
-    expect($array)->toHaveKeys(['ServiceId', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc', 'Metrics'])
+    expect($array)->toHaveKeys(['ServiceId', 'FirstTimeUnitStartUtc', 'LastTimeUnitStartUtc', 'Metrics', 'ResourceCategoryIds'])
         ->and($array['ServiceId'])->toBe('service-123')
         ->and($array['FirstTimeUnitStartUtc'])->toMatch('/2025-01-01T00:00:00/')
         ->and($array['LastTimeUnitStartUtc'])->toMatch('/2025-01-31T23:59:59/')
@@ -64,3 +64,17 @@ it('throws exception when metrics list is empty', function () {
         metrics: []
     );
 })->throws(\InvalidArgumentException::class, 'Metrics cannot be empty');
+
+
+it('includes resource category ids when provided', function () {
+    $payload = new GetAvailabilityPayload(
+        serviceId: 'service-123',
+        firstTimeUnitStartUtc: Carbon::parse('2025-01-01 00:00:00 UTC'),
+        lastTimeUnitStartUtc: Carbon::parse('2025-01-02 00:00:00 UTC'),
+        resourceCategoryIds: ['category-1', 'category-2']
+    );
+
+    $array = $payload->toArray();
+
+    expect($array['ResourceCategoryIds'])->toBe(['category-1', 'category-2']);
+});

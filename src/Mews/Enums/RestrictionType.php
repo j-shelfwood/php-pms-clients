@@ -16,4 +16,7 @@ enum RestrictionType: string
 
     /** Restriction applied during the stay period */
     case Stay = 'Stay';
+
+    /** Restriction applied at the end of a reservation */
+    case End = 'End';
 }

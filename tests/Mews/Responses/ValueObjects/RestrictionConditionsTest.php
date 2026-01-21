@@ -18,6 +18,12 @@ it('maps restriction conditions with required fields', function () {
 });
 
 it('throws on missing required fields', function () {
-    RestrictionConditions::map(['Type' => 'Start']);
+    RestrictionConditions::map([
+        'StartUtc' => '2026-01-02T23:00:00Z',
+        'EndUtc' => '2026-01-03T23:00:00Z',
+        'Days' => ['Friday'],
+        'Hours' => ['Zero' => true],
+    ]);
 })->throws(\Shelfwood\PhpPms\Exceptions\MappingException::class);
+
 

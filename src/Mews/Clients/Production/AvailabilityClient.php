@@ -34,6 +34,7 @@ class AvailabilityClient
             firstTimeUnitStartUtc: $this->toEnterpriseMidnightBoundaryUtc($payload->firstTimeUnitStartUtc, $enterpriseTimezone),
             lastTimeUnitStartUtc: $this->toEnterpriseMidnightBoundaryUtc($payload->lastTimeUnitStartUtc, $enterpriseTimezone),
             metrics: $payload->metrics,
+            resourceCategoryIds: $payload->resourceCategoryIds,
         );
 
         $body = $this->httpClient->buildRequestBody($normalizedPayload->toArray());

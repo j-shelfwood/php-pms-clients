@@ -247,3 +247,33 @@ it('returns null when resource block not found', function () {
 
     expect($block)->toBeNull();
 });
+
+it('updates customer via payload', function () {
+    $mockResponse = new Response(200, [], json_encode([
+        'Id' => 'customer-123',
+        'ChainId' => 'chain-123',
+        'Number' => 'C-123',
+        'FirstName' => 'Updated',
+        'LastName' => 'User'
+    ]));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/api/connector/v1/customers/update#'),
+            Mockery::type('array')
+        )
+        ->andReturn($mockResponse);
+
+    $api = new Shelfwood\PhpPms\Mews\MewsConnectorAPI($this->config, $httpClient);
+    $payload = new Shelfwood\PhpPms\Mews\Payloads\UpdateCustomerPayload(
+        customerId: 'customer-123',
+        firstName: 'Updated',
+        lastName: 'User'
+    );
+
+    $customer = $api->updateCustomer($payload);
+    expect($customer->id)->toBe('customer-123');
+});
+

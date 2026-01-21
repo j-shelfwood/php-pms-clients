@@ -17,6 +17,7 @@ class GetAvailabilityPayload
         public readonly Carbon $firstTimeUnitStartUtc,
         public readonly Carbon $lastTimeUnitStartUtc,
         ?array $metrics = null,
+        public readonly ?array $resourceCategoryIds = null,
     ) {
         $this->metrics = $this->normalizeMetrics($metrics ?? ResourceAvailabilityMetricType::cases());
         $this->validate();
@@ -63,6 +64,7 @@ class GetAvailabilityPayload
             'FirstTimeUnitStartUtc' => $this->firstTimeUnitStartUtc->copy()->utc()->toIso8601ZuluString(),
             'LastTimeUnitStartUtc' => $this->lastTimeUnitStartUtc->copy()->utc()->toIso8601ZuluString(),
             'Metrics' => array_map(fn (ResourceAvailabilityMetricType $metric) => $metric->value, $this->metrics),
+            'ResourceCategoryIds' => $this->resourceCategoryIds,
         ];
     }
 }

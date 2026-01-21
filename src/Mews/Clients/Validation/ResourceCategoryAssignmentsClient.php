@@ -20,6 +20,10 @@ class ResourceCategoryAssignmentsClient
         $allAssignments = [];
         $cursor = null;
 
+        if ($resourceIds !== null && ($resourceCategoryIds === null || $resourceCategoryIds === [])) {
+            throw new \InvalidArgumentException('ResourceCategoryIds is required when filtering by ResourceIds');
+        }
+
         do {
             $params = [
                 'Limitation' => [
@@ -28,9 +32,7 @@ class ResourceCategoryAssignmentsClient
                 ],
             ];
 
-            if ($resourceCategoryIds !== null) {
-                $params['ResourceCategoryIds'] = $resourceCategoryIds;
-            }
+            $params['ResourceCategoryIds'] = $resourceCategoryIds ?? [];
 
             if ($resourceIds !== null) {
                 $params['ResourceIds'] = $resourceIds;
@@ -51,4 +53,12 @@ class ResourceCategoryAssignmentsClient
 
         return new ResourceCategoryAssignmentsResponse(items: collect($allAssignments));
     }
+
+
+    public function getForResource(string $resourceId): ?\Shelfwood\PhpPms\Mews\Responses\ValueObjects\ResourceCategoryAssignment
+    {
+        $response = $this->getAll(resourceIds: [$resourceId]);
+        return $response->items->first();
+    }
+
 }

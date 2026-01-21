@@ -70,28 +70,15 @@ it('filters assignments by resource category IDs', function () {
     $assignmentsClient->getAll(resourceCategoryIds: ['category-1', 'category-2']);
 });
 
-it('filters assignments by resource IDs', function () {
-    $mockResponse = new Response(200, [], json_encode($this->mockData));
-
+it('throws when filtering by resource IDs without category IDs', function () {
     $httpClient = Mockery::mock(Client::class);
-    $httpClient->shouldReceive('post')
-        ->once()
-        ->with(
-            Mockery::any(),
-            Mockery::on(function ($options) {
-                $body = $options['json'];
-                expect($body)->toHaveKey('ResourceIds')
-                    ->and($body['ResourceIds'])->toBe(['resource-1']);
-                return true;
-            })
-        )
-        ->andReturn($mockResponse);
+    $httpClient->shouldNotReceive('post');
 
     $mewsClient = new MewsHttpClient($this->config, $httpClient);
     $assignmentsClient = new ResourceCategoryAssignmentsClient($mewsClient);
 
     $assignmentsClient->getAll(resourceIds: ['resource-1']);
-});
+})->throws(\InvalidArgumentException::class, 'ResourceCategoryIds is required when filtering by ResourceIds');
 
 it('filters assignments by activity states', function () {
     $mockResponse = new Response(200, [], json_encode($this->mockData));
