@@ -25,7 +25,6 @@ use Shelfwood\PhpPms\Exceptions\NetworkException;
 use Shelfwood\PhpPms\Exceptions\XmlParsingException;
 use Shelfwood\PhpPms\Exceptions\ApiException;
 use Shelfwood\PhpPms\Exceptions\MappingException;
-use GuzzleHttp\Exception\ClientException;
 
 class BookingManagerAPI extends XMLClient
 {
@@ -33,9 +32,22 @@ class BookingManagerAPI extends XMLClient
         ClientInterface $httpClient,
         string $apiKey,
         string $baseUrl,
-        ?LoggerInterface $logger = null
+        ?LoggerInterface $logger = null,
+        ?\Psr\SimpleCache\CacheInterface $cache = null,
+        ?string $rateLimitKey = null,
+        int $rateLimitMaxRequests = 60,
+        int $rateLimitWindowSeconds = 60
     ) {
-        parent::__construct($baseUrl, $apiKey, $httpClient, $logger);
+        parent::__construct(
+            $baseUrl,
+            $apiKey,
+            $httpClient,
+            $logger,
+            $cache,
+            $rateLimitKey,
+            $rateLimitMaxRequests,
+            $rateLimitWindowSeconds
+        );
     }
 
     /**
@@ -88,12 +100,6 @@ class BookingManagerAPI extends XMLClient
 
             return $parsedData;
         } catch (NetworkException | XmlParsingException | ApiException $e) {
-            // Handle rate limiting with progressive backoff
-            if ($this->isRateLimitError($e) && $attempt <= 5) {
-                $this->handleRateLimit($e, $attempt);
-                return $this->performApiCall($endpoint, $apiParams, $attempt + 1);
-            }
-
             $this->logger->error("API call failed: {$e->getMessage()}", [
                 'endpoint' => $endpoint,
                 'params' => $apiParams,
@@ -123,24 +129,6 @@ class BookingManagerAPI extends XMLClient
     private function getEndpoint(): string
     {
         return "{$this->baseUrl}/api";
-    }
-
-    private function handleRateLimit(\Throwable $e, int $attempt = 1): void
-    {
-        if ($this->isRateLimitError($e)) {
-            $backoffSeconds = min(60 * pow(2, $attempt - 1), 600); // 60s, 120s, 240s, 480s, 600s max
-            $this->logger->warning("Rate limit hit, backing off for {$backoffSeconds}s", [
-                'attempt' => $attempt,
-                'error' => $e->getMessage()
-            ]);
-            sleep($backoffSeconds);
-        }
-    }
-
-    private function isRateLimitError(\Throwable $e): bool
-    {
-        return ($e instanceof ClientException && $e->getResponse() && $e->getResponse()->getStatusCode() === 403) ||
-               ($e instanceof ApiException && $e->getCode() === 403);
     }
 
     /**

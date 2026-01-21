@@ -22,7 +22,7 @@ class PhpPmsServiceProvider extends ServiceProvider
             $httpClient = $parameters['http_client'] ?? new Client(); // Simple, clean client
             $logger = $parameters['logger'] ?? $app->make(LoggerInterface::class);
 
-            return new BookingManagerAPI($baseUrl, $apiKey, $httpClient, $logger);
+            return new BookingManagerAPI($httpClient, $apiKey, $baseUrl, $logger);
         });
     }
 }

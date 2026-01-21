@@ -8,6 +8,7 @@ use Shelfwood\PhpPms\Exceptions\HttpClientException;
 use Shelfwood\PhpPms\Exceptions\NetworkException;
 use Shelfwood\PhpPms\Exceptions\ApiException;
 use Tests\Helpers\TestHelpers;
+use Tests\Support\InMemoryCache;
 
 class TestXMLClient extends XMLClient
 {
@@ -41,5 +42,34 @@ describe('XMLClientTest', function () {
             throw new ApiException($errorDetails->message, is_numeric($errorDetails->code) ? (int)$errorDetails->code : 0, null, $errorDetails);
         }
     })->throws(ApiException::class);
+
+    it('throttles using shared cache', function () {
+        $mock = Mockery::mock(ClientInterface::class);
+        $mock->shouldReceive('request')
+            ->twice()
+            ->andReturn(
+                new Response(200, [], '<success/>'),
+                new Response(200, [], '<success/>')
+            );
+
+        $cache = new InMemoryCache();
+        $client = new TestXMLClient(
+            'http://test',
+            'apikey',
+            $mock,
+            new NullLogger(),
+            $cache,
+            'booking_manager:apikey',
+            1,
+            1
+        );
+
+        $start = microtime(true);
+        $client->publicExecutePostRequest('http://test/endpoint', []);
+        $client->publicExecutePostRequest('http://test/endpoint', []);
+        $elapsed = microtime(true) - $start;
+
+        expect($elapsed)->toBeGreaterThan(0.9);
+    });
 
 });

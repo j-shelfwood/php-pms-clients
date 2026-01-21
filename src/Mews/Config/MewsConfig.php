@@ -4,6 +4,8 @@ namespace Shelfwood\PhpPms\Mews\Config;
 
 class MewsConfig
 {
+    private string $rateLimitKeyPrefix = 'pms:rate';
+
     public function __construct(
         public readonly string $clientToken,
         public readonly string $accessToken,
@@ -40,6 +42,12 @@ class MewsConfig
                 throw new \InvalidArgumentException('Rate limit window seconds must be positive');
             }
         }
+    }
+
+    public function getRateLimitKey(string $provider, string $token): string
+    {
+        $hash = hash('sha256', $token);
+        return "{$this->rateLimitKeyPrefix}:{$provider}:{$hash}";
     }
 
     /**

@@ -5,6 +5,8 @@ namespace Shelfwood\PhpPms\Mews\Http;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
+use Shelfwood\PhpPms\Http\SharedRateLimiter;
 use Shelfwood\PhpPms\Mews\Config\MewsConfig;
 use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
 use Shelfwood\PhpPms\Exceptions\NetworkException;
@@ -13,13 +15,12 @@ class MewsHttpClient
 {
     private ?array $configurationCache = null;
     private ?string $enterpriseTimezoneIdentifierCache = null;
-    private ?int $rateLimitWindowStart = null;
-    private int $rateLimitRequestCount = 0;
 
     public function __construct(
         private MewsConfig $config,
         private Client $httpClient,
-        private ?LoggerInterface $logger = null
+        private ?LoggerInterface $logger = null,
+        private ?CacheInterface $cache = null
     ) {}
 
     /**
@@ -99,27 +100,21 @@ class MewsHttpClient
 
         $maxRequests = $this->config->rateLimitMaxRequests;
         $windowSeconds = $this->config->rateLimitWindowSeconds;
-        $now = time();
+        $rateKey = $this->config->getRateLimitKey('mews', $this->config->accessToken);
 
-        if ($this->rateLimitWindowStart === null || ($now - $this->rateLimitWindowStart) >= $windowSeconds) {
-            $this->rateLimitWindowStart = $now;
-            $this->rateLimitRequestCount = 0;
-        }
-
-        if ($this->rateLimitRequestCount >= $maxRequests) {
-            $sleepFor = max(1, $windowSeconds - ($now - $this->rateLimitWindowStart));
-            $this->logger?->warning('Mews API throttling', [
+        if ($this->cache === null) {
+            $this->logger?->warning('Mews API throttling disabled: shared cache not configured', [
                 'endpoint' => $endpoint,
-                'sleep_seconds' => $sleepFor,
+                'key' => $rateKey,
                 'limit' => $maxRequests,
                 'window_seconds' => $windowSeconds,
             ]);
-            sleep($sleepFor);
-            $this->rateLimitWindowStart = time();
-            $this->rateLimitRequestCount = 0;
+            return;
         }
 
-        $this->rateLimitRequestCount++;
+        (new SharedRateLimiter($this->cache, $this->logger))->throttle($rateKey, $maxRequests, $windowSeconds, [
+            'endpoint' => $endpoint,
+        ]);
     }
 
     /**

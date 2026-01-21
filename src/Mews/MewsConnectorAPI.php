@@ -5,6 +5,7 @@ namespace Shelfwood\PhpPms\Mews;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 use Shelfwood\PhpPms\Mews\Config\MewsConfig;
 use Shelfwood\PhpPms\Mews\Http\MewsHttpClient;
 use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
@@ -85,12 +86,14 @@ class MewsConnectorAPI
     public function __construct(
         MewsConfig $config,
         ?Client $guzzleClient = null,
-        ?LoggerInterface $logger = null
+        ?LoggerInterface $logger = null,
+        ?CacheInterface $cache = null
     ) {
         $this->httpClient = new MewsHttpClient(
             $config,
             $guzzleClient ?? new Client(),
-            $logger
+            $logger,
+            $cache
         );
 
         $this->webhookSecret = $config->webhookSecret;

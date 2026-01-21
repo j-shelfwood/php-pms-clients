@@ -9,14 +9,14 @@
       "email": "joris@shelfwood.co"
     }
   ],
-  "require": {
-    "php": "^8.2",
-    "fakerphp/faker": "^1.24",
-    "guzzlehttp/guzzle": "^7.9",
-    "illuminate/support": "^10.0|^11.0",
-    "nesbot/carbon": "^3.9",
-    "psr/log": "^3.0"
-  },
+    "require": {
+      "php": "^8.2",
+      "fakerphp/faker": "^1.24",
+      "guzzlehttp/guzzle": "^7.9",
+      "illuminate/support": "^10.0|^11.0",
+      "nesbot/carbon": "^3.9",
+      "psr/log": "^3.0"
+    },
   "require-dev": {
     "mockery/mockery": "^1.6",
     "pestphp/pest": "^3.8",

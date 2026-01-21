@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use Psr\Log\NullLogger;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\ClientInterface;
+use Psr\SimpleCache\CacheInterface;
 use Shelfwood\PhpPms\Http\XMLParser;
 use Shelfwood\PhpPms\Exceptions\ParseException;
 use Shelfwood\PhpPms\Exceptions\HttpClientException;
@@ -20,17 +21,29 @@ abstract class XMLClient
     protected string $apiKey;
     protected int $defaultTimeout = 30;
     protected array $defaultHeaders = ['Accept' => 'application/xml'];
+    protected ?CacheInterface $cache = null;
+    protected int $rateLimitMaxRequests = 60;
+    protected int $rateLimitWindowSeconds = 60;
+    protected ?string $rateLimitKey = null;
 
     public function __construct(
         string $baseUrl,
         string $apiKey,
         ?ClientInterface $httpClient = null,
-        ?LoggerInterface $logger = null
+        ?LoggerInterface $logger = null,
+        ?CacheInterface $cache = null,
+        ?string $rateLimitKey = null,
+        int $rateLimitMaxRequests = 60,
+        int $rateLimitWindowSeconds = 60
     ) {
         $this->baseUrl = rtrim($baseUrl, '/'); // Remove trailing slash to prevent double slashes
         $this->apiKey = $apiKey;
         $this->httpClient = $httpClient ?? new Client();
         $this->logger = $logger ?? new NullLogger();
+        $this->cache = $cache;
+        $this->rateLimitKey = $rateLimitKey;
+        $this->rateLimitMaxRequests = $rateLimitMaxRequests;
+        $this->rateLimitWindowSeconds = $rateLimitWindowSeconds;
     }
 
     /**
@@ -39,6 +52,7 @@ abstract class XMLClient
      */
     protected function executePostRequest(string $url, array $formData): string
     {
+        $this->throttleRequest($url);
         $options = [
             'headers' => $this->defaultHeaders,
             'timeout' => $this->defaultTimeout,
@@ -64,5 +78,21 @@ abstract class XMLClient
             ]);
             throw new NetworkException('HTTP request failed: ' . $e->getMessage(), $e->getCode(), $e);
         }
+    }
+
+    protected function throttleRequest(string $endpoint): void
+    {
+        if ($this->cache === null || $this->rateLimitKey === null) {
+            return;
+        }
+
+        (new SharedRateLimiter($this->cache, $this->logger))->throttle(
+            $this->rateLimitKey,
+            $this->rateLimitMaxRequests,
+            $this->rateLimitWindowSeconds,
+            [
+                'endpoint' => $endpoint,
+            ]
+        );
     }
 }
