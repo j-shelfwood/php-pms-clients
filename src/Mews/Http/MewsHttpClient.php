@@ -13,6 +13,8 @@ class MewsHttpClient
 {
     private ?array $configurationCache = null;
     private ?string $enterpriseTimezoneIdentifierCache = null;
+    private ?int $rateLimitWindowStart = null;
+    private int $rateLimitRequestCount = 0;
 
     public function __construct(
         private MewsConfig $config,
@@ -34,6 +36,7 @@ class MewsHttpClient
         $url = $this->config->baseUrl . $endpoint;
 
         try {
+            $this->throttleRequest($endpoint);
             $this->logger?->debug('Mews API request', [
                 'url' => $url,
                 'body' => $body,
@@ -86,6 +89,37 @@ class MewsHttpClient
                 $e
             );
         }
+    }
+
+    private function throttleRequest(string $endpoint): void
+    {
+        if (!$this->config->rateLimitEnabled) {
+            return;
+        }
+
+        $maxRequests = $this->config->rateLimitMaxRequests;
+        $windowSeconds = $this->config->rateLimitWindowSeconds;
+        $now = time();
+
+        if ($this->rateLimitWindowStart === null || ($now - $this->rateLimitWindowStart) >= $windowSeconds) {
+            $this->rateLimitWindowStart = $now;
+            $this->rateLimitRequestCount = 0;
+        }
+
+        if ($this->rateLimitRequestCount >= $maxRequests) {
+            $sleepFor = max(1, $windowSeconds - ($now - $this->rateLimitWindowStart));
+            $this->logger?->warning('Mews API throttling', [
+                'endpoint' => $endpoint,
+                'sleep_seconds' => $sleepFor,
+                'limit' => $maxRequests,
+                'window_seconds' => $windowSeconds,
+            ]);
+            sleep($sleepFor);
+            $this->rateLimitWindowStart = time();
+            $this->rateLimitRequestCount = 0;
+        }
+
+        $this->rateLimitRequestCount++;
     }
 
     /**
