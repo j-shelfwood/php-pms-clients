@@ -17,6 +17,9 @@ class RestrictionsClient
     /**
      * Get all restrictions for a service across a date range
      *
+     * Handles cursor-based pagination with infinite loop protection.
+     * The Mews API has a bug where it can return the same cursor indefinitely.
+     *
      * @param string $serviceId Service UUID
      * @param Carbon $start Start date (UTC)
      * @param Carbon $end End date (UTC)
@@ -32,8 +35,29 @@ class RestrictionsClient
     ): RestrictionsResponse {
         $allRestrictions = [];
         $cursor = null;
+        $seenCursors = [];
+        $maxPages = 100; // Safety limit to prevent infinite loops
+        $pageCount = 0;
 
         do {
+            // Infinite loop protection: detect cursor repetition
+            if ($cursor !== null && isset($seenCursors[$cursor])) {
+                // API returned same cursor twice - pagination complete
+                break;
+            }
+
+            // Safety limit: prevent runaway pagination
+            if (++$pageCount > $maxPages) {
+                throw new MewsApiException(
+                    "Restrictions pagination exceeded {$maxPages} pages. " .
+                    "This may indicate an API issue or excessive data."
+                );
+            }
+
+            if ($cursor !== null) {
+                $seenCursors[$cursor] = true;
+            }
+
             $body = $this->httpClient->buildRequestBody([
                 'ServiceIds' => [$serviceId],
                 'CollidingUtc' => [
@@ -48,7 +72,12 @@ class RestrictionsClient
             $response = $this->httpClient->post('/api/connector/v1/restrictions/getAll', $body);
 
             $pageResponse = RestrictionsResponse::map($response);
-            $allRestrictions = array_merge($allRestrictions, $pageResponse->items->all());
+            
+            // Only merge results if we haven't seen this cursor before
+            if ($cursor === null || !isset($seenCursors[$cursor])) {
+                $allRestrictions = array_merge($allRestrictions, $pageResponse->items->all());
+            }
+            
             $cursor = $pageResponse->cursor;
         } while ($cursor !== null);
 

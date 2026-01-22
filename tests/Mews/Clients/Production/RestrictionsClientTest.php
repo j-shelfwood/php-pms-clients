@@ -321,3 +321,92 @@ it('handles restrictions without minimum stay set', function () {
 
     expect($minimumStay)->toBeNull();
 });
+
+it('detects infinite loop when API returns same cursor repeatedly', function () {
+    // Mock API returning same cursor on every request (infinite loop bug)
+    $infinitePage = [
+        'Restrictions' => [$this->mockData['Restrictions'][0]],
+        'Cursor' => 'stuck-cursor'
+    ];
+
+    $mockResponse = new Response(200, [], json_encode($infinitePage));
+
+    $httpClient = Mockery::mock(Client::class);
+    
+    // First request (no cursor)
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::any(),
+            Mockery::on(function ($options) {
+                $body = $options['json'];
+                expect($body)->not->toHaveKey('Cursor');
+                return true;
+            })
+        )
+        ->andReturn($mockResponse);
+
+    // Second request (with cursor) - returns SAME cursor again
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::any(),
+            Mockery::on(function ($options) {
+                $body = $options['json'];
+                expect($body['Cursor'])->toBe('stuck-cursor');
+                return true;
+            })
+        )
+        ->andReturn($mockResponse);
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $restrictionsClient = new RestrictionsClient($mewsClient);
+
+    // Should detect infinite loop and break (not hang)
+    $response = $restrictionsClient->getAll(
+        serviceId: 'test-service',
+        start: Carbon::parse('2025-01-01'),
+        end: Carbon::parse('2025-12-31')
+    );
+
+    // Should have deduplicated results (only 1 item, not infinite)
+    expect($response->items)->toHaveCount(1);
+});
+
+it('throws exception when pagination exceeds maximum pages', function () {
+    // Mock API that returns different cursors infinitely (never null)
+    $httpClient = Mockery::mock(Client::class);
+    
+    // Mock unlimited pages - each returns a unique cursor
+    $httpClient->shouldReceive('post')
+        ->times(100) // Will be called 100 times before throwing
+        ->andReturnUsing(function () {
+            static $counter = 0;
+            $counter++;
+            $page = [
+                'Restrictions' => [
+                    [
+                        'Id' => 'restriction-' . $counter,
+                        'ServiceId' => 'test-service',
+                        'Conditions' => ['Type' => 'Stay', 'Days' => [], 'Hours' => []],
+                        'Exceptions' => []
+                    ]
+                ],
+                'Cursor' => 'cursor-' . ($counter + 1) // Always return a new cursor
+            ];
+            return new Response(200, [], json_encode($page));
+        });
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $restrictionsClient = new RestrictionsClient($mewsClient);
+
+    // Should throw exception on 101st attempt (after 100 pages)
+    $restrictionsClient->getAll(
+        serviceId: 'test-service',
+        start: Carbon::parse('2025-01-01'),
+        end: Carbon::parse('2025-12-31')
+    );
+})->throws(
+    \Shelfwood\PhpPms\Mews\Exceptions\MewsApiException::class,
+    'Restrictions pagination exceeded 100 pages'
+);
