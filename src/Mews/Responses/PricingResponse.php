@@ -4,13 +4,14 @@ namespace Shelfwood\PhpPms\Mews\Responses;
 
 use Illuminate\Support\Collection;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\PricingBlock;
+use Shelfwood\PhpPms\Mews\Responses\ValueObjects\AmountPrice;
 
 class PricingResponse
 {
     /**
      * @param string $currency
      * @param array<int, string> $timeUnitStartsUtc
-     * @param array<int, float> $baseAmountPrices
+     * @param array<int, AmountPrice> $baseAmountPrices
      * @param Collection<int, PricingBlock> $categoryPrices
      * @param array<int, string>|null $datesUtc
      * @param array<int, float>|null $basePrices
@@ -42,7 +43,10 @@ class PricingResponse
         return new self(
             currency: $data['Currency'] ?? 'EUR',
             timeUnitStartsUtc: $data['TimeUnitStartsUtc'] ?? [],
-            baseAmountPrices: $data['BaseAmountPrices'] ?? [],
+            baseAmountPrices: array_map(
+                fn($item) => AmountPrice::map($item, $data['Currency'] ?? 'EUR'),
+                $data['BaseAmountPrices'] ?? []
+            ),
             categoryPrices: collect($data['CategoryPrices'] ?? [])
                 ->map(fn($item) => PricingBlock::map($item)),
             // Additional fields from API

@@ -7,11 +7,9 @@ use Shelfwood\PhpPms\Mews\Http\MewsHttpClient;
 use Shelfwood\PhpPms\Mews\Payloads\GetPricingPayload;
 use Shelfwood\PhpPms\Mews\Responses\RatesResponse;
 use Shelfwood\PhpPms\Mews\Responses\PricingResponse;
-use Shelfwood\PhpPms\Mews\Responses\CalendarResponse;
 use Shelfwood\PhpPms\Mews\Responses\AvailabilityResponse;
 use Shelfwood\PhpPms\Mews\Payloads\GetAvailabilityPayload;
 use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
-use Shelfwood\PhpPms\Mews\Enums\RateType;
 use Shelfwood\PhpPms\Mews\Services\DateConverter;
 
 class PricingClient
@@ -73,66 +71,6 @@ class PricingClient
         $response = $this->httpClient->post('/api/connector/v1/rates/getPricing', $body);
 
         return PricingResponse::map($response);
-    }
-
-    /**
-     * Get calendar/availability data for a service across a date range
-     *
-     * Combines availability and pricing data for calendar display by fetching
-     * service availability metrics and rate pricing information, then merging
-     * them into a unified calendar response.
-     *
-     * @see https://mews-systems.gitbook.io/connector-api/operations/services#get-service-availability
-     * @see https://mews-systems.gitbook.io/connector-api/operations/rates#get-all-rates
-     * @see https://mews-systems.gitbook.io/connector-api/operations/rates#get-rate-pricing
-     * @param string $serviceId Service UUID
-     * @param Carbon $start Start date (UTC)
-     * @param Carbon $end End date (UTC)
-     * @param int $adults Number of adults (default 2)
-     * @param int $children Number of children (default 0)
-     * @return CalendarResponse Calendar data with Availability, Pricing, ServiceId, date range
-     * @throws MewsApiException
-     */
-    public function getCalendar(
-        string $serviceId,
-        Carbon $start,
-        Carbon $end,
-        int $adults = 2,
-        int $children = 0
-    ): CalendarResponse {
-        // Get availability for the date range
-        $availabilityPayload = new GetAvailabilityPayload(
-            serviceId: $serviceId,
-            firstTimeUnitStartUtc: $start,
-            lastTimeUnitStartUtc: $end
-        );
-        $availability = $this->availabilityClient->get($availabilityPayload);
-
-        // Get rates for pricing information
-        $rates = $this->getServiceRates($serviceId);
-
-        // Find best public rate
-        $publicRates = $rates->items->filter(function ($rate) {
-            return $rate->isActive &&
-                   $rate->type === RateType::Public &&
-                   $rate->baseRateId === null;
-        });
-
-        $pricing = null;
-        if ($publicRates->isNotEmpty()) {
-            $bestRate = $publicRates->first();
-            $pricingPayload = new GetPricingPayload(
-                rateId: $bestRate->id,
-                firstTimeUnitStartUtc: $start,
-                lastTimeUnitStartUtc: $end
-            );
-            $pricing = $this->getPricing($pricingPayload);
-        }
-
-        return new CalendarResponse(
-            availability: $availability,
-            pricing: $pricing
-        );
     }
 
     private function toEnterpriseMidnightBoundaryUtc(Carbon $date, string $enterpriseTimezone): Carbon

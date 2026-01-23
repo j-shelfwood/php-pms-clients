@@ -152,8 +152,21 @@ class MewsHttpClient
             return $this->configurationCache;
         }
 
+        $cacheKey = 'mews:configuration:' . hash('sha256', $this->config->clientToken);
+        if ($this->cache && $this->cache->has($cacheKey)) {
+            $cached = $this->cache->get($cacheKey);
+            if (is_array($cached)) {
+                $this->configurationCache = $cached;
+                return $this->configurationCache;
+            }
+        }
+
         $body = $this->buildRequestBody([]);
         $this->configurationCache = $this->post('/api/connector/v1/configuration/get', $body);
+
+        if ($this->cache) {
+            $this->cache->set($cacheKey, $this->configurationCache, 3600);
+        }
 
         return $this->configurationCache;
     }

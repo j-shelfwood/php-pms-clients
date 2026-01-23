@@ -11,6 +11,9 @@ it('maps pricing block from API response', function () {
 
     expect($block->resourceCategoryId)->toBe('44bd8ad0-e70b-4bd9-8445-ad7200d7c349')
         ->and($block->amountPrices)->toBeArray();
+    if (!empty($block->amountPrices)) {
+        expect($block->amountPrices[0])->toBeInstanceOf(\Shelfwood\PhpPms\Mews\Responses\ValueObjects\AmountPrice::class);
+    }
 });
 
 it('throws exception on missing required field', function () {

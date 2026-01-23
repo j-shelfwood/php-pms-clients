@@ -33,7 +33,6 @@ use Shelfwood\PhpPms\Mews\Responses\AgeCategoriesResponse;
 use Shelfwood\PhpPms\Mews\Responses\AvailabilityResponse;
 use Shelfwood\PhpPms\Mews\Responses\RatesResponse;
 use Shelfwood\PhpPms\Mews\Responses\PricingResponse;
-use Shelfwood\PhpPms\Mews\Responses\CalendarResponse;
 use Shelfwood\PhpPms\Mews\Responses\CustomersResponse;
 use Shelfwood\PhpPms\Mews\Responses\ReservationsResponse;
 use Shelfwood\PhpPms\Mews\Responses\RestrictionsResponse;
@@ -343,29 +342,6 @@ class MewsConnectorAPI
         );
 
         return $this->pricingClient->getPricing($payload);
-    }
-
-    /**
-     * Get calendar/availability data for a service across a date range
-     *
-     * This combines availability and pricing data for calendar display
-     *
-     * @param string $serviceId Service UUID
-     * @param Carbon $start Start date (UTC)
-     * @param Carbon $end End date (UTC)
-     * @param int $adults Number of adults (default 2)
-     * @param int $children Number of children (default 0)
-     * @return CalendarResponse Calendar data with availability and pricing per day
-     * @throws MewsApiException
-     */
-    public function getCalendar(
-        string $serviceId,
-        Carbon $start,
-        Carbon $end,
-        int $adults = 2,
-        int $children = 0
-    ): CalendarResponse {
-        return $this->pricingClient->getCalendar($serviceId, $start, $end, $adults, $children);
     }
 
     // ========================================================================

@@ -10,7 +10,6 @@ use Shelfwood\PhpPms\Mews\Clients\Production\AvailabilityClient;
 use Shelfwood\PhpPms\Mews\Payloads\GetPricingPayload;
 use Shelfwood\PhpPms\Mews\Responses\RatesResponse;
 use Shelfwood\PhpPms\Mews\Responses\PricingResponse;
-use Shelfwood\PhpPms\Mews\Responses\CalendarResponse;
 use Shelfwood\PhpPms\Mews\Enums\RateType;
 
 beforeEach(function () {
@@ -144,116 +143,20 @@ it('validates pricing response structure', function () {
     $response = $pricingClient->getPricing($payload);
 
     // Validate base prices structure
-    expect($response->baseAmountPrices[0])->toHaveKeys(['GrossValue', 'NetValue', 'TaxValues', 'Currency'])
-        ->and($response->baseAmountPrices[0]['GrossValue'])->toEqual(10000.0)
-        ->and($response->baseAmountPrices[0]['NetValue'])->toEqual(8333.33)
-        ->and($response->baseAmountPrices[0]['Currency'])->toBe('GBP');
+    expect($response->baseAmountPrices[0])->toBeInstanceOf(\Shelfwood\PhpPms\Mews\Responses\ValueObjects\AmountPrice::class)
+        ->and($response->baseAmountPrices[0]->grossValue)->toEqual(10000.0)
+        ->and($response->baseAmountPrices[0]->netValue)->toEqual(8333.33)
+        ->and($response->baseAmountPrices[0]->currency)->toBe('GBP')
+        ->and($response->baseAmountPrices[0]->taxValues)->toHaveCount(1)
+        ->and($response->baseAmountPrices[0]->taxValues[0]->code)->toBe('UK-2022-20%')
+        ->and($response->baseAmountPrices[0]->taxValues[0]->value)->toEqual(1666.67)
+        ->and($response->baseAmountPrices[0]->breakdown)->not->toBeNull()
+        ->and($response->baseAmountPrices[0]->breakdown->items[0]->taxRateCode)->toBe('UK-2022-20%')
+        ->and($response->baseAmountPrices[0]->breakdown->items[0]->taxValue)->toEqual(1666.67);
 
     // Validate category prices structure
     expect($response->categoryPrices[0]->resourceCategoryId)->toBe('44bd8ad0-e70b-4bd9-8445-ad7200d7c349')
         ->and($response->categoryPrices[0]->amountPrices)->toHaveCount(4);
-});
-
-it('gets calendar data with availability and pricing', function () {
-    $mockRatesResponse = new Response(200, [], json_encode($this->itemsMockData));
-    $mockPricingResponse = new Response(200, [], json_encode($this->pricingMockData));
-    $mockAvailabilityResponse = new Response(200, [], json_encode($this->availabilityMockData));
-
-    $httpClient = Mockery::mock(Client::class);
-
-    // First call: configuration (timezone)
-    $httpClient->shouldReceive('post')
-        ->once()
-        ->with(Mockery::pattern('#/api/connector/v1/configuration/get#'), Mockery::any())
-        ->andReturn(new Response(200, [], json_encode([
-            'Enterprise' => ['TimeZoneIdentifier' => 'Europe/Budapest'],
-        ])));
-
-    // Second call: get availability
-    $httpClient->shouldReceive('post')
-        ->once()
-        ->with(Mockery::pattern('#/services/getAvailability#'), Mockery::any())
-        ->andReturn($mockAvailabilityResponse);
-
-    // Third call: get rates
-    $httpClient->shouldReceive('post')
-        ->once()
-        ->with(Mockery::pattern('#/rates/getAll#'), Mockery::any())
-        ->andReturn($mockRatesResponse);
-
-    // Fourth call: get pricing
-    $httpClient->shouldReceive('post')
-        ->once()
-        ->with(Mockery::pattern('#/rates/getPricing#'), Mockery::any())
-        ->andReturn($mockPricingResponse);
-
-    $mewsClient = new MewsHttpClient($this->config, $httpClient);
-    $availabilityClient = new AvailabilityClient($mewsClient);
-    $pricingClient = new PricingClient($mewsClient, $availabilityClient);
-
-    $start = Carbon::parse('2025-01-15');
-    $end = Carbon::parse('2025-01-17');
-
-    $response = $pricingClient->getCalendar(
-        serviceId: 'ec9d261c-1ef1-4a6e-8565-ad7200d77411',
-        start: $start,
-        end: $end,
-        adults: 2,
-        children: 0
-    );
-
-    expect($response)->toBeInstanceOf(CalendarResponse::class)
-        ->and($response->availability)->not->toBeNull()
-        ->and($response->pricing)->not->toBeNull();
-});
-
-it('gets calendar without pricing when no public rates exist', function () {
-    // Mock rates response with no public rates
-    $ratesWithoutPublic = $this->itemsMockData;
-    $ratesWithoutPublic['Rates'][0]['Type'] = 'Private';
-
-    $mockRatesResponse = new Response(200, [], json_encode($ratesWithoutPublic));
-    $mockAvailabilityResponse = new Response(200, [], json_encode($this->availabilityMockData));
-
-    $httpClient = Mockery::mock(Client::class);
-
-    // First call: configuration (timezone)
-    $httpClient->shouldReceive('post')
-        ->once()
-        ->with(Mockery::pattern('#/api/connector/v1/configuration/get#'), Mockery::any())
-        ->andReturn(new Response(200, [], json_encode([
-            'Enterprise' => ['TimeZoneIdentifier' => 'Europe/Budapest'],
-        ])));
-
-    // Second call: get availability
-    $httpClient->shouldReceive('post')
-        ->once()
-        ->with(Mockery::pattern('#/services/getAvailability#'), Mockery::any())
-        ->andReturn($mockAvailabilityResponse);
-
-    // Third call: get rates
-    $httpClient->shouldReceive('post')
-        ->once()
-        ->with(Mockery::pattern('#/rates/getAll#'), Mockery::any())
-        ->andReturn($mockRatesResponse);
-
-    // Should NOT call getPricing
-    $httpClient->shouldNotReceive('post')
-        ->with(Mockery::pattern('#/rates/getPricing#'), Mockery::any());
-
-    $mewsClient = new MewsHttpClient($this->config, $httpClient);
-    $availabilityClient = new AvailabilityClient($mewsClient);
-    $pricingClient = new PricingClient($mewsClient, $availabilityClient);
-
-    $response = $pricingClient->getCalendar(
-        serviceId: 'test-service',
-        start: Carbon::parse('2025-01-15'),
-        end: Carbon::parse('2025-01-17')
-    );
-
-    expect($response)->toBeInstanceOf(CalendarResponse::class)
-        ->and($response->availability)->not->toBeNull()
-        ->and($response->pricing)->toBeNull();
 });
 
 it('sends pricing request without occupancy configuration', function () {
