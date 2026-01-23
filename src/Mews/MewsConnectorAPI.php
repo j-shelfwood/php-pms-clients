@@ -654,11 +654,14 @@ class MewsConnectorAPI
      */
     public function getResourceBlock(string $blockId, ?string $enterpriseId = null): ?ResourceBlock
     {
+        // Mews API limit: 3 months + 1 day (3M1D)
+        // Use 90-day window centered on today for webhook block lookups
+        $now = \Carbon\Carbon::now();
         $payload = [
             'ResourceBlockIds' => [$blockId],
             'CollidingUtc' => [
-                'StartUtc' => '2020-01-01T00:00:00Z',
-                'EndUtc' => \Carbon\Carbon::now()->addYears(5)->format('Y-m-d\TH:i:s\Z'),
+                'StartUtc' => $now->copy()->subDays(45)->format('Y-m-d\TH:i:s\Z'),
+                'EndUtc' => $now->copy()->addDays(45)->format('Y-m-d\TH:i:s\Z'),
             ],
             'Limitation' => [
                 'Count' => 1,
