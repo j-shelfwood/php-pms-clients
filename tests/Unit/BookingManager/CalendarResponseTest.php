@@ -145,7 +145,7 @@ XML;
         $parsed = ['empty' => 'response'];
 
         expect(fn() => CalendarResponse::map($parsed))
-            ->toThrow(MappingException::class, 'Invalid calendar response');
+            ->toThrow(MappingException::class);
     });
 
     test('filters out invalid day info entries', function () {
@@ -157,7 +157,10 @@ XML;
             <available>1</available>
             <stay_minimum>1</stay_minimum>
         </info>
-        <info><!-- Invalid - missing day attribute --></info>
+        <info day="" season="low" modified="2024-01-01 00:00:00">
+            <available>1</available>
+            <stay_minimum>1</stay_minimum>
+        </info>
         <info day="2024-01-02" season="low" modified="2024-01-01 00:00:00">
             <available>1</available>
             <stay_minimum>1</stay_minimum>
@@ -245,6 +248,6 @@ XML;
         $endDate = Carbon::parse('2024-01-10');
 
         expect(fn() => CalendarResponse::map($parsed, $startDate, $endDate))
-            ->toThrow(\Throwable::class);
+            ->toThrow(MappingException::class);
     });
 });

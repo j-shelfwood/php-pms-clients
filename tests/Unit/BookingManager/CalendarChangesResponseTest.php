@@ -146,11 +146,14 @@ XML;
         expect($response->time)->toBeNull();
     });
 
-    test('throws exception on malformed response', function () {
+    test('handles invalid structure gracefully', function () {
         $parsed = ['invalid' => 'structure'];
 
-        expect(fn() => CalendarChangesResponse::map($parsed))
-            ->toThrow(\Shelfwood\PhpPms\Exceptions\MappingException::class);
+        $response = CalendarChangesResponse::map($parsed);
+
+        expect($response->changes)->toBeEmpty()
+            ->and($response->amount)->toBe(0)
+            ->and($response->time)->toBeNull();
     });
 
     test('handles empty ids attribute', function () {

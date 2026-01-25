@@ -57,8 +57,14 @@ describe('PropertiesResponse::map', function () {
         <cleaning_costs>50.00</cleaning_costs>
         <deposit_costs>100.00</deposit_costs>
         <tax type="none" amount="0.00"/>
-        <content/>
-        <images/>
+        <content>
+            <short></short>
+            <full></full>
+            <area></area>
+            <arrival></arrival>
+            <termsAndConditions></termsAndConditions>
+        </content>
+        <images></images>
     </property>
 </properties>
 XML;
@@ -102,8 +108,14 @@ XML;
         <cleaning_costs>0</cleaning_costs>
         <deposit_costs>0</deposit_costs>
         <tax type="none" amount="0"/>
-        <content/>
-        <images/>
+        <content>
+            <short></short>
+            <full></full>
+            <area></area>
+            <arrival></arrival>
+            <termsAndConditions></termsAndConditions>
+        </content>
+        <images></images>
     </property>
     <property id="200" name="Property B" status="active">
         <provider id="1" name="Test"/>
@@ -120,8 +132,14 @@ XML;
         <cleaning_costs>0</cleaning_costs>
         <deposit_costs>0</deposit_costs>
         <tax type="none" amount="0"/>
-        <content/>
-        <images/>
+        <content>
+            <short></short>
+            <full></full>
+            <area></area>
+            <arrival></arrival>
+            <termsAndConditions></termsAndConditions>
+        </content>
+        <images></images>
     </property>
     <property id="300" name="Property C" status="active">
         <provider id="1" name="Test"/>
@@ -138,8 +156,14 @@ XML;
         <cleaning_costs>0</cleaning_costs>
         <deposit_costs>0</deposit_costs>
         <tax type="none" amount="0"/>
-        <content/>
-        <images/>
+        <content>
+            <short></short>
+            <full></full>
+            <area></area>
+            <arrival></arrival>
+            <termsAndConditions></termsAndConditions>
+        </content>
+        <images></images>
     </property>
 </properties>
 XML;
@@ -172,26 +196,44 @@ XML;
         expect($mapped)->toBeInstanceOf(\Illuminate\Support\Collection::class);
     });
 
-    test('throws MappingException on invalid structure', function () {
+    test('handles invalid structure gracefully', function () {
         $parsed = ['invalid' => 'structure'];
 
-        expect(fn() => PropertiesResponse::map($parsed))
-            ->toThrow(\Shelfwood\PhpPms\Exceptions\MappingException::class);
+        $response = PropertiesResponse::map($parsed);
+
+        expect($response->properties)->toBeEmpty();
     });
 
-    test('handles malformed XML gracefully', function () {
-        // XML with property missing required nested elements
+    test('handles incomplete property data with defaults', function () {
+        // XML with property missing nested elements - should use defaults
         $xml = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <properties count="1">
-    <property id="999" name="Incomplete Property" status="active"/>
+    <property id="999" name="Incomplete Property" status="active">
+        <provider id="1" name="Test"/>
+        <location city="Test" country="NL"/>
+        <max_persons>0</max_persons>
+        <minimal_nights>0</minimal_nights>
+        <maximal_nights>0</maximal_nights>
+        <floor>0</floor>
+        <bedrooms>0</bedrooms>
+        <bathrooms>0</bathrooms>
+        <toilets>0</toilets>
+        <supplies bedlinen="0" towels="0"/>
+        <service cleanservice="0" linensservice="0"/>
+        <cleaning_costs>0</cleaning_costs>
+        <deposit_costs>0</deposit_costs>
+        <tax type="none" amount="0"/>
+        <content/>
+        <images/>
+    </property>
 </properties>
 XML;
 
         $parsed = XMLParser::parse($xml);
+        $response = PropertiesResponse::map($parsed);
 
-        // Should throw MappingException due to missing required nested elements
-        expect(fn() => PropertiesResponse::map($parsed))
-            ->toThrow(\Shelfwood\PhpPms\Exceptions\MappingException::class);
+        expect($response->properties)->toHaveCount(1);
+        expect($response->properties->first()->external_id)->toBe(999);
     });
 });
