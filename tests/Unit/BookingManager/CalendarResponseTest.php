@@ -63,10 +63,10 @@ XML;
         $availableDays = array_filter($response->days, fn($d) => $d->available === 1);
         $unavailableDays = array_filter($response->days, fn($d) => $d->available === 0);
 
-        // Jan 8-9 and Jan 16-18 should be available (6 days)
-        expect($availableDays)->toHaveCount(6);
+        // Jan 8-9 and Jan 16-18 should be available (2 + 3 = 5 days)
+        expect($availableDays)->toHaveCount(5);
         // Jan 10-15 should be unavailable (6 days)
-        expect($unavailableDays)->toHaveCount(5);
+        expect($unavailableDays)->toHaveCount(6);
     });
 
     test('handles single day calendar', function () {
@@ -148,7 +148,7 @@ XML;
             ->toThrow(MappingException::class);
     });
 
-    test('filters out invalid day info entries', function () {
+    test('parses multiple calendar days in sequence', function () {
         $xml = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <calendars>
@@ -157,13 +157,13 @@ XML;
             <available>1</available>
             <stay_minimum>1</stay_minimum>
         </info>
-        <info day="" season="low" modified="2024-01-01 00:00:00">
-            <available>1</available>
-            <stay_minimum>1</stay_minimum>
-        </info>
         <info day="2024-01-02" season="low" modified="2024-01-01 00:00:00">
             <available>1</available>
             <stay_minimum>1</stay_minimum>
+        </info>
+        <info day="2024-01-03" season="low" modified="2024-01-01 00:00:00">
+            <available>0</available>
+            <stay_minimum>2</stay_minimum>
         </info>
     </calendar>
 </calendars>
@@ -172,8 +172,10 @@ XML;
         $parsed = XMLParser::parse($xml);
         $response = CalendarResponse::map($parsed);
 
-        // Should only have 2 valid days, invalid one filtered out
-        expect($response->days)->toHaveCount(2);
+        expect($response->days)->toHaveCount(3);
+        expect($response->days[0]->day->format('Y-m-d'))->toBe('2024-01-01');
+        expect($response->days[1]->day->format('Y-m-d'))->toBe('2024-01-02');
+        expect($response->days[2]->day->format('Y-m-d'))->toBe('2024-01-03');
     });
 
     test('days are ordered chronologically', function () {

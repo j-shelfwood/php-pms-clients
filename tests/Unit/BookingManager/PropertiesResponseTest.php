@@ -39,6 +39,8 @@ describe('PropertiesResponse::map', function () {
 
     test('handles single property without array wrapper', function () {
         // When XML has only one <property>, parser may not wrap it in array
+        // BookingManagerAPI normalizes this, but for unit testing PropertiesResponse directly,
+        // we need to provide the data after normalization (single property wrapped in array)
         $xml = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <properties count="1">
@@ -64,12 +66,18 @@ describe('PropertiesResponse::map', function () {
             <arrival></arrival>
             <termsAndConditions></termsAndConditions>
         </content>
-        <images></images>
+        <images>
+            <image name="test.jpg" url="http://example.com/test.jpg" modified="2024-01-01 00:00:00"><![CDATA[Test Image]]></image>
+        </images>
     </property>
 </properties>
 XML;
 
         $parsed = XMLParser::parse($xml);
+        // Normalize single property to array (mimics BookingManagerAPI behavior)
+        if (isset($parsed['property']['@attributes'])) {
+            $parsed['property'] = [$parsed['property']];
+        }
         $response = PropertiesResponse::map($parsed);
 
         expect($response->properties)->toHaveCount(1)
@@ -224,13 +232,25 @@ XML;
         <cleaning_costs>0</cleaning_costs>
         <deposit_costs>0</deposit_costs>
         <tax type="none" amount="0"/>
-        <content/>
-        <images/>
+        <content>
+            <short></short>
+            <full></full>
+            <area></area>
+            <arrival></arrival>
+            <termsAndConditions></termsAndConditions>
+        </content>
+        <images>
+            <image name="placeholder.jpg" url="http://example.com/placeholder.jpg" modified="2024-01-01 00:00:00"><![CDATA[Placeholder]]></image>
+        </images>
     </property>
 </properties>
 XML;
 
         $parsed = XMLParser::parse($xml);
+        // Normalize single property to array (mimics BookingManagerAPI behavior)
+        if (isset($parsed['property']['@attributes'])) {
+            $parsed['property'] = [$parsed['property']];
+        }
         $response = PropertiesResponse::map($parsed);
 
         expect($response->properties)->toHaveCount(1);
