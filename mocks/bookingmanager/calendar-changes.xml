@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Mock Source: BookingManager API - changes.xml endpoint
+  API Endpoint: https://xmlsync.bookingmanager.com/changes.xml
+  Captured: 2026-01-25 (v5.2.0 fix)
+  Last Validated: 2026-01-25
+  Validation Test: tests/Integration/BookingManager/CalendarChangesIntegrationTest.php
+  Auto-Validation: .github/workflows/validate-mocks.yml (daily)
+
+  Response Structure:
+  - Root <changes> element (no attributes)
+  - Child <change> elements with:
+    - type: Change category (details, availability, rate)
+    - ids: Comma-separated property IDs (plural!)
+    - time: Timestamp when change occurred
+    - amount: Number of properties in this change type
+
+  Important Notes:
+  - Use 'ids' (plural) NOT 'id' (singular)
+  - Multiple change types can reference same property IDs
+  - System returns unique property IDs across all change types
+  - Time attribute tracks latest change timestamp
+-->
 <changes>
   <change type="details" amount="3" ids="22958,23180,23640" time="2026-01-25 10:53:50"/>
   <change type="availability" amount="3" ids="22958,23180,23640" time="2026-01-25 16:20:10"/>

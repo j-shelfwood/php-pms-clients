@@ -63,4 +63,76 @@ describe('PropertiesEndpointTest', function () {
         expect($response)->toBeInstanceOf(PropertiesResponse::class);
         expect($response->properties)->toBeInstanceOf(\Illuminate\Support\Collection::class)->toBeEmpty();
     });
+
+    test('it handles single property without array wrapper', function () {
+        $xml = file_get_contents(TestHelpers::getMockFilePath('property-by-id.xml'));
+
+        $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockStream = $this->createMock(\Psr\Http\Message\StreamInterface::class);
+        $mockStream->method('getContents')->willReturn($xml);
+        $mockResponse->method('getBody')->willReturn($mockStream);
+        $this->mockHttpClient->method('request')->willReturn($mockResponse);
+
+        $response = $this->api->properties();
+
+        expect($response)->toBeInstanceOf(PropertiesResponse::class);
+        expect($response->properties)->toHaveCount(1);
+        expect($response->properties->first())->toBeInstanceOf(PropertyDetails::class);
+    });
+
+    test('it correctly parses property status enum', function () {
+        $xml = file_get_contents(TestHelpers::getMockFilePath('all-properties.xml'));
+
+        $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockStream = $this->createMock(\Psr\Http\Message\StreamInterface::class);
+        $mockStream->method('getContents')->willReturn($xml);
+        $mockResponse->method('getBody')->willReturn($mockStream);
+        $this->mockHttpClient->method('request')->willReturn($mockResponse);
+
+        $response = $this->api->properties();
+
+        // All properties should have a valid status or null
+        foreach ($response->properties as $property) {
+            if ($property->status !== null) {
+                expect($property->status)->toBeInstanceOf(PropertyStatus::class);
+            }
+        }
+    });
+
+    test('it extracts property IDs correctly', function () {
+        $xml = file_get_contents(TestHelpers::getMockFilePath('all-properties.xml'));
+
+        $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockStream = $this->createMock(\Psr\Http\Message\StreamInterface::class);
+        $mockStream->method('getContents')->willReturn($xml);
+        $mockResponse->method('getBody')->willReturn($mockStream);
+        $this->mockHttpClient->method('request')->willReturn($mockResponse);
+
+        $response = $this->api->properties();
+
+        // All properties must have positive integer IDs
+        foreach ($response->properties as $property) {
+            expect($property->external_id)->toBeInt()->toBeGreaterThan(0);
+        }
+    });
+
+    test('it preserves property order from XML', function () {
+        $xml = file_get_contents(TestHelpers::getMockFilePath('all-properties.xml'));
+
+        $mockResponse = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $mockStream = $this->createMock(\Psr\Http\Message\StreamInterface::class);
+        $mockStream->method('getContents')->willReturn($xml);
+        $mockResponse->method('getBody')->willReturn($mockStream);
+        $this->mockHttpClient->method('request')->willReturn($mockResponse);
+
+        $response = $this->api->properties();
+
+        // Collection should maintain insertion order
+        $properties = $response->properties;
+        expect($properties)->toBeInstanceOf(\Illuminate\Support\Collection::class);
+
+        // Verify it's a sequential collection (not keyed by ID)
+        $keys = $properties->keys()->toArray();
+        expect($keys)->toBe(range(0, $properties->count() - 1));
+    });
 });

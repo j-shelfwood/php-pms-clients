@@ -1,0 +1,117 @@
+name: Validate Mocks
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+  workflow_dispatch:
+    # Allow manual triggering
+
+  pull_request:
+    paths:
+      - 'mocks/**/*.xml'
+      - 'mocks/**/*.json'
+      - 'src/**/Responses/**'
+      - 'scripts/validate-mocks.php'
+
+jobs:
+  validate-bookingmanager:
+    name: Validate BookingManager Mocks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Validate BookingManager mocks
+        env:
+          BM_API_KEY: ${{ secrets.BM_API_KEY }}
+          BM_BASE_URL: ${{ secrets.BM_BASE_URL }}
+        run: php scripts/validate-mocks.php --provider=bookingmanager
+
+      - name: Notify on failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            ⚠️ BookingManager mock validation failed!
+            Mocks may be out of sync with API.
+            Please review: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  validate-mews:
+    name: Validate Mews Mocks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Validate Mews mocks
+        env:
+          MEWS_CLIENT_TOKEN: ${{ secrets.MEWS_CLIENT_TOKEN }}
+          MEWS_ACCESS_TOKEN: ${{ secrets.MEWS_ACCESS_TOKEN }}
+          MEWS_BASE_URL: 'https://api.mews-demo.com'
+        run: |
+          echo "⏭️  Mews validation not yet implemented"
+          # php scripts/validate-mocks.php --provider=mews
+
+  integration-tests:
+    name: Run Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run BookingManager integration tests
+        env:
+          BM_API_KEY: ${{ secrets.BM_API_KEY }}
+          BM_BASE_URL: ${{ secrets.BM_BASE_URL }}
+        run: vendor/bin/pest --group=integration,bookingmanager
+
+      - name: Run Mews integration tests
+        env:
+          MEWS_CLIENT_TOKEN: ${{ secrets.MEWS_CLIENT_TOKEN }}
+          MEWS_ACCESS_TOKEN: ${{ secrets.MEWS_ACCESS_TOKEN }}
+          MEWS_BASE_URL: 'https://api.mews-demo.com'
+        run: |
+          echo "⏭️  Mews integration tests not yet implemented"
+          # vendor/bin/pest --group=integration,mews

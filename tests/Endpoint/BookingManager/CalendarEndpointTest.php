@@ -95,4 +95,84 @@ describe('CalendarEndpointTest', function () {
         expect($secondDay->rate->final)->toBe(0.0); // No rate data from availability.xml
     });
 
+    test('it handles empty calendar gracefully', function () {
+        $mockXml = '<?xml version="1.0" encoding="UTF-8"?>
+<calendars>
+    <calendar property_id="12345"/>
+</calendars>';
+
+        $mockHttpResponse = $this->createMock(ResponseInterface::class);
+        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream->method('getContents')->willReturn($mockXml);
+        $mockHttpResponse->method('getBody')->willReturn($mockStream);
+        $this->mockHttpClient->method('request')->willReturn($mockHttpResponse);
+
+        $startDate = Carbon::parse('2024-01-01');
+        $endDate = Carbon::parse('2024-01-31');
+
+        $response = $this->api->calendar(12345, $startDate, $endDate);
+
+        expect($response)->toBeInstanceOf(CalendarResponse::class);
+        expect($response->propertyId)->toBe(12345);
+        expect($response->days)->toBeArray()->toBeEmpty();
+    });
+
+    test('it handles multiple unavailable periods in availability response', function () {
+        $mockXml = '<?xml version="1.0" encoding="UTF-8"?>
+<response>
+    <unavailable property_id="999">
+        <start>2024-01-05</start>
+        <end>2024-01-07</end>
+        <modified>2024-01-01 10:00:00</modified>
+    </unavailable>
+    <unavailable property_id="999">
+        <start>2024-01-15</start>
+        <end>2024-01-17</end>
+        <modified>2024-01-01 11:00:00</modified>
+    </unavailable>
+</response>';
+
+        $mockHttpResponse = $this->createMock(ResponseInterface::class);
+        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream->method('getContents')->willReturn($mockXml);
+        $mockHttpResponse->method('getBody')->willReturn($mockStream);
+        $this->mockHttpClient->method('request')->willReturn($mockHttpResponse);
+
+        $startDate = Carbon::parse('2024-01-01');
+        $endDate = Carbon::parse('2024-01-20');
+
+        $response = $this->api->availability(999, $startDate, $endDate);
+
+        expect($response)->toBeInstanceOf(CalendarResponse::class);
+        expect($response->days)->toHaveCount(20);
+
+        // Count unavailable days (Jan 5-7: 3 days, Jan 15-17: 3 days = 6 total)
+        $unavailableDays = array_filter($response->days, fn($d) => $d->available === 0);
+        expect(count($unavailableDays))->toBe(6);
+    });
+
+    test('it preserves calendar day order', function () {
+        $xml = file_get_contents(__DIR__ . '/../../../mocks/bookingmanager/calendar-date-range.xml');
+
+        $mockHttpResponse = $this->createMock(ResponseInterface::class);
+        $mockStream = $this->createMock(StreamInterface::class);
+        $mockStream->method('getContents')->willReturn($xml);
+        $mockHttpResponse->method('getBody')->willReturn($mockStream);
+        $this->mockHttpClient->method('request')->willReturn($mockHttpResponse);
+
+        $startDate = Carbon::parse('2023-11-01');
+        $endDate = Carbon::parse('2023-11-07');
+
+        $response = $this->api->calendar(22958, $startDate, $endDate);
+
+        // Days should be in chronological order
+        $previousDate = null;
+        foreach ($response->days as $day) {
+            if ($previousDate !== null) {
+                expect($day->day->greaterThanOrEqualTo($previousDate))->toBeTrue();
+            }
+            $previousDate = $day->day;
+        }
+    });
+
 });
