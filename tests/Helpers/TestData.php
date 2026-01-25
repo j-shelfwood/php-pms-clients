@@ -425,20 +425,30 @@ yes',
 
     /**
      * Golden Master data for calendar-changes.xml mock
+     *
+     * Updated to match actual BookingManager API format (2026):
+     * - No root-level amount/time attributes
+     * - Changes grouped by type (details, availability, rate)
+     * - Property IDs in comma-separated 'ids' attribute
+     * - No 'months' attribute (API doesn't provide month-level granularity)
      */
     public static function getExpectedCalendarChangesData(): array
     {
         return [
-            'amount' => 2,
-            'time' => '2023-11-12T12:00:00.000000Z',
+            'amount' => 3, // 3 unique property IDs across all change types
+            'time' => '2026-01-25T16:20:10.000000Z', // Latest timestamp across all changes
             'changes' => [
                 [
                     'propertyId' => 22958,
-                    'months' => ['2023-11', '2023-12', '2024-01', '2024-02', '2024-03', '2024-04', '2024-05', '2024-06', '2024-07', '2024-08', '2024-09', '2024-10', '2024-11']
+                    'months' => [] // BookingManager API doesn't provide month data
                 ],
                 [
                     'propertyId' => 23180,
-                    'months' => ['2024-02', '2024-03', '2024-04', '2024-05', '2024-06', '2024-07', '2024-08', '2024-09', '2024-10', '2024-11']
+                    'months' => []
+                ],
+                [
+                    'propertyId' => 23640,
+                    'months' => []
                 ]
             ]
         ];
