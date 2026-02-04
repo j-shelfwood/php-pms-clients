@@ -277,3 +277,164 @@ it('updates customer via payload', function () {
     expect($customer->id)->toBe('customer-123');
 });
 
+it('adds external payment with required parameters', function () {
+    $mockData = json_decode(
+        file_get_contents(__DIR__ . '/../../mocks/mews/responses/payments-addexternal.json'),
+        true
+    );
+
+    $mockResponse = new Response(200, [], json_encode($mockData));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/api/connector/v1/payments/addExternal#'),
+            Mockery::on(function ($options) {
+                $body = $options['json'];
+                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'Client', 'AccountId', 'Amount']);
+                expect($body['AccountId'])->toBe('35d4b117-4e60-44a3-9580-c582117eff98');
+                expect($body['Amount'])->toBe(['Currency' => 'GBP', 'GrossValue' => 10000]);
+                return true;
+            })
+        )
+        ->andReturn($mockResponse);
+
+    $api = new MewsConnectorAPI($this->config, $httpClient);
+
+    $result = $api->addExternalPayment([
+        'AccountId' => '35d4b117-4e60-44a3-9580-c582117eff98',
+        'Amount' => [
+            'Currency' => 'GBP',
+            'GrossValue' => 10000
+        ]
+    ]);
+
+    expect($result)->toBeArray()
+        ->toHaveKey('ExternalPaymentId')
+        ->and($result['ExternalPaymentId'])->toBe('4ee05b77-ae21-46e8-8418-ac1c009dfb2b');
+});
+
+it('adds external payment with all optional parameters', function () {
+    $mockData = json_decode(
+        file_get_contents(__DIR__ . '/../../mocks/mews/responses/payments-addexternal.json'),
+        true
+    );
+
+    $mockResponse = new Response(200, [], json_encode($mockData));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/api/connector/v1/payments/addExternal#'),
+            Mockery::on(function ($options) {
+                $body = $options['json'];
+                expect($body)->toHaveKeys([
+                    'ClientToken', 'AccessToken', 'Client',
+                    'AccountId', 'Amount', 'Type', 'ExternalIdentifier',
+                    'ReservationId', 'Notes', 'EnterpriseId'
+                ]);
+                expect($body['Type'])->toBe('Cash');
+                expect($body['ExternalIdentifier'])->toBe('stripe-pi_abc123');
+                expect($body['ReservationId'])->toBe('reservation-uuid-123');
+                expect($body['Notes'])->toBe('Stripe payment: pi_abc123');
+                expect($body['EnterpriseId'])->toBe('enterprise-uuid-456');
+                return true;
+            })
+        )
+        ->andReturn($mockResponse);
+
+    $api = new MewsConnectorAPI($this->config, $httpClient);
+
+    $result = $api->addExternalPayment([
+        'AccountId' => '35d4b117-4e60-44a3-9580-c582117eff98',
+        'Amount' => [
+            'Currency' => 'EUR',
+            'GrossValue' => 15000
+        ],
+        'Type' => 'Cash',
+        'ExternalIdentifier' => 'stripe-pi_abc123',
+        'ReservationId' => 'reservation-uuid-123',
+        'Notes' => 'Stripe payment: pi_abc123',
+        'EnterpriseId' => 'enterprise-uuid-456'
+    ]);
+
+    expect($result)->toBeArray()
+        ->toHaveKey('ExternalPaymentId');
+});
+
+it('adds external payment with BillId parameter', function () {
+    $mockData = json_decode(
+        file_get_contents(__DIR__ . '/../../mocks/mews/responses/payments-addexternal.json'),
+        true
+    );
+
+    $mockResponse = new Response(200, [], json_encode($mockData));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/api/connector/v1/payments/addExternal#'),
+            Mockery::on(function ($options) {
+                $body = $options['json'];
+                expect($body)->toHaveKey('BillId');
+                expect($body['BillId'])->toBe('bill-uuid-789');
+                return true;
+            })
+        )
+        ->andReturn($mockResponse);
+
+    $api = new MewsConnectorAPI($this->config, $httpClient);
+
+    $result = $api->addExternalPayment([
+        'AccountId' => '35d4b117-4e60-44a3-9580-c582117eff98',
+        'Amount' => [
+            'Currency' => 'EUR',
+            'GrossValue' => 20000
+        ],
+        'BillId' => 'bill-uuid-789'
+    ]);
+
+    expect($result)->toBeArray()
+        ->toHaveKey('ExternalPaymentId');
+});
+
+it('adds external payment with accounting category', function () {
+    $mockData = json_decode(
+        file_get_contents(__DIR__ . '/../../mocks/mews/responses/payments-addexternal.json'),
+        true
+    );
+
+    $mockResponse = new Response(200, [], json_encode($mockData));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/api/connector/v1/payments/addExternal#'),
+            Mockery::on(function ($options) {
+                $body = $options['json'];
+                expect($body)->toHaveKey('AccountingCategoryId');
+                expect($body['AccountingCategoryId'])->toBe('category-uuid-999');
+                return true;
+            })
+        )
+        ->andReturn($mockResponse);
+
+    $api = new MewsConnectorAPI($this->config, $httpClient);
+
+    $result = $api->addExternalPayment([
+        'AccountId' => '35d4b117-4e60-44a3-9580-c582117eff98',
+        'Amount' => [
+            'Currency' => 'USD',
+            'GrossValue' => 5000
+        ],
+        'AccountingCategoryId' => 'category-uuid-999'
+    ]);
+
+    expect($result)->toBeArray()
+        ->toHaveKey('ExternalPaymentId');
+});
+

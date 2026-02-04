@@ -684,6 +684,53 @@ class MewsConnectorAPI
     }
 
     // ========================================================================
+    // PAYMENTS
+    // ========================================================================
+
+    /**
+     * Add external payment to customer account.
+     *
+     * Records payment processed outside Mews (e.g., Stripe, bank transfer).
+     * Payment appears in customer bill and can be assigned to reservation.
+     *
+     * Prerequisites:
+     * - External payment type must be enabled in Mews (Settings → Payment Types)
+     * - Customer account must exist (AccountId)
+     * - Amount must be in cents (e.g., €100.00 = 10000)
+     *
+     * @param array $params Payment parameters:
+     *   - AccountId (string, required): Customer or Company UUID
+     *   - Amount (array, required): ['Currency' => 'EUR', 'GrossValue' => cents]
+     *   - Type (string, optional): External payment type (Cash, Invoice, etc.)
+     *   - ExternalIdentifier (string, optional): Reference from external system
+     *   - ReservationId (string, optional): UUID to assign to specific reservation
+     *   - BillId (string, optional): UUID to assign to specific bill
+     *   - Notes (string, optional): Payment description
+     *   - EnterpriseId (string, optional): Required for Portfolio Access Tokens
+     *   - AccountingCategoryId (string, optional): Accounting category UUID
+     *
+     * @return array Response with ExternalPaymentId
+     * @throws MewsApiException If API request fails
+     * @see https://docs.mews.com/connector-api/operations/payments#add-external-payment
+     *
+     * @example
+     * $payment = $api->addExternalPayment([
+     *     'AccountId' => 'customer-uuid',
+     *     'Amount' => ['Currency' => 'EUR', 'GrossValue' => 10000],
+     *     'Type' => 'Cash',
+     *     'ExternalIdentifier' => 'stripe-pi_xxx',
+     *     'ReservationId' => 'reservation-uuid',
+     *     'Notes' => 'Stripe payment: pi_xxx'
+     * ]);
+     * // Returns: ['ExternalPaymentId' => 'payment-uuid']
+     */
+    public function addExternalPayment(array $params): array
+    {
+        $body = $this->httpClient->buildRequestBody($params);
+        return $this->httpClient->post('/api/connector/v1/payments/addExternal', $body);
+    }
+
+    // ========================================================================
     // CONFIGURATION & WEBHOOKS
     // ========================================================================
 
