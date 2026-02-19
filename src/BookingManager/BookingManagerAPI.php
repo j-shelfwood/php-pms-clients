@@ -223,7 +223,7 @@ class BookingManagerAPI extends XMLClient
             'departure' => $departure->format('Y-m-d'),
             'adults' => $adults,
         ];
-        $parsedData = $this->performApiCall('info.xml', $apiParams);
+        $parsedData = $this->performApiCall('info', $apiParams);
 
         // Handle both API response structures:
         // Mock/Test: parsedData['info']['property']['rate']
