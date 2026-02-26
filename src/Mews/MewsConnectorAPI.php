@@ -731,6 +731,64 @@ class MewsConnectorAPI
     }
 
     // ========================================================================
+    // ORDERS
+    // ========================================================================
+
+    /**
+     * Add an order (product/charge) linked to a reservation.
+     *
+     * Used to post tourist tax as a folio item on a Mews reservation.
+     * Order appears on customer bill and reservation folio for accounting tracking.
+     *
+     * Prerequisites:
+     * - Service must exist (ServiceId)
+     * - Customer account must exist (CustomerId)
+     * - Linked reservation must exist (LinkedReservationId)
+     *
+     * @param string $serviceId Service UUID
+     * @param string $customerId Customer UUID
+     * @param string $linkedReservationId Reservation UUID to attach the order to
+     * @param array $items Custom items to post, each with:
+     *   - Name (string): Item description
+     *   - UnitCount (int): Quantity (typically 1 for tourist tax)
+     *   - UnitAmount (array): ['GrossValue' => cents, 'Currency' => string]
+     * @return array Response with order details
+     * @throws MewsApiException If API request fails
+     * @see https://mews-systems.gitbook.io/connector-api/operations/orders#add-order
+     *
+     * @example
+     * $order = $api->addOrder(
+     *     serviceId: 'service-uuid',
+     *     customerId: 'customer-uuid',
+     *     linkedReservationId: 'reservation-uuid',
+     *     items: [[
+     *         'Name' => 'Tourist Tax - City of The Hague',
+     *         'UnitCount' => 1,
+     *         'UnitAmount' => [
+     *             'GrossValue' => 12340, // €123.40 in cents
+     *             'Currency' => 'EUR'
+     *         ]
+     *     ]]
+     * );
+     */
+    public function addOrder(
+        string $serviceId,
+        string $customerId,
+        string $linkedReservationId,
+        array $items
+    ): array {
+        $params = [
+            'ServiceId' => $serviceId,
+            'CustomerId' => $customerId,
+            'LinkedReservationId' => $linkedReservationId,
+            'Items' => $items,
+        ];
+
+        $body = $this->httpClient->buildRequestBody($params);
+        return $this->httpClient->post('/api/connector/v1/orders/add', $body);
+    }
+
+    // ========================================================================
     // CONFIGURATION & WEBHOOKS
     // ========================================================================
 

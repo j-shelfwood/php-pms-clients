@@ -438,3 +438,53 @@ it('adds external payment with accounting category', function () {
         ->toHaveKey('ExternalPaymentId');
 });
 
+it('adds order with tourist tax item linked to reservation', function () {
+    $mockData = [
+        'OrderId' => 'order-uuid-123',
+    ];
+
+    $mockResponse = new Response(200, [], json_encode($mockData));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/api/connector/v1/orders/add#'),
+            Mockery::on(function ($options) {
+                $body = $options['json'];
+                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'Client', 'ServiceId', 'CustomerId', 'LinkedReservationId', 'Items']);
+                expect($body['ServiceId'])->toBe('service-uuid-123');
+                expect($body['CustomerId'])->toBe('customer-uuid-456');
+                expect($body['LinkedReservationId'])->toBe('reservation-uuid-789');
+                expect($body['Items'])->toHaveCount(1);
+                expect($body['Items'][0])->toHaveKeys(['Name', 'UnitCount', 'UnitAmount']);
+                expect($body['Items'][0]['Name'])->toContain('Tourist Tax');
+                expect($body['Items'][0]['UnitCount'])->toBe(1);
+                expect($body['Items'][0]['UnitAmount']['GrossValue'])->toBe(2700.0); // 27 EUR in cents
+                expect($body['Items'][0]['UnitAmount']['Currency'])->toBe('EUR');
+                return true;
+            })
+        )
+        ->andReturn($mockResponse);
+
+    $api = new MewsConnectorAPI($this->config, $httpClient);
+
+    $result = $api->addOrder(
+        serviceId: 'service-uuid-123',
+        customerId: 'customer-uuid-456',
+        linkedReservationId: 'reservation-uuid-789',
+        items: [[
+            'Name' => 'Tourist Tax - City of The Hague (€3/person/night × 3 persons × 3 nights)',
+            'UnitCount' => 1,
+            'UnitAmount' => [
+                'GrossValue' => 2700.0, // 27 EUR in cents
+                'Currency' => 'EUR',
+            ],
+        ]]
+    );
+
+    expect($result)->toBeArray()
+        ->toHaveKey('OrderId')
+        ->and($result['OrderId'])->toBe('order-uuid-123');
+});
+
