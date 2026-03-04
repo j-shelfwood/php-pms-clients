@@ -62,12 +62,29 @@ it('gets all service rates successfully', function () {
     $response = $pricingClient->getServiceRates('ec9d261c-1ef1-4a6e-8565-ad7200d77411');
 
     expect($response)->toBeInstanceOf(RatesResponse::class)
-        ->and($response->items)->toHaveCount(1)
-        ->and($response->items[0]->id)->toBe('11672368-e0d7-4a6d-bd85-ad7200d77428')
-        ->and($response->items[0]->names['en-GB'])->toBe('Fully Flexible')
-        ->and($response->items[0]->type)->toBe(RateType::Public)
-        ->and($response->items[0]->isActive)->toBeTrue()
-        ->and($response->items[0]->isPublic)->toBeTrue();
+        ->and($response->items)->toHaveCount(2);
+
+    // Base rate: Fully Flexible
+    $baseRate = $response->items[0];
+    expect($baseRate->id)->toBe('11672368-e0d7-4a6d-bd85-ad7200d77428')
+        ->and($baseRate->names['en-GB'])->toBe('Fully Flexible')
+        ->and($baseRate->type)->toBe(RateType::Public)
+        ->and($baseRate->isActive)->toBeTrue()
+        ->and($baseRate->isPublic)->toBeTrue()
+        ->and($baseRate->baseRateId)->toBeNull()
+        ->and($baseRate->relativeAdjustment)->toBe(0.0)
+        ->and($baseRate->absoluteAdjustment)->toBe(0.0);
+
+    // Dependent rate: Non Refundable (-7%)
+    $nonRefundableRate = $response->items[1];
+    expect($nonRefundableRate->id)->toBe('22781479-f1e8-4b17-cb96-be3311e88539')
+        ->and($nonRefundableRate->names['en-GB'])->toBe('Non Refundable')
+        ->and($nonRefundableRate->type)->toBe(RateType::Public)
+        ->and($nonRefundableRate->isActive)->toBeTrue()
+        ->and($nonRefundableRate->isPublic)->toBeTrue()
+        ->and($nonRefundableRate->baseRateId)->toBe('11672368-e0d7-4a6d-bd85-ad7200d77428')
+        ->and($nonRefundableRate->relativeAdjustment)->toBe(-0.07)
+        ->and($nonRefundableRate->absoluteAdjustment)->toBe(0.0);
 });
 
 it('gets pricing for rate and date range successfully', function () {

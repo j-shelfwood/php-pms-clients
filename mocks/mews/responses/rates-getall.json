@@ -53,6 +53,47 @@
             },
             "TaxExemptionReason": null,
             "TaxExemptionLegalReference": null
+        },
+        {
+            "Id": "22781479-f1e8-4b17-cb96-be3311e88539",
+            "GroupId": "fc029fg3-g2fd-516g-b552-be4422e88532",
+            "ServiceId": "ec9d261c-1ef1-4a6e-8565-ad7200d77411",
+            "BaseRateId": "11672368-e0d7-4a6d-bd85-ad7200d77428",
+            "IsBaseRate": false,
+            "BusinessSegmentId": null,
+            "IsActive": true,
+            "IsEnabled": true,
+            "IsPublic": true,
+            "IsDefault": false,
+            "Type": "Public",
+            "Name": "Non Refundable",
+            "Names": {
+                "en-GB": "Non Refundable"
+            },
+            "ShortName": "NR",
+            "UpdatedUtc": "2025-09-17T11:22:18Z",
+            "ExternalNames": {
+                "en-GB": "Non Refundable"
+            },
+            "Description": {
+                "en-GB": "No refund possible. Pay directly after making the booking."
+            },
+            "ExternalIdentifier": null,
+            "Options": {
+                "HidePriceFromGuest": false,
+                "IsBonusPointsEligible": false
+            },
+            "Pricing": {
+                "Discriminator": "DependentRatePricing",
+                "BaseRatePricing": null,
+                "DependentRatePricing": {
+                    "BaseRateId": "11672368-e0d7-4a6d-bd85-ad7200d77428",
+                    "RelativeAdjustment": -0.07,
+                    "AbsoluteAdjustment": 0.0
+                }
+            },
+            "TaxExemptionReason": null,
+            "TaxExemptionLegalReference": null
         }
     ],
     "RateGroups": [
@@ -61,6 +102,13 @@
             "ServiceId": "ec9d261c-1ef1-4a6e-8565-ad7200d77411",
             "IsActive": true,
             "Name": "Default",
+            "ExternalIdentifier": null
+        },
+        {
+            "Id": "fc029fg3-g2fd-516g-b552-be4422e88532",
+            "ServiceId": "ec9d261c-1ef1-4a6e-8565-ad7200d77411",
+            "IsActive": true,
+            "Name": "Non Refundable",
             "ExternalIdentifier": null
         }
     ],
