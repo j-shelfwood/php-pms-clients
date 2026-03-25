@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+    <error>
+        <code>300</code>
+        <message>No results</message>
+    </error>
+</response>

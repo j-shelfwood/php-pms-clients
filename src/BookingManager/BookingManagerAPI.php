@@ -173,7 +173,25 @@ class BookingManagerAPI extends XMLClient
             'end' => $endDate->format('Y-m-d'),
         ];
 
-        $parsedData = $this->performApiCall('calendar', $apiParams);
+        try {
+            $parsedData = $this->performApiCall('calendar', $apiParams);
+        } catch (ApiException $e) {
+            // "No results" (code 300) is a transient BookingManager response meaning
+            // no calendar data is available for this property/range right now.
+            // Return empty response instead of throwing — existing calendar data
+            // in the consumer is preserved since upserts only run on non-empty results.
+            if ($e->getCode() === 300 && str_contains($e->getMessage(), 'No results')) {
+                $this->logger->warning('BookingManager calendar returned "No results" — returning empty response', [
+                    'property_id' => $propertyId,
+                    'start' => $startDate->format('Y-m-d'),
+                    'end' => $endDate->format('Y-m-d'),
+                ]);
+
+                return new CalendarResponse($propertyId, []);
+            }
+
+            throw $e;
+        }
 
         // CalendarResponse::map() handles calendar.xml format when no startDate/endDate are provided
         return CalendarResponse::map($parsedData);
@@ -198,7 +216,21 @@ class BookingManagerAPI extends XMLClient
             'end' => $endDate->format('Y-m-d'),
         ];
 
-        $parsedData = $this->performApiCall('availability', $apiParams);
+        try {
+            $parsedData = $this->performApiCall('availability', $apiParams);
+        } catch (ApiException $e) {
+            if ($e->getCode() === 300 && str_contains($e->getMessage(), 'No results')) {
+                $this->logger->warning('BookingManager availability returned "No results" — returning empty response', [
+                    'property_id' => $propertyId,
+                    'start' => $startDate->format('Y-m-d'),
+                    'end' => $endDate->format('Y-m-d'),
+                ]);
+
+                return new CalendarResponse($propertyId, []);
+            }
+
+            throw $e;
+        }
 
         // CalendarResponse::map() handles availability.xml format when startDate/endDate are provided
         return CalendarResponse::map($parsedData, $startDate, $endDate);
