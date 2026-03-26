@@ -12,7 +12,7 @@ it('maps rates response from API', function () {
     $response = RatesResponse::map($mockData);
 
     expect($response->items)->toBeInstanceOf(Collection::class)
-        ->and($response->items)->toHaveCount(1)
+        ->and($response->items)->toHaveCount(2)
         ->and($response->items[0])->toBeInstanceOf(Rate::class)
         ->and($response->items[0]->type)->toBe(RateType::Public)
         ->and($response->rateGroups)->toBeArray()

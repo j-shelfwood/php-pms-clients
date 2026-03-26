@@ -144,7 +144,7 @@ it('filters by resource category IDs', function () {
     );
 });
 
-it('finds minimum stay for date and category', function () {
+it('returns most restrictive minimum stay when multiple Stay restrictions overlap', function () {
     $restrictions = [
         Restriction::map([
             'Id' => 'restriction-1',
@@ -157,9 +157,7 @@ it('finds minimum stay for date and category', function () {
                 'Days' => [],
                 'Hours' => [],
             ],
-            'Exceptions' => [
-                'MinLength' => 'P0M3DT0H0M0S',
-            ],
+            'Exceptions' => ['MinLength' => 'P0M3DT0H0M0S'],
         ]),
         Restriction::map([
             'Id' => 'restriction-2',
@@ -172,27 +170,17 @@ it('finds minimum stay for date and category', function () {
                 'Days' => [],
                 'Hours' => [],
             ],
-            'Exceptions' => [
-                'MinLength' => 'P0M5DT0H0M0S',
-            ],
+            'Exceptions' => ['MinLength' => 'P0M5DT0H0M0S'],
         ]),
     ];
 
-    $httpClient = Mockery::mock(Client::class);
-    $mewsClient = new MewsHttpClient($this->config, $httpClient);
-    $restrictionsClient = new RestrictionsClient($mewsClient);
+    $restrictionsClient = new RestrictionsClient(new MewsHttpClient($this->config, Mockery::mock(Client::class)));
 
-    // Date within both restrictions (should return first one found)
-    $minimumStay = $restrictionsClient->findMinimumStayForDate(
-        restrictions: $restrictions,
-        date: Carbon::parse('2025-12-28'),
-        resourceCategoryId: 'category-1'
-    );
-
-    expect($minimumStay)->toBe('P0M3DT0H0M0S');
+    // Date within both — 5 nights wins over 3 nights
+    expect($restrictionsClient->findMinimumStayForDate($restrictions, Carbon::parse('2025-12-28'), 'category-1'))->toBe(5);
 });
 
-it('finds minimum stay when only one restriction applies', function () {
+it('returns minimum stay as int for single matching Stay restriction', function () {
     $restrictions = [
         Restriction::map([
             'Id' => 'restriction-1',
@@ -205,23 +193,13 @@ it('finds minimum stay when only one restriction applies', function () {
                 'Days' => [],
                 'Hours' => [],
             ],
-            'Exceptions' => [
-                'MinLength' => 'P0M3DT0H0M0S',
-            ],
+            'Exceptions' => ['MinLength' => 'P0M3DT0H0M0S'],
         ]),
     ];
 
-    $httpClient = Mockery::mock(Client::class);
-    $mewsClient = new MewsHttpClient($this->config, $httpClient);
-    $restrictionsClient = new RestrictionsClient($mewsClient);
+    $restrictionsClient = new RestrictionsClient(new MewsHttpClient($this->config, Mockery::mock(Client::class)));
 
-    $minimumStay = $restrictionsClient->findMinimumStayForDate(
-        restrictions: $restrictions,
-        date: Carbon::parse('2025-12-25'),
-        resourceCategoryId: 'category-1'
-    );
-
-    expect($minimumStay)->toBe('P0M3DT0H0M0S');
+    expect($restrictionsClient->findMinimumStayForDate($restrictions, Carbon::parse('2025-12-25'), 'category-1'))->toBe(3);
 });
 
 it('returns null when no restrictions apply for date', function () {
@@ -237,24 +215,13 @@ it('returns null when no restrictions apply for date', function () {
                 'Days' => [],
                 'Hours' => [],
             ],
-            'Exceptions' => [
-                'MinLength' => 'P0M3DT0H0M0S',
-            ],
+            'Exceptions' => ['MinLength' => 'P0M3DT0H0M0S'],
         ]),
     ];
 
-    $httpClient = Mockery::mock(Client::class);
-    $mewsClient = new MewsHttpClient($this->config, $httpClient);
-    $restrictionsClient = new RestrictionsClient($mewsClient);
+    $restrictionsClient = new RestrictionsClient(new MewsHttpClient($this->config, Mockery::mock(Client::class)));
 
-    // Date outside restriction range
-    $minimumStay = $restrictionsClient->findMinimumStayForDate(
-        restrictions: $restrictions,
-        date: Carbon::parse('2025-11-01'),
-        resourceCategoryId: 'category-1'
-    );
-
-    expect($minimumStay)->toBeNull();
+    expect($restrictionsClient->findMinimumStayForDate($restrictions, Carbon::parse('2025-11-01'), 'category-1'))->toBeNull();
 });
 
 it('returns null when no restrictions apply for category', function () {
@@ -270,27 +237,16 @@ it('returns null when no restrictions apply for category', function () {
                 'Days' => [],
                 'Hours' => [],
             ],
-            'Exceptions' => [
-                'MinLength' => 'P0M3DT0H0M0S',
-            ],
+            'Exceptions' => ['MinLength' => 'P0M3DT0H0M0S'],
         ]),
     ];
 
-    $httpClient = Mockery::mock(Client::class);
-    $mewsClient = new MewsHttpClient($this->config, $httpClient);
-    $restrictionsClient = new RestrictionsClient($mewsClient);
+    $restrictionsClient = new RestrictionsClient(new MewsHttpClient($this->config, Mockery::mock(Client::class)));
 
-    // Different category
-    $minimumStay = $restrictionsClient->findMinimumStayForDate(
-        restrictions: $restrictions,
-        date: Carbon::parse('2025-12-25'),
-        resourceCategoryId: 'category-2'
-    );
-
-    expect($minimumStay)->toBeNull();
+    expect($restrictionsClient->findMinimumStayForDate($restrictions, Carbon::parse('2025-12-25'), 'category-2'))->toBeNull();
 });
 
-it('handles restrictions without minimum stay set', function () {
+it('ignores Start and End type restrictions for minimum stay', function () {
     $restrictions = [
         Restriction::map([
             'Id' => 'restriction-1',
@@ -303,23 +259,37 @@ it('handles restrictions without minimum stay set', function () {
                 'Days' => [],
                 'Hours' => [],
             ],
-            'Exceptions' => [
-                'MinLength' => null,
-            ],
+            'Exceptions' => ['MinLength' => 'P0M5DT0H0M0S'],
         ]),
     ];
 
-    $httpClient = Mockery::mock(Client::class);
-    $mewsClient = new MewsHttpClient($this->config, $httpClient);
-    $restrictionsClient = new RestrictionsClient($mewsClient);
+    $restrictionsClient = new RestrictionsClient(new MewsHttpClient($this->config, Mockery::mock(Client::class)));
 
-    $minimumStay = $restrictionsClient->findMinimumStayForDate(
-        restrictions: $restrictions,
-        date: Carbon::parse('2025-12-25'),
-        resourceCategoryId: 'category-1'
-    );
+    // Start-type restriction must not affect stay_minimum
+    expect($restrictionsClient->findMinimumStayForDate($restrictions, Carbon::parse('2025-12-25'), 'category-1'))->toBeNull();
+});
 
-    expect($minimumStay)->toBeNull();
+it('applies open-ended restrictions with null startUtc and endUtc', function () {
+    $restrictions = [
+        Restriction::map([
+            'Id' => 'restriction-1',
+            'ServiceId' => 'service-1',
+            'Conditions' => [
+                'Type' => 'Stay',
+                'ResourceCategoryId' => null,
+                'StartUtc' => null,
+                'EndUtc' => null,
+                'Days' => [],
+                'Hours' => [],
+            ],
+            'Exceptions' => ['MinLength' => 'P0M7DT0H0M0S'],
+        ]),
+    ];
+
+    $restrictionsClient = new RestrictionsClient(new MewsHttpClient($this->config, Mockery::mock(Client::class)));
+
+    // Any date, any category — restriction applies indefinitely to all categories
+    expect($restrictionsClient->findMinimumStayForDate($restrictions, Carbon::parse('2030-06-15'), 'any-category'))->toBe(7);
 });
 
 it('detects infinite loop when API returns same cursor repeatedly', function () {

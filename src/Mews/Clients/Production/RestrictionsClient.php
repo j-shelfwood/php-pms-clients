@@ -85,35 +85,62 @@ class RestrictionsClient
     }
 
     /**
-     * Find minimum stay requirement for a specific date and resource category
+     * Find minimum stay requirement for a specific date and resource category.
+     *
+     * Only Stay-type restrictions govern minimum stay length. Start/End restrictions
+     * control check-in/check-out day eligibility and do not affect stay_minimum.
+     *
+     * Handles open-ended restrictions (null startUtc/endUtc = applies indefinitely).
+     * Returns the most restrictive (longest) minimum stay when multiple apply.
      *
      * @param array<Restriction> $restrictions All restrictions data
      * @param Carbon $date Date to check
      * @param string $resourceCategoryId Resource category UUID
-     * @return string|null Maximum applicable minimum stay (ISO 8601 duration), or null if none found
+     * @return int|null Most restrictive minimum stay in nights, or null if none found
      */
-    public function findMinimumStayForDate(array $restrictions, Carbon $date, string $resourceCategoryId): ?string
+    public function findMinimumStayForDate(array $restrictions, Carbon $date, string $resourceCategoryId): ?int
     {
-        $applicableStays = [];
+        $maxNights = null;
 
         foreach ($restrictions as $restriction) {
-            if ($restriction->conditions->resourceCategoryId !== $resourceCategoryId) {
+            $conditions = $restriction->conditions;
+
+            // Only Stay-type restrictions govern minimum stay length
+            if ($conditions->type->value !== 'Stay') {
                 continue;
             }
 
-            $start = Carbon::parse($restriction->conditions->startUtc);
-            $end = Carbon::parse($restriction->conditions->endUtc);
+            // Filter by category — null means applies to all categories
+            if ($conditions->resourceCategoryId !== null && $conditions->resourceCategoryId !== $resourceCategoryId) {
+                continue;
+            }
 
-            if ($date->between($start, $end)) {
-                if ($restriction->exceptions->minLength !== null) {
-                    $applicableStays[] = $restriction->exceptions->minLength;
-                }
+            // Handle open-ended restrictions (null start/end = applies indefinitely)
+            $start = $conditions->startUtc !== null ? Carbon::parse($conditions->startUtc) : null;
+            $end = $conditions->endUtc !== null ? Carbon::parse($conditions->endUtc) : null;
+
+            $inRange = ($start === null || $start->lte($date)) && ($end === null || $end->gte($date));
+
+            if (! $inRange) {
+                continue;
+            }
+
+            $minLength = $restriction->exceptions->minLength ?? null;
+            if ($minLength === null) {
+                continue;
+            }
+
+            try {
+                $nights = (int) (new \DateInterval($minLength))->d;
+            } catch (\Exception) {
+                continue;
+            }
+
+            if ($nights > 0 && ($maxNights === null || $nights > $maxNights)) {
+                $maxNights = $nights;
             }
         }
 
-        // Return the most restrictive (longest) minimum stay
-        // For simplicity, return the first one found. A proper implementation
-        // would parse ISO 8601 durations and compare them.
-        return !empty($applicableStays) ? $applicableStays[0] : null;
+        return $maxNights;
     }
 }
