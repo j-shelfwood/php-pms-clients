@@ -7,6 +7,7 @@ use Shelfwood\PhpPms\Mews\Http\MewsHttpClient;
 use Shelfwood\PhpPms\Mews\Responses\RestrictionsResponse;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Restriction;
 use Shelfwood\PhpPms\Mews\Exceptions\MewsApiException;
+use Shelfwood\PhpPms\Mews\Support\RestrictionMinStayResolver;
 
 class RestrictionsClient
 {
@@ -100,47 +101,6 @@ class RestrictionsClient
      */
     public function findMinimumStayForDate(array $restrictions, Carbon $date, string $resourceCategoryId): ?int
     {
-        $maxNights = null;
-
-        foreach ($restrictions as $restriction) {
-            $conditions = $restriction->conditions;
-
-            // Only Stay-type restrictions govern minimum stay length
-            if ($conditions->type->value !== 'Stay') {
-                continue;
-            }
-
-            // Filter by category — null means applies to all categories
-            if ($conditions->resourceCategoryId !== null && $conditions->resourceCategoryId !== $resourceCategoryId) {
-                continue;
-            }
-
-            // Handle open-ended restrictions (null start/end = applies indefinitely)
-            $start = $conditions->startUtc !== null ? Carbon::parse($conditions->startUtc) : null;
-            $end = $conditions->endUtc !== null ? Carbon::parse($conditions->endUtc) : null;
-
-            $inRange = ($start === null || $start->lte($date)) && ($end === null || $end->gte($date));
-
-            if (! $inRange) {
-                continue;
-            }
-
-            $minLength = $restriction->exceptions->minLength ?? null;
-            if ($minLength === null) {
-                continue;
-            }
-
-            try {
-                $nights = (int) (new \DateInterval($minLength))->d;
-            } catch (\Exception) {
-                continue;
-            }
-
-            if ($nights > 0 && ($maxNights === null || $nights > $maxNights)) {
-                $maxNights = $nights;
-            }
-        }
-
-        return $maxNights;
+        return RestrictionMinStayResolver::resolveForDate($restrictions, $date, $resourceCategoryId);
     }
 }
