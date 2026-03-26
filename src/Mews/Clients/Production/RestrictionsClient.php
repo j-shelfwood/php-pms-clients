@@ -16,9 +16,17 @@ class RestrictionsClient
     ) {}
 
     /**
-     * Get all restrictions for a service across a date range
+     * Maximum days per request allowed by the Mews API.
+     * Requests exceeding this will return a 400 Bad Request error.
+     */
+    private const MAX_RANGE_DAYS = 90;
+
+    /**
+     * Get all restrictions for a service across a date range.
      *
-     * Handles cursor-based pagination with infinite loop protection.
+     * Automatically chunks requests into ≤90-day windows when the range exceeds
+     * the Mews API limit of 100 days (we use 90 for safety margin).
+     * Handles cursor-based pagination with infinite loop protection per chunk.
      * The Mews API has a bug where it can return the same cursor indefinitely.
      *
      * @param string $serviceId Service UUID
@@ -34,6 +42,36 @@ class RestrictionsClient
         Carbon $end,
         ?array $resourceCategoryIds = null
     ): RestrictionsResponse {
+        $allRestrictions = [];
+        $chunkStart = $start->copy();
+
+        while ($chunkStart->lte($end)) {
+            $chunkEnd = $chunkStart->copy()->addDays(self::MAX_RANGE_DAYS - 1);
+            if ($chunkEnd->gt($end)) {
+                $chunkEnd = $end->copy();
+            }
+
+            $chunkItems = $this->fetchChunk($serviceId, $chunkStart, $chunkEnd, $resourceCategoryIds);
+            $allRestrictions = array_merge($allRestrictions, $chunkItems);
+
+            $chunkStart->addDays(self::MAX_RANGE_DAYS);
+        }
+
+        return new RestrictionsResponse(items: collect($allRestrictions));
+    }
+
+    /**
+     * Fetch all pages of restrictions for a single ≤90-day chunk.
+     *
+     * @return array<Restriction>
+     * @throws MewsApiException
+     */
+    private function fetchChunk(
+        string $serviceId,
+        Carbon $start,
+        Carbon $end,
+        ?array $resourceCategoryIds
+    ): array {
         $allRestrictions = [];
         $cursor = null;
         $seenCursors = [];
@@ -73,16 +111,16 @@ class RestrictionsClient
             $response = $this->httpClient->post('/api/connector/v1/restrictions/getAll', $body);
 
             $pageResponse = RestrictionsResponse::map($response);
-            
+
             // Only merge results if we haven't seen this cursor before
             if ($cursor === null || !isset($seenCursors[$cursor])) {
                 $allRestrictions = array_merge($allRestrictions, $pageResponse->items->all());
             }
-            
+
             $cursor = $pageResponse->cursor;
         } while ($cursor !== null);
 
-        return new RestrictionsResponse(items: collect($allRestrictions));
+        return $allRestrictions;
     }
 
     /**

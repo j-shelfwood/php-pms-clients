@@ -50,7 +50,7 @@ it('gets all restrictions for service and date range', function () {
     $response = $restrictionsClient->getAll(
         serviceId: 'bd26d8db-86a4-4f18-9e94-1b2362a1073c',
         start: Carbon::parse('2025-07-01'),
-        end: Carbon::parse('2025-12-31')
+        end: Carbon::parse('2025-09-01') // 62 days — single chunk
     );
 
     expect($response)->toBeInstanceOf(RestrictionsResponse::class)
@@ -109,7 +109,7 @@ it('handles paginated responses with cursor', function () {
     $response = $restrictionsClient->getAll(
         serviceId: 'test-service',
         start: Carbon::parse('2025-01-01'),
-        end: Carbon::parse('2025-12-31')
+        end: Carbon::parse('2025-03-01') // 59 days — single chunk
     );
 
     // Should aggregate both pages
@@ -139,7 +139,7 @@ it('filters by resource category IDs', function () {
     $restrictionsClient->getAll(
         serviceId: 'test-service',
         start: Carbon::parse('2025-01-01'),
-        end: Carbon::parse('2025-12-31'),
+        end: Carbon::parse('2025-03-01'), // 59 days — single chunk
         resourceCategoryIds: ['category-1', 'category-2']
     );
 });
@@ -292,6 +292,39 @@ it('applies open-ended restrictions with null startUtc and endUtc', function () 
     expect($restrictionsClient->findMinimumStayForDate($restrictions, Carbon::parse('2030-06-15'), 'any-category'))->toBe(7);
 });
 
+it('chunks requests when date range exceeds 90 days', function () {
+    $mockResponse = new Response(200, [], json_encode($this->mockData));
+
+    $httpClient = Mockery::mock(Client::class);
+
+    // Range of 180 days → 2 chunks of ≤90 days each
+    $httpClient->shouldReceive('post')
+        ->twice() // Exactly 2 API calls
+        ->with(
+            Mockery::pattern('#/api/connector/v1/restrictions/getAll#'),
+            Mockery::on(function ($options) {
+                $body = $options['json'];
+                $start = Carbon::parse($body['CollidingUtc']['StartUtc']);
+                $end = Carbon::parse($body['CollidingUtc']['EndUtc']);
+                // Each chunk must be ≤90 days
+                expect($end->diffInDays($start))->toBeLessThanOrEqual(89);
+                return true;
+            })
+        )
+        ->andReturn($mockResponse);
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $restrictionsClient = new RestrictionsClient($mewsClient);
+
+    $response = $restrictionsClient->getAll(
+        serviceId: 'test-service',
+        start: Carbon::parse('2025-01-01'),
+        end: Carbon::parse('2025-06-29') // 179 days = 2 chunks
+    );
+
+    expect($response)->toBeInstanceOf(RestrictionsResponse::class);
+});
+
 it('detects infinite loop when API returns same cursor repeatedly', function () {
     // Mock API returning same cursor on every request (infinite loop bug)
     $infinitePage = [
@@ -302,7 +335,7 @@ it('detects infinite loop when API returns same cursor repeatedly', function () 
     $mockResponse = new Response(200, [], json_encode($infinitePage));
 
     $httpClient = Mockery::mock(Client::class);
-    
+
     // First request (no cursor)
     $httpClient->shouldReceive('post')
         ->once()
@@ -332,11 +365,11 @@ it('detects infinite loop when API returns same cursor repeatedly', function () 
     $mewsClient = new MewsHttpClient($this->config, $httpClient);
     $restrictionsClient = new RestrictionsClient($mewsClient);
 
-    // Should detect infinite loop and break (not hang)
+    // Use a ≤90-day range so only 1 chunk is needed
     $response = $restrictionsClient->getAll(
         serviceId: 'test-service',
         start: Carbon::parse('2025-01-01'),
-        end: Carbon::parse('2025-12-31')
+        end: Carbon::parse('2025-03-01') // 59 days — single chunk
     );
 
     // Should have deduplicated results (only 1 item, not infinite)
@@ -370,11 +403,11 @@ it('throws exception when pagination exceeds maximum pages', function () {
     $mewsClient = new MewsHttpClient($this->config, $httpClient);
     $restrictionsClient = new RestrictionsClient($mewsClient);
 
-    // Should throw exception on 101st attempt (after 100 pages)
+    // Use a ≤90-day range so only 1 chunk is needed — tests per-chunk page limit
     $restrictionsClient->getAll(
         serviceId: 'test-service',
         start: Carbon::parse('2025-01-01'),
-        end: Carbon::parse('2025-12-31')
+        end: Carbon::parse('2025-03-01') // 59 days — single chunk, hits 100-page limit
     );
 })->throws(
     \Shelfwood\PhpPms\Mews\Exceptions\MewsApiException::class,
