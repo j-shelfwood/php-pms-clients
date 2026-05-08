@@ -413,3 +413,43 @@ it('throws exception when pagination exceeds maximum pages', function () {
     \Shelfwood\PhpPms\Mews\Exceptions\MewsApiException::class,
     'Restrictions pagination exceeded 100 pages'
 );
+
+it('exposes getPage() returning a single page with cursor', function () {
+    $firstPage = [
+        'Restrictions' => [$this->mockData['Restrictions'][0]],
+        'Cursor' => 'next-page-token'
+    ];
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/api/connector/v1/restrictions/getAll#'),
+            Mockery::on(function ($options) {
+                $body = $options['json'];
+                expect($body['Cursor'])->toBe('start-cursor')
+                    ->and($body['Limitation']['Count'])->toBe(500);
+                return true;
+            })
+        )
+        ->andReturn(new Response(200, [], json_encode($firstPage)));
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $restrictionsClient = new RestrictionsClient($mewsClient);
+
+    $page = $restrictionsClient->getPage(
+        serviceId: 'svc-1',
+        start: Carbon::parse('2025-07-01'),
+        end: Carbon::parse('2025-08-01'),
+        cursor: 'start-cursor',
+        pageSize: 500
+    );
+
+    expect($page)->toBeInstanceOf(RestrictionsResponse::class)
+        ->and($page->cursor)->toBe('next-page-token')
+        ->and($page->items)->toHaveCount(1);
+});
+
+it('exposes PAGE_SIZE constant', function () {
+    expect(RestrictionsClient::PAGE_SIZE)->toBe(1000);
+});

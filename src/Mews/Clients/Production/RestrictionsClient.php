@@ -22,6 +22,12 @@ class RestrictionsClient
     private const MAX_RANGE_DAYS = 90;
 
     /**
+     * Default page size for restrictions/getAll. Mews returns at most this many
+     * items per cursor page; consumers detect the final page when items < PAGE_SIZE.
+     */
+    public const PAGE_SIZE = 1000;
+
+    /**
      * Get all restrictions for a service across a date range.
      *
      * Automatically chunks requests into ≤90-day windows when the range exceeds
@@ -97,20 +103,14 @@ class RestrictionsClient
                 $seenCursors[$cursor] = true;
             }
 
-            $body = $this->httpClient->buildRequestBody([
-                'ServiceIds' => [$serviceId],
-                'CollidingUtc' => [
-                    'StartUtc' => $start->toIso8601String(),
-                    'EndUtc' => $end->toIso8601String(),
-                ],
-                'ResourceCategoryIds' => $resourceCategoryIds,
-                'Limitation' => ['Count' => 1000],
-                'Cursor' => $cursor,
-            ]);
-
-            $response = $this->httpClient->post('/api/connector/v1/restrictions/getAll', $body);
-
-            $pageResponse = RestrictionsResponse::map($response);
+            $pageResponse = $this->getPage(
+                $serviceId,
+                $start,
+                $end,
+                $cursor,
+                self::PAGE_SIZE,
+                $resourceCategoryIds
+            );
 
             // Only merge results if we haven't seen this cursor before
             if ($cursor === null || !isset($seenCursors[$cursor])) {
@@ -121,6 +121,52 @@ class RestrictionsClient
         } while ($cursor !== null);
 
         return $allRestrictions;
+    }
+
+    /**
+     * Fetch a single page of restrictions for cursor-based pagination.
+     *
+     * Use this when you need fine-grained control over pagination — e.g. when each
+     * page becomes its own queued job rather than being collected in-process.
+     * For most callers prefer `getAll()`, which handles chunking + pagination internally.
+     *
+     * The caller is responsible for:
+     * - Keeping requests within the 100-day API limit (use windows ≤ 90 days for safety)
+     * - Detecting the last page (items < PAGE_SIZE), guarding against the Mews API bug
+     *   where the same cursor is returned indefinitely for single-page result sets
+     * - Driving the loop / dispatching follow-up pages
+     *
+     * @param string $serviceId Service UUID
+     * @param Carbon $start Start date (UTC) — must be within 90 days of $end
+     * @param Carbon $end End date (UTC)
+     * @param string|null $cursor Cursor from previous page (null for first page)
+     * @param int $pageSize Items per page (default: PAGE_SIZE)
+     * @param array<int, string>|null $resourceCategoryIds Specific categories (optional)
+     * @return RestrictionsResponse Single page with cursor for next page (or null if last)
+     * @throws MewsApiException
+     */
+    public function getPage(
+        string $serviceId,
+        Carbon $start,
+        Carbon $end,
+        ?string $cursor = null,
+        int $pageSize = self::PAGE_SIZE,
+        ?array $resourceCategoryIds = null
+    ): RestrictionsResponse {
+        $body = $this->httpClient->buildRequestBody([
+            'ServiceIds' => [$serviceId],
+            'CollidingUtc' => [
+                'StartUtc' => $start->toIso8601String(),
+                'EndUtc' => $end->toIso8601String(),
+            ],
+            'ResourceCategoryIds' => $resourceCategoryIds,
+            'Limitation' => ['Count' => $pageSize],
+            'Cursor' => $cursor,
+        ]);
+
+        $response = $this->httpClient->post('/api/connector/v1/restrictions/getAll', $body);
+
+        return RestrictionsResponse::map($response);
     }
 
     /**

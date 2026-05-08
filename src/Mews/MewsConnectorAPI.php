@@ -367,6 +367,44 @@ class MewsConnectorAPI
         return $this->restrictionsClient->getAll($serviceId, $start, $end, $resourceCategoryIds);
     }
 
+    /**
+     * Fetch a single page of restrictions for cursor-based pagination.
+     *
+     * Use this when you need per-page granularity — e.g. when each page becomes its
+     * own queued job rather than being collected in-process. For most callers prefer
+     * `getRestrictions()` which handles chunking + pagination internally.
+     *
+     * Detect the last page via `$page->items->count() < RestrictionsClient::PAGE_SIZE`.
+     * The Mews API has a bug where it returns the same cursor on the final page; the
+     * size-based check is the only reliable termination signal.
+     *
+     * @param string $serviceId Service UUID
+     * @param Carbon $start Start date (UTC) — must be within 90 days of $end
+     * @param Carbon $end End date (UTC)
+     * @param string|null $cursor Cursor from previous page (null for first page)
+     * @param int $pageSize Items per page (default: RestrictionsClient::PAGE_SIZE)
+     * @param array<int, string>|null $resourceCategoryIds Specific categories (optional)
+     * @return RestrictionsResponse Single page with cursor for next page
+     * @throws MewsApiException
+     */
+    public function getRestrictionsPage(
+        string $serviceId,
+        Carbon $start,
+        Carbon $end,
+        ?string $cursor = null,
+        int $pageSize = RestrictionsClient::PAGE_SIZE,
+        ?array $resourceCategoryIds = null
+    ): RestrictionsResponse {
+        return $this->restrictionsClient->getPage(
+            $serviceId,
+            $start,
+            $end,
+            $cursor,
+            $pageSize,
+            $resourceCategoryIds
+        );
+    }
+
     // ========================================================================
     // CUSTOMERS
     // ========================================================================
