@@ -162,13 +162,29 @@ class ReservationsClient
      */
     public function cancel(string $reservationId, string $reason): Reservation
     {
-        $payload = new UpdateReservationPayload(
-            reservationId: $reservationId,
-            state: ReservationState::Canceled,
-            notes: $reason
-        );
+        // Mews dedicated cancellation endpoint. Sending State=Canceled through
+        // /reservations/update returns 200 but the state silently does NOT
+        // transition — Mews accepts the update, advances UpdatedUtc, and leaves
+        // State at its prior value. Verified against Mews production 2026-05-28.
+        // The correct path per Mews Connector docs is /reservations/cancel
+        // with `ReservationIds` (array) + `Notes`.
+        $body = $this->httpClient->buildRequestBody([
+            'ReservationIds' => [$reservationId],
+            'Notes' => $reason,
+            'PostCancellationFee' => false,
+            'SendEmail' => false,
+        ]);
 
-        return $this->update($payload);
+        $response = $this->httpClient->post('/api/connector/v1/reservations/cancel', $body);
+
+        // /reservations/cancel returns {"ReservationIds": [...]} — it doesn't
+        // echo the full reservation object. Re-fetch to return a Reservation VO
+        // so the existing public contract (Reservation return type) is preserved.
+        if (empty($response['ReservationIds'] ?? [])) {
+            throw new MewsApiException('Failed to cancel reservation', 500);
+        }
+
+        return $this->getById($reservationId);
     }
 
     /**

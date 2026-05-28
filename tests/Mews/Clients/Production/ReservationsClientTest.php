@@ -254,15 +254,35 @@ it('throws exception when update fails', function () {
     $reservationsClient->update($payload);
 })->throws(MewsApiException::class, 'Failed to update reservation');
 
-it('cancels reservation successfully', function () {
+it('cancels reservation via /reservations/cancel and returns the canceled reservation', function () {
+    // Mews /reservations/cancel responds with only {"ReservationIds": [...]}
+    // (no full Reservation object). Client re-fetches via getById to return a
+    // populated Reservation VO. Two HTTP calls expected.
+    $cancelEndpointResponse = new Response(200, [], json_encode([
+        'ReservationIds' => ['bfee2c44-1f84-4326-a862-5289598a6cea'],
+    ]));
+
     $cancelledReservation = $this->mockData['Reservations'][0];
     $cancelledReservation['State'] = 'Canceled';
-    $mockResponse = new Response(200, [], json_encode(['Reservations' => [$cancelledReservation]]));
+    $getByIdResponse = new Response(200, [], json_encode([
+        'Reservations' => [$cancelledReservation],
+        'Customers' => $this->mockData['Customers'] ?? [],
+    ]));
 
     $httpClient = Mockery::mock(Client::class);
+    // Two calls: /reservations/cancel then /reservations/getAll (via getById).
+    // Guzzle's `post($url, $options)` puts the payload under $options['json'].
     $httpClient->shouldReceive('post')
-        ->once()
-        ->andReturn($mockResponse);
+        ->twice()
+        ->andReturnUsing(function ($url, $options) use ($cancelEndpointResponse, $getByIdResponse) {
+            if (str_contains($url, '/reservations/cancel')) {
+                $body = $options['json'] ?? [];
+                expect($body['ReservationIds'] ?? null)->toBe(['bfee2c44-1f84-4326-a862-5289598a6cea']);
+                expect($body['Notes'] ?? null)->toBe('Guest requested cancellation');
+                return $cancelEndpointResponse;
+            }
+            return $getByIdResponse;
+        });
 
     $mewsClient = new MewsHttpClient($this->config, $httpClient);
     $reservationsClient = new ReservationsClient($mewsClient);
@@ -275,6 +295,18 @@ it('cancels reservation successfully', function () {
     expect($reservation)->toBeInstanceOf(Reservation::class)
         ->and($reservation->state)->toBe(ReservationState::Canceled);
 });
+
+it('throws when /reservations/cancel returns empty ReservationIds', function () {
+    $emptyResponse = new Response(200, [], json_encode(['ReservationIds' => []]));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')->once()->andReturn($emptyResponse);
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $reservationsClient = new ReservationsClient($mewsClient);
+
+    $reservationsClient->cancel('bfee2c44-1f84-4326-a862-5289598a6cea', 'reason');
+})->throws(MewsApiException::class, 'Failed to cancel reservation');
 
 it('updates reservation state successfully', function () {
     $confirmedReservation = $this->mockData['Reservations'][0];
