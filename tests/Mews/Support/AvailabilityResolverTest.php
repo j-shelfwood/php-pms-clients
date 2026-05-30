@@ -72,11 +72,25 @@ it('returns false when target category is not present in response', function () 
     expect(AvailabilityResolver::isFullyAvailable($response, 'cat-MISSING'))->toBeFalse();
 });
 
-it('subtracts OutOfOrderBlocks from free capacity', function () {
-    // Usable=3, Occupied=1, OutOfOrder=2 → free=0 → unavailable
+it('errs on the safe side — subtracts OutOfOrderBlocks even though Usable already encodes them', function () {
+    // Live verification revealed Mews itself can refuse reservations/add even when
+    // category-level metrics suggest there is room. We can't reproduce per-resource
+    // continuity from the category metrics, so we keep the conservative OOB
+    // subtraction to avoid promising availability that the PMS will later reject.
+    // pid=5 / d+15 production: Usable=2 OOB=1 Occupied=1 — Mews refused booking.
     $response = makeAvailabilityResponse(
-        ['2026-06-14T22:00:00Z'],
-        ['cat-1' => ['usable' => [3], 'occupied' => [1], 'outOfOrder' => [2]]]
+        ['2026-06-15T22:00:00Z'],
+        ['cat-1' => ['usable' => [2], 'occupied' => [1], 'outOfOrder' => [1]]]
+    );
+
+    expect(AvailabilityResolver::isFullyAvailable($response, 'cat-1'))->toBeFalse();
+});
+
+it('returns false when UsableResources is already zero (fully OOO blocked)', function () {
+    // pid=22 production scenario: Active=[2] OOB=[2] Usable=[0] Occupied=[0].
+    $response = makeAvailabilityResponse(
+        ['2026-07-30T22:00:00Z'],
+        ['cat-1' => ['usable' => [0, 0], 'occupied' => [0, 0], 'outOfOrder' => [2, 2]]]
     );
 
     expect(AvailabilityResolver::isFullyAvailable($response, 'cat-1'))->toBeFalse();
