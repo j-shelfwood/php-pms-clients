@@ -188,11 +188,52 @@ class ReservationsClient
     }
 
     /**
-     * Update reservation state (e.g., Optional → Confirmed)
+     * Confirm a previously-Optional reservation.
+     *
+     * Mews has a dedicated state-transition endpoint for promoting reservations
+     * out of Optional. Sending State=Confirmed through /reservations/update
+     * returns 200 but silently does NOT transition state — Mews accepts the
+     * update, advances UpdatedUtc, and leaves State at Optional. Verified
+     * empirically against Mews production 2026-05-30 (probe reservation
+     * 91277ea1-e6d3-4bdb-a658-b45a0143d1c6: update→200+no change, confirm→200+Confirmed).
+     *
+     * Mews rejects duplicate confirmation with 403 "Cannot confirm order".
+     * Mews rejects confirmation of cancelled reservations with the same 403.
+     * Callers MUST check current state via getById before invoking — there is
+     * no idempotency at the API layer.
+     *
+     * @param string $reservationId Reservation UUID (must be in Optional state)
+     * @return Reservation Confirmed reservation object (re-fetched)
+     * @throws MewsApiException On 403 (already-confirmed, cancelled, or other policy block)
+     */
+    public function confirm(string $reservationId): Reservation
+    {
+        $body = $this->httpClient->buildRequestBody([
+            'ReservationIds' => [$reservationId],
+        ]);
+
+        $response = $this->httpClient->post('/api/connector/v1/reservations/confirm', $body);
+
+        // /reservations/confirm returns {"ReservationIds": [...]} — no full
+        // reservation object. Re-fetch to honour the Reservation return type.
+        if (empty($response['ReservationIds'] ?? [])) {
+            throw new MewsApiException('Failed to confirm reservation', 500);
+        }
+
+        return $this->getById($reservationId);
+    }
+
+    /**
+     * Update reservation state (e.g., Optional → Confirmed).
+     *
+     * @deprecated Use confirm() or cancel() for state transitions.
+     *             /reservations/update silently ignores the State field — verified
+     *             against Mews production 2026-05-30. This method is retained for
+     *             backwards compatibility but does NOT change reservation state.
      *
      * @param string $reservationId Reservation UUID
-     * @param ReservationState $newState New state (Optional, Confirmed, Canceled, etc.)
-     * @return Reservation Updated reservation object
+     * @param ReservationState $newState Ignored by Mews when sent via this path
+     * @return Reservation Reservation as-is (state unchanged)
      * @throws MewsApiException
      */
     public function updateState(string $reservationId, ReservationState $newState): Reservation

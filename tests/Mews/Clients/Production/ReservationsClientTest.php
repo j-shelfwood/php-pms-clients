@@ -308,24 +308,77 @@ it('throws when /reservations/cancel returns empty ReservationIds', function () 
     $reservationsClient->cancel('bfee2c44-1f84-4326-a862-5289598a6cea', 'reason');
 })->throws(MewsApiException::class, 'Failed to cancel reservation');
 
-it('updates reservation state successfully', function () {
+it('confirms reservation via /reservations/confirm and returns the confirmed reservation', function () {
+    // /reservations/confirm mirrors /reservations/cancel: returns only
+    // {"ReservationIds": [...]} on success. Client re-fetches via getById.
+    $confirmEndpointResponse = new Response(200, [], json_encode([
+        'ReservationIds' => ['bfee2c44-1f84-4326-a862-5289598a6cea'],
+    ]));
+
     $confirmedReservation = $this->mockData['Reservations'][0];
     $confirmedReservation['State'] = 'Confirmed';
-    $mockResponse = new Response(200, [], json_encode(['Reservations' => [$confirmedReservation]]));
+    $getByIdResponse = new Response(200, [], json_encode([
+        'Reservations' => [$confirmedReservation],
+        'Customers' => $this->mockData['Customers'] ?? [],
+    ]));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->twice()
+        ->andReturnUsing(function ($url, $options) use ($confirmEndpointResponse, $getByIdResponse) {
+            if (str_contains($url, '/reservations/confirm')) {
+                $body = $options['json'] ?? [];
+                expect($body['ReservationIds'] ?? null)->toBe(['bfee2c44-1f84-4326-a862-5289598a6cea']);
+                return $confirmEndpointResponse;
+            }
+            return $getByIdResponse;
+        });
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $reservationsClient = new ReservationsClient($mewsClient);
+
+    $reservation = $reservationsClient->confirm('bfee2c44-1f84-4326-a862-5289598a6cea');
+
+    expect($reservation)->toBeInstanceOf(Reservation::class)
+        ->and($reservation->state)->toBe(ReservationState::Confirmed);
+});
+
+it('throws when /reservations/confirm returns empty ReservationIds', function () {
+    $emptyResponse = new Response(200, [], json_encode(['ReservationIds' => []]));
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')->once()->andReturn($emptyResponse);
+
+    $mewsClient = new MewsHttpClient($this->config, $httpClient);
+    $reservationsClient = new ReservationsClient($mewsClient);
+
+    $reservationsClient->confirm('bfee2c44-1f84-4326-a862-5289598a6cea');
+})->throws(MewsApiException::class, 'Failed to confirm reservation');
+
+it('updateState (deprecated) still hits /reservations/update for non-state field updates', function () {
+    // The state field itself is silently ignored by Mews — verified against
+    // production. This test pins the wire behavior of the deprecated path so
+    // callers know it does NOT transition state. Use confirm() / cancel() instead.
+    $unchangedReservation = $this->mockData['Reservations'][0]; // State stays Optional in real-world
+    $mockResponse = new Response(200, [], json_encode(['Reservations' => [$unchangedReservation]]));
 
     $httpClient = Mockery::mock(Client::class);
     $httpClient->shouldReceive('post')
         ->once()
+        ->withArgs(function ($url, $options) {
+            return str_contains($url, '/reservations/update');
+        })
         ->andReturn($mockResponse);
 
     $mewsClient = new MewsHttpClient($this->config, $httpClient);
     $reservationsClient = new ReservationsClient($mewsClient);
 
+    // We intentionally do NOT assert state transitions here — Mews silently
+    // drops them. This test only pins the wire call shape.
     $reservation = $reservationsClient->updateState(
         reservationId: 'bfee2c44-1f84-4326-a862-5289598a6cea',
         newState: ReservationState::Confirmed
     );
 
-    expect($reservation)->toBeInstanceOf(Reservation::class)
-        ->and($reservation->state)->toBe(ReservationState::Confirmed);
+    expect($reservation)->toBeInstanceOf(Reservation::class);
 });

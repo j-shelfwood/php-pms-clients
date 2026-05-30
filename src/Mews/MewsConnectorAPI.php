@@ -608,11 +608,34 @@ class MewsConnectorAPI
     }
 
     /**
-     * Update reservation state (e.g., Optional → Confirmed)
+     * Confirm a previously-Optional reservation via the dedicated Mews endpoint.
+     *
+     * Use this — NOT updateReservationState — to promote Optional → Confirmed.
+     * Mews silently ignores State changes sent through /reservations/update;
+     * /reservations/confirm is the only path that actually transitions state.
+     *
+     * Callers must check current state before invoking (Mews returns 403 on
+     * duplicate confirm or attempts to confirm a cancelled reservation).
+     *
+     * @param string $reservationId Reservation UUID (must be Optional)
+     * @return Reservation Confirmed reservation object
+     * @throws MewsApiException
+     */
+    public function confirmReservation(string $reservationId): Reservation
+    {
+        return $this->reservationsClient->confirm($reservationId);
+    }
+
+    /**
+     * Update reservation state (e.g., Optional → Confirmed).
+     *
+     * @deprecated Use confirmReservation() or cancelReservation() — Mews silently
+     *             ignores the State field when sent through /reservations/update.
+     *             This method does NOT change reservation state in Mews.
      *
      * @param string $reservationId Reservation UUID
-     * @param string $newState New state ('Optional', 'Confirmed', 'Canceled', etc.)
-     * @return Reservation Updated reservation object
+     * @param ReservationState $newState Ignored by Mews
+     * @return Reservation Reservation as-is (state unchanged)
      * @throws MewsApiException
      */
     public function updateReservationState(string $reservationId, ReservationState $newState): Reservation
