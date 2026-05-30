@@ -9,47 +9,65 @@ use Shelfwood\PhpPms\Mews\Responses\ValueObjects\ResourceCategoryAvailability;
 /**
  * AvailabilityResolver — pure helper for interpreting Mews availability metrics.
  *
- * Returns true only when EVERY night in the queried window has at least one
- * apparently-free resource in the target category. This is the conservative
- * "category-level free count" check (Usable − Occupied − OutOfOrderBlocks > 0).
+ * Returns true only when EVERY billable night in the queried window has at least
+ * one free resource in the target category.
  *
- * KNOWN LIMITATIONS — read before relying on a true verdict:
+ * ## Free-resource formula
  *
- *  1. False negatives possible. UsableResources is already net of OOB per Mews,
- *     so subtracting OOB again can hide categories Mews would actually accept.
- *     Empirically (pid=13 d+30: Usable=2 OOB=2 Occupied=0), Mews accepts the
- *     booking even though this helper reports false. We choose the safe side
- *     here: a missed sale beats a charged-but-rejected booking.
+ * Per Mews's own spec ("Service availability metrics, ver 2024-01-22"):
  *
- *  2. False positives still possible. Even when Usable − Occupied − OOB > 0
- *     across the window, Mews can still refuse reservations/add because:
- *       - Per-resource continuity: a 3-night stay needs ONE specific room free
- *         on all 3 nights; this metric is category-level and doesn't reveal
- *         room rotations within the window.
- *       - Rate restrictions: minAdvance/minLength on the selected rate.
- *       - PublicAvailabilityAdjustment, BlockAvailability, AllocatedBlockAvailability
- *         applied at booking time but not modeled here.
+ *   UsableResources = "Number of usable resources (i.e. which are not out of order)"
+ *   Occupied        = "Number of bookings that have been assigned to the resource category"
  *
- * Callers MUST still handle reservations/add 403 "no availability" responses.
- * This helper only catches the obvious "every night has zero free" cases that
- * previously caused quote endpoints to lie before the customer entered payment.
+ * Therefore:    free = UsableResources − Occupied
  *
- * Historical bug (pre-fix): callers used "any night has capacity" → quote endpoint
- * returned available=true even when every night except one was sold out.
+ * Empirically verified across 290 live samples from the Stayci production tenant
+ * (29 categories × 10 windows): the identities `Usable = Active − OOB` and
+ * `Occupied = Confirmed + Optional` hold without exception. Subtracting OOB
+ * again would be double-counting and produced false negatives on every
+ * category with OOB > 0 (~7 of 29 Stayci categories).
+ *
+ * ## N+1 endpoint convention
+ *
+ * Mews getAvailability returns N+1 time-unit entries for an N-night stay where
+ * the last entry corresponds to the CHECKOUT DAY (the day the guest leaves;
+ * not a billable night). Example: a stay 2026-07-30 → 2026-08-02 returns 4
+ * entries mapped to [night1, night2, night3, checkout-day]. The pricing
+ * transformer slices [0..N) for the same reason — see N+1 handling in
+ * MewsPricingTransformer.
+ *
+ * We drop the last index here so the resolver only checks nights the guest
+ * actually occupies. Without this, a fully-booked checkout day (next stay
+ * starts that day) wrongly hid the property from quote.
+ *
+ * ## What this resolver does NOT cover
+ *
+ * Even when this returns true, Mews `reservations/add` can still 403 because of:
+ *  - Per-resource continuity: a 3-night stay needs ONE specific room free
+ *    across all nights. Category-level metrics expose only aggregate counts.
+ *    Mews doesn't surface per-resource availability in this endpoint.
+ *  - Rate restrictions: `minAdvance`, `minLength`, etc. live in restrictions/getAll.
+ *    Filter rates upstream of the booking call.
+ *  - AvailabilityBlock / AllocatedBlockAvailability: rare on standard inventory
+ *    but possible on partner-allotment channels.
+ *
+ * Callers MUST still handle reservations/add 403 "no availability" responses
+ * — this resolver only catches the cases where category metrics themselves
+ * preclude a booking.
  */
 class AvailabilityResolver
 {
     /**
-     * Check whether a specific resource category has at least one apparently-free
-     * resource on EVERY night returned by getAvailability.
+     * Check whether a specific resource category has at least one free resource on
+     * every billable night returned by getAvailability.
      *
      * Returns false when:
      *  - no category matches the optional $resourceCategoryId filter
-     *  - any night has Usable − Occupied − OutOfOrderBlocks ≤ 0
-     *  - metrics arrays are empty (treat as unknown → not available)
+     *  - any billable night has Usable − Occupied ≤ 0
+     *  - the response has zero time-units, or only the checkout-day entry
      *
-     * When $resourceCategoryId is null, ALL categories in the response must be fully
-     * available (rare — callers should normally scope to one category).
+     * When $resourceCategoryId is null, ALL categories in the response must be
+     * fully available (rare — callers should normally scope to one category).
      */
     public static function isFullyAvailable(
         AvailabilityResponse $availability,
@@ -58,6 +76,13 @@ class AvailabilityResolver
         $categories = $availability->resourceCategoryAvailabilities;
 
         if ($categories->isEmpty()) {
+            return false;
+        }
+
+        // For an N-night stay Mews returns N+1 entries — drop the last
+        // (checkout-day). For a 1-entry response there are no billable nights.
+        $billableNightCount = count($availability->timeUnitStartsUtc) - 1;
+        if ($billableNightCount <= 0) {
             return false;
         }
 
@@ -76,7 +101,7 @@ class AvailabilityResolver
 
             $matched = true;
 
-            if (! self::categoryFullyAvailable($category)) {
+            if (! self::categoryFullyAvailable($category, $billableNightCount)) {
                 return false;
             }
         }
@@ -85,31 +110,25 @@ class AvailabilityResolver
     }
 
     /**
-     * Per-category check: every index of UsableResources must yield > 0 free.
+     * Per-category check: every billable-night index must have Usable − Occupied > 0.
      *
-     * Free = Usable − Occupied − OutOfOrderBlocks. This double-counts OOB
-     * vs. how Mews internally computes Usable, but errs on the safe side:
-     * the resolver may say "unavailable" when Mews would have accepted,
-     * but it never says "available" purely on category metrics when those
-     * indicate a sold-out night. False positives can still arise from
-     * per-resource continuity rules — see class-level docblock.
+     * We do NOT subtract OutOfOrderBlocks again because UsableResources already
+     * nets OOB per Mews's spec.
      */
-    private static function categoryFullyAvailable(ResourceCategoryAvailability $category): bool
-    {
+    private static function categoryFullyAvailable(
+        ResourceCategoryAvailability $category,
+        int $billableNightCount
+    ): bool {
         $metrics = $category->metrics;
         $usable = $metrics[ResourceAvailabilityMetricType::UsableResources->value] ?? [];
         $occupied = $metrics[ResourceAvailabilityMetricType::Occupied->value] ?? [];
-        $outOfOrder = $metrics[ResourceAvailabilityMetricType::OutOfOrderBlocks->value] ?? [];
 
-        if ($usable === []) {
+        if ($usable === [] || count($usable) < $billableNightCount) {
             return false;
         }
 
-        foreach ($usable as $index => $usableCount) {
-            $free = $usableCount
-                - ($occupied[$index] ?? 0)
-                - ($outOfOrder[$index] ?? 0);
-
+        for ($i = 0; $i < $billableNightCount; $i++) {
+            $free = $usable[$i] - ($occupied[$i] ?? 0);
             if ($free <= 0) {
                 return false;
             }
