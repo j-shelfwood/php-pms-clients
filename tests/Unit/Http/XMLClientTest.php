@@ -28,6 +28,25 @@ describe('XMLClientTest', function () {
         $client->publicExecutePostRequest('http://test/endpoint', []);
     })->throws(NetworkException::class);
 
+    it('maps a cURL timeout (ConnectException) to NetworkException', function () {
+        $mock = Mockery::mock(ClientInterface::class);
+        $mock->shouldReceive('request')
+            ->andThrow(new \GuzzleHttp\Exception\ConnectException(
+                'cURL error 28: Operation timed out after 30001 milliseconds with 179618 bytes received',
+                new \GuzzleHttp\Psr7\Request('POST', 'test')
+            ));
+
+        $client = new TestXMLClient('http://test', 'apikey', $mock, new NullLogger());
+
+        try {
+            $client->publicExecutePostRequest('http://test/endpoint', []);
+            $this->fail('Expected NetworkException');
+        } catch (NetworkException $e) {
+            expect($e->getPrevious())->toBeInstanceOf(\GuzzleHttp\Exception\ConnectException::class)
+                ->and($e->getMessage())->toContain('cURL error 28');
+        }
+    });
+
     it('throws on API error in XML', function () {
         $mock = Mockery::mock(ClientInterface::class);
         $mock->shouldReceive('request')

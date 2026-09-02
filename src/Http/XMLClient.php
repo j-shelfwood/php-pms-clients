@@ -70,11 +70,18 @@ abstract class XMLClient
                 throw new NetworkException('Received empty response body from API.');
             }
             return $body;
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
+        } catch (\GuzzleHttp\Exception\TransferException $e) {
+            // TransferException covers both RequestException (HTTP 4xx/5xx) and
+            // ConnectException (DNS, connect and cURL 28 read timeouts). Catching
+            // only RequestException let timeouts escape as a generic \Throwable,
+            // which consumers cannot classify as retryable network errors.
+            $response = $e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()
+                ? (string) $e->getResponse()->getBody()
+                : null;
             $this->logger->error('HTTP request failed', [
                 'url' => $url,
                 'error' => $e->getMessage(),
-                'response_body' => $e->hasResponse() ? (string) $e->getResponse()->getBody() : null,
+                'response_body' => $response,
             ]);
             throw new NetworkException('HTTP request failed: ' . $e->getMessage(), $e->getCode(), $e);
         }
