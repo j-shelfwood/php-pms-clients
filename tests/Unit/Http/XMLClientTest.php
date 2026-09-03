@@ -47,6 +47,24 @@ describe('XMLClientTest', function () {
         }
     });
 
+    it('passes a configured timeout to Guzzle and defaults to 30', function () {
+        $seen = [];
+        $mock = Mockery::mock(ClientInterface::class);
+        $mock->shouldReceive('request')->twice()->andReturnUsing(function ($m, $u, $o) use (&$seen) {
+            $seen[] = $o['timeout'];
+            return new Response(200, [], '<ok/>');
+        });
+
+        (new TestXMLClient('http://test', 'k', $mock, new NullLogger()))->publicExecutePostRequest('http://test/e', []);
+        (new TestXMLClient('http://test', 'k', $mock, new NullLogger(), null, null, 60, 60, 90))->publicExecutePostRequest('http://test/e', []);
+
+        expect($seen)->toBe([30, 90]);
+    });
+
+    it('rejects a non-positive timeout', function () {
+        new TestXMLClient('http://test', 'k', Mockery::mock(ClientInterface::class), new NullLogger(), null, null, 60, 60, 0);
+    })->throws(\InvalidArgumentException::class);
+
     it('throws on API error in XML', function () {
         $mock = Mockery::mock(ClientInterface::class);
         $mock->shouldReceive('request')

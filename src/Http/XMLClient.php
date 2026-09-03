@@ -19,6 +19,7 @@ abstract class XMLClient
     protected LoggerInterface $logger;
     protected string $baseUrl;
     protected string $apiKey;
+    /** Per-request Guzzle timeout in seconds. Calendar payloads from xmlsync.bookingmanager.com run to 300 KB and have exceeded 30 s. */
     protected int $defaultTimeout = 30;
     protected array $defaultHeaders = ['Accept' => 'application/xml'];
     protected ?CacheInterface $cache = null;
@@ -34,8 +35,15 @@ abstract class XMLClient
         ?CacheInterface $cache = null,
         ?string $rateLimitKey = null,
         int $rateLimitMaxRequests = 60,
-        int $rateLimitWindowSeconds = 60
+        int $rateLimitWindowSeconds = 60,
+        ?int $timeout = null
     ) {
+        if ($timeout !== null) {
+            if ($timeout < 1) {
+                throw new \InvalidArgumentException('timeout must be a positive number of seconds');
+            }
+            $this->defaultTimeout = $timeout;
+        }
         $this->baseUrl = rtrim($baseUrl, '/'); // Remove trailing slash to prevent double slashes
         $this->apiKey = $apiKey;
         $this->httpClient = $httpClient ?? new Client();

@@ -36,7 +36,8 @@ class BookingManagerAPI extends XMLClient
         ?\Psr\SimpleCache\CacheInterface $cache = null,
         ?string $rateLimitKey = null,
         int $rateLimitMaxRequests = 60,
-        int $rateLimitWindowSeconds = 60
+        int $rateLimitWindowSeconds = 60,
+        ?int $timeout = null
     ) {
         parent::__construct(
             $baseUrl,
@@ -46,7 +47,8 @@ class BookingManagerAPI extends XMLClient
             $cache,
             $rateLimitKey,
             $rateLimitMaxRequests,
-            $rateLimitWindowSeconds
+            $rateLimitWindowSeconds,
+            $timeout
         );
     }
 
