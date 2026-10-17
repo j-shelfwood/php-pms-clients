@@ -5,7 +5,6 @@
   Captured: 2026-01-25 (v5.2.0 fix)
   Last Validated: 2026-01-25
   Validation Test: tests/Integration/BookingManager/CalendarChangesIntegrationTest.php
-  Auto-Validation: .github/workflows/validate-mocks.yml (daily)
 
   Response Structure:
   - Root <changes> element (no attributes)
