@@ -18,6 +18,8 @@ class CreateReservationPayload
         public readonly ReservationState $state = ReservationState::Confirmed,
         public readonly ?string $notes = null,
         public readonly ?Carbon $releaseUtc = null,
+        /** @var TimeUnitPrice[]|null Per-night prices; Mews `TimeUnitPrices` */
+        public readonly ?array $timeUnitPrices = null,
     ) {
         $this->validate();
     }
@@ -35,6 +37,52 @@ class CreateReservationPayload
         if ($this->state === ReservationState::Optional && $this->releaseUtc === null) {
             throw new \InvalidArgumentException('ReleaseUtc required for Optional reservations');
         }
+
+        if ($this->timeUnitPrices !== null) {
+            $this->validateTimeUnitPrices($this->timeUnitPrices);
+        }
+    }
+
+    private function validateTimeUnitPrices(array $prices): void
+    {
+        if ($prices === []) {
+            throw new \InvalidArgumentException('TimeUnitPrices cannot be an empty array; pass null to omit');
+        }
+
+        $nights = $this->nights();
+        $seen = [];
+
+        foreach ($prices as $price) {
+            if (! $price instanceof TimeUnitPrice) {
+                throw new \InvalidArgumentException('TimeUnitPrices must contain only TimeUnitPrice instances');
+            }
+
+            if ($price->index < 0 || $price->index >= $nights) {
+                throw new \InvalidArgumentException(sprintf(
+                    'TimeUnitPrice Index %d out of range 0..%d',
+                    $price->index,
+                    $nights - 1,
+                ));
+            }
+
+            if (isset($seen[$price->index])) {
+                throw new \InvalidArgumentException(sprintf('Duplicate TimeUnitPrice Index %d', $price->index));
+            }
+
+            $seen[$price->index] = true;
+        }
+    }
+
+    /**
+     * Number of nights as the difference between the UTC calendar dates of
+     * StartUtc and EndUtc.
+     */
+    private function nights(): int
+    {
+        $start = $this->startUtc->copy()->utc()->startOfDay();
+        $end = $this->endUtc->copy()->utc()->startOfDay();
+
+        return (int) $start->diffInDays($end);
     }
 
     public function toArray(): array
@@ -49,6 +97,9 @@ class CreateReservationPayload
             'State' => $this->state->value,
             'Notes' => $this->notes,
             'ReleasedUtc' => $this->releaseUtc?->copy()->utc()->toIso8601ZuluString(),
+            'TimeUnitPrices' => $this->timeUnitPrices === null
+                ? null
+                : array_map(fn (TimeUnitPrice $price) => $price->toArray(), array_values($this->timeUnitPrices)),
         ], fn($value) => $value !== null);
     }
 }
