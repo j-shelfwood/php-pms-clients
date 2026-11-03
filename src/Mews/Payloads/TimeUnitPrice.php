@@ -76,6 +76,9 @@ final class TimeUnitPrice
         }
     }
 
+    /**
+     * @return array{Index: int, Amount: array<string, mixed>}
+     */
     public function toArray(): array
     {
         $amount = ['Currency' => $this->currency];

@@ -43,6 +43,9 @@ class CreateReservationPayload
         }
     }
 
+    /**
+     * @param array<mixed> $prices Untrusted caller input; elements are checked to be TimeUnitPrice
+     */
     private function validateTimeUnitPrices(array $prices): void
     {
         if ($prices === []) {
