@@ -53,6 +53,7 @@ use Shelfwood\PhpPms\Mews\Payloads\CreateCustomerPayload;
 use Shelfwood\PhpPms\Mews\Payloads\UpdateCustomerPayload;
 use Shelfwood\PhpPms\Mews\Payloads\CreateReservationPayload;
 use Shelfwood\PhpPms\Mews\Payloads\UpdateReservationPayload;
+use Shelfwood\PhpPms\Mews\Payloads\TimeUnitPrice;
 
 /**
  * Mews Connector API Facade
@@ -519,6 +520,7 @@ class MewsConnectorAPI
      * @param string|null $notes Notes (optional)
      * @param Carbon|null $releasedUtc Release date/time (required for Optional)
      * @param bool $sendConfirmationEmail Whether to send confirmation email
+     * @param TimeUnitPrice[]|null $timeUnitPrices Per-night prices sent as `TimeUnitPrices` (optional)
      * @return Reservation Created reservation object
      * @throws MewsApiException
      */
@@ -533,7 +535,8 @@ class MewsConnectorAPI
         ReservationState $state = ReservationState::Confirmed,
         ?string $notes = null,
         ?Carbon $releasedUtc = null,
-        bool $sendConfirmationEmail = true
+        bool $sendConfirmationEmail = true,
+        ?array $timeUnitPrices = null
     ): Reservation {
         $payload = new CreateReservationPayload(
             serviceId: $serviceId,
@@ -545,7 +548,8 @@ class MewsConnectorAPI
             requestedCategoryId: $requestedCategoryId,
             state: $state,
             notes: $notes,
-            releaseUtc: $releasedUtc
+            releaseUtc: $releasedUtc,
+            timeUnitPrices: $timeUnitPrices
         );
 
         return $this->reservationsClient->create($payload, $sendConfirmationEmail);

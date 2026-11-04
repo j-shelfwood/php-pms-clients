@@ -6,6 +6,7 @@ use GuzzleHttp\Psr7\Response;
 use Shelfwood\PhpPms\Mews\Config\MewsConfig;
 use Shelfwood\PhpPms\Mews\MewsConnectorAPI;
 use Shelfwood\PhpPms\Mews\Enums\ReservationState;
+use Shelfwood\PhpPms\Mews\Payloads\TimeUnitPrice;
 use Shelfwood\PhpPms\Mews\Responses\AvailabilityResponse;
 use Shelfwood\PhpPms\Mews\Responses\PricingResponse;
 use Shelfwood\PhpPms\Mews\Responses\ValueObjects\Reservation;
@@ -148,6 +149,83 @@ it('creates reservation from params', function () {
     );
 
     expect($reservation)->toBeInstanceOf(Reservation::class);
+});
+
+it('passes TimeUnitPrices from params into the reservations/add body', function () {
+    $mockData = json_decode(
+        file_get_contents(__DIR__ . '/../../mocks/mews/responses/reservations-add.json'),
+        true
+    );
+
+    $captured = null;
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/api/connector/v1/reservations/add#'),
+            Mockery::on(function ($options) use (&$captured) {
+                $captured = $options['json'];
+                return true;
+            })
+        )
+        ->andReturn(new Response(200, [], json_encode($mockData)));
+
+    $api = new MewsConnectorAPI($this->config, $httpClient);
+
+    $api->createReservationFromParams(
+        serviceId: 'bd26d8db-86a4-4f18-9e94-1b2362a1073c',
+        customerId: '35d4b117-4e60-44a3-9580-c1deae0557c1',
+        rateId: 'ed4b660b-19d0-434b-9360-a4de2101ed08',
+        startUtc: Carbon::parse('2025-01-14T23:00:00Z'),
+        endUtc: Carbon::parse('2025-01-16T23:00:00Z'),
+        personCounts: [
+            ['AgeCategoryId' => '1f67644f-052d-4863-acdf-ae1600c60ca0', 'Count' => 2],
+        ],
+        timeUnitPrices: [
+            TimeUnitPrice::gross(0, 149.0, 'EUR', ['NL-2019-L']),
+            TimeUnitPrice::gross(1, 159.0, 'EUR', ['NL-2019-L']),
+        ],
+    );
+
+    expect($captured['Reservations'][0]['TimeUnitPrices'])->toBe([
+        ['Index' => 0, 'Amount' => ['Currency' => 'EUR', 'GrossValue' => 149.0, 'TaxCodes' => ['NL-2019-L']]],
+        ['Index' => 1, 'Amount' => ['Currency' => 'EUR', 'GrossValue' => 159.0, 'TaxCodes' => ['NL-2019-L']]],
+    ])->and($captured['Reservations'][0])->not->toHaveKey('TimeUnitAmount');
+});
+
+it('omits TimeUnitPrices from the reservations/add body when not given', function () {
+    $mockData = json_decode(
+        file_get_contents(__DIR__ . '/../../mocks/mews/responses/reservations-add.json'),
+        true
+    );
+
+    $captured = null;
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')
+        ->once()
+        ->with(
+            Mockery::pattern('#/api/connector/v1/reservations/add#'),
+            Mockery::on(function ($options) use (&$captured) {
+                $captured = $options['json'];
+                return true;
+            })
+        )
+        ->andReturn(new Response(200, [], json_encode($mockData)));
+
+    $api = new MewsConnectorAPI($this->config, $httpClient);
+
+    $api->createReservationFromParams(
+        serviceId: 'bd26d8db-86a4-4f18-9e94-1b2362a1073c',
+        customerId: '35d4b117-4e60-44a3-9580-c1deae0557c1',
+        rateId: 'ed4b660b-19d0-434b-9360-a4de2101ed08',
+        startUtc: Carbon::parse('2025-01-14T23:00:00Z'),
+        endUtc: Carbon::parse('2025-01-16T23:00:00Z'),
+        personCounts: [
+            ['AgeCategoryId' => '1f67644f-052d-4863-acdf-ae1600c60ca0', 'Count' => 2],
+        ],
+    );
+
+    expect($captured['Reservations'][0])->not->toHaveKey('TimeUnitPrices');
 });
 
 it('updates reservation state via enum', function () {
