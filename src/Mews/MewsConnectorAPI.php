@@ -709,7 +709,8 @@ class MewsConnectorAPI
      * by property managers or automatically by the system.
      *
      * Note: Uses resourceBlocks/getAll endpoint with ResourceBlockIds filter, as there is no
-     * dedicated single-block retrieval endpoint in the Mews API.
+     * dedicated single-block retrieval endpoint in the Mews API. Returns deleted
+     * blocks as well (isActive false), whatever their dates.
      *
      * @param string $blockId Resource block UUID
      * @param string|null $enterpriseId Optional enterprise UUID for scoping (defaults to all accessible)
@@ -719,15 +720,13 @@ class MewsConnectorAPI
      */
     public function getResourceBlock(string $blockId, ?string $enterpriseId = null): ?ResourceBlock
     {
-        // Mews API limit: 3 months + 1 day (3M1D)
-        // Use 90-day window centered on today for webhook block lookups
-        $now = \Carbon\Carbon::now();
+        // ResourceBlockIds alone is a valid filter, so no CollidingUtc window: a
+        // window drops blocks dated outside it (a block a year ahead). Deleted
+        // blocks are requested too: a deletion webhook must still resolve the
+        // block's resource and dates so the freed range can be re-synced.
         $payload = [
             'ResourceBlockIds' => [$blockId],
-            'CollidingUtc' => [
-                'StartUtc' => $now->copy()->subDays(45)->format('Y-m-d\TH:i:s\Z'),
-                'EndUtc' => $now->copy()->addDays(45)->format('Y-m-d\TH:i:s\Z'),
-            ],
+            'ActivityStates' => ['Active', 'Deleted'],
             'Limitation' => [
                 'Count' => 1,
             ],

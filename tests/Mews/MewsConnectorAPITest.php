@@ -281,7 +281,9 @@ it('fetches resource block by ID', function () {
             Mockery::pattern('#/api/connector/v1/resourceBlocks/getAll#'),
             Mockery::on(function ($options) {
                 $body = $options['json'];
-                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'Client', 'ResourceBlockIds', 'CollidingUtc', 'Limitation']);
+                expect($body)->toHaveKeys(['ClientToken', 'AccessToken', 'Client', 'ResourceBlockIds', 'ActivityStates', 'Limitation']);
+                expect($body)->not->toHaveKey('CollidingUtc');
+                expect($body['ActivityStates'])->toBe(['Active', 'Deleted']);
                 expect($body['ResourceBlockIds'])->toContain('73dd4eb5-1c8e-48c1-9677-ae4500b918ab');
                 expect($body['Limitation']['Count'])->toBe(1);
                 return true;
@@ -301,6 +303,23 @@ it('fetches resource block by ID', function () {
         ->and($block->assignedResourceId)->toBe('aea0d575-0284-4958-b387-ab1300d8fa6b')
         ->and($block->type)->toBe('OutOfOrder')
         ->and($block->name)->toBe('Space block unit: Spatie room sdsdxc (28-02-26 - 27-02-27)');
+});
+
+it('returns a deleted resource block so its dates can be re-synced', function () {
+    $mockData = json_decode(
+        file_get_contents(__DIR__ . '/../../mocks/mews/responses/resourceblocks-get.json'),
+        true
+    );
+    $mockData['ResourceBlocks'][0]['IsActive'] = false;
+
+    $httpClient = Mockery::mock(Client::class);
+    $httpClient->shouldReceive('post')->once()->andReturn(new Response(200, [], json_encode($mockData)));
+
+    $block = (new MewsConnectorAPI($this->config, $httpClient))->getResourceBlock('73dd4eb5-1c8e-48c1-9677-ae4500b918ab');
+
+    expect($block)->not->toBeNull()
+        ->and($block->isActive)->toBeFalse()
+        ->and($block->assignedResourceId)->toBe('aea0d575-0284-4958-b387-ab1300d8fa6b');
 });
 
 it('returns null when resource block not found', function () {
